@@ -13,7 +13,7 @@ type HeatmapData = {
   value: number;
 };
 
-async function fetchGithubPage(name: string): Promise<HeatmapData[]> {
+async function fetchGithubPage(name: string) {
   const data = await fetch(
     `https://github.com/${name}?tab=overview&from=2023-01-01`,
   );
@@ -38,19 +38,32 @@ async function fetchGithubPage(name: string): Promise<HeatmapData[]> {
       // Extract and log data from each td
       tdElements.forEach((td) => {
         const date = td.getAttribute("data-date");
-        const level = td.getAttribute("data-level");
-        if (date && level) {
-          heatmapData.push({
-            day: date,
-            value: parseInt(level, 10),
-          });
+
+        // find in the td elements, the <tool-tip> with the property for=td.id
+
+        const toolTip = tr.querySelector(`[for=${td.id}]`);
+        // text can be {number} contributions... or "No contributions"
+        const text = toolTip?.text.trim().split(" ")[0];
+        if (!text || !date) {
+          return;
         }
+        const count = !/\D/.test(text) ? parseInt(text) : 0;
+
+        heatmapData.push({
+          day: date,
+          value: count,
+        });
       });
     });
   } else {
     console.error("Tbody not found in the HTML content");
   }
-  return heatmapData;
+  // find <img src="https://avatars.githubusercontent.com/u/39114868?v=4" alt="" size="32" height="32" width="32" data-view-component="true" class="avatar circle"/>
+  const avatar = doc.querySelector("img.avatar")?.getAttribute("src");
+  return {
+    avatar,
+    heatmapData,
+  };
 }
 
 // If succeeded
@@ -159,7 +172,7 @@ async function fetchFromSocialData(input: {
     throw new Error(json.message);
   }
   const oldestSnowflake = json.tweets[json.tweets.length - 1]?.id_str;
-  console.log("Oldest snowflake", oldestSnowflake);
+
   if (!oldestSnowflake) {
     return json.tweets;
   }
@@ -207,46 +220,47 @@ async function fetchTweetsFromUser(name: string): Promise<HeatmapData[]> {
 }
 
 export default async function Page() {
-  const pageData = await fetchGithubPage("RhysSullivan");
+  const githubName = "RhysSullivan";
+  const { avatar, heatmapData: pageData } = await fetchGithubPage(githubName);
   const tweets = await fetchTweetsFromUser("RhysSullivan");
 
   const pageDataMap = new Map(pageData.map((d) => [d.day, d.value]));
   const tweetsMap = new Map(tweets.map((d) => [d.day, d.value]));
 
-  // Merge the two, if tweets is bigger, set the value to negative, if pageData is bigger, set the value to positive
+  const keys = new Set([...pageDataMap.keys(), ...tweetsMap.keys()]);
   const mergedData = new Map<string, number>();
-  for (const [day, value] of pageDataMap) {
-    mergedData.set(day, value);
-  }
-
-  for (const [day, value] of tweetsMap) {
-    const existing = mergedData.get(day) ?? 0;
-    if (existing < -value) {
-      mergedData.set(day, value);
-    }
-  }
+  keys.forEach((key) => {
+    const pageValue = pageDataMap.get(key) ?? 0;
+    const tweetValue = tweetsMap.get(key) ?? 0;
+    mergedData.set(key, pageValue > tweetValue ? pageValue : -tweetValue);
+  });
 
   const mergedAsArray = Array.from(mergedData).map(([day, value]) => {
-    console.log(day, value);
     return { day, value };
   });
 
+  const tweetCount = tweets.reduce((acc, tweet) => {
+    return acc + tweet.value;
+  }, 0);
+  const commitCount = pageData.reduce((acc, commit) => {
+    return acc + commit.value;
+  }, 0);
   return (
     <div>
-      <h2>Tweet count: 0</h2>
+      <a href={`https://github.com/${githubName}`}>
+        <div>
+          <span>{githubName}</span>
+          <img src={avatar} alt="avatar" />
+        </div>
+      </a>
+      <span>Tweet count: {tweetCount}</span>
+      <br />
+      <span>Commit count: {commitCount}</span>
       <div className="h-[400px] max-w-[70%]">
         <ClientHeatmap
           data={mergedAsArray}
           from="2023-01-01"
           to="2023-12-31"
-          emptyColor="#eeeeee"
-          minValue={0}
-          colors={[
-            // Go from Twitter blue, to gray, to GitHub green
-            "#28a745",
-            "#eeeeee",
-            "#1DA1F2",
-          ]}
           margin={{ top: 40, right: 40, bottom: 100, left: 40 }}
           dayBorderWidth={2}
         />
