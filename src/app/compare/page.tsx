@@ -1,70 +1,13 @@
-import { parse } from "node-html-parser";
-import { ClientHeatmap } from "../_components/heatmap";
+import type { HeatmapData } from "~/lib/utils";
+import { HeatmapCalendar } from "../_components/heatmap";
 import { Redis } from "@upstash/redis";
+import { fetchGithubPage } from "~/lib/github";
 
 const redis = new Redis({
   url: process.env.UPSTASH_URL!,
   token: process.env.UPSTASH_TOKEN!,
 });
 // export const runtime = "edge";
-
-type HeatmapData = {
-  day: string;
-  value: number;
-};
-
-async function fetchGithubPage(name: string) {
-  const data = await fetch(
-    `https://github.com/${name}?tab=overview&from=2023-01-01`,
-  );
-  // Assuming you have access to the HTML content as a string
-  const htmlContent = await data.text();
-  const doc = parse(htmlContent);
-
-  // Get the tbody element
-  const tbody = doc.querySelector("tbody");
-
-  const heatmapData: HeatmapData[] = [];
-  // Check if tbody is found
-  if (tbody) {
-    // Get all the tr elements inside tbody
-    const trElements = tbody.querySelectorAll("tr");
-
-    // Iterate through each tr element
-    trElements.forEach((tr) => {
-      // Get all the td elements inside each tr
-      const tdElements = tr.querySelectorAll("td");
-
-      // Extract and log data from each td
-      tdElements.forEach((td) => {
-        const date = td.getAttribute("data-date");
-
-        // find in the td elements, the <tool-tip> with the property for=td.id
-
-        const toolTip = tr.querySelector(`[for=${td.id}]`);
-        // text can be {number} contributions... or "No contributions"
-        const text = toolTip?.text.trim().split(" ")[0];
-        if (!text || !date) {
-          return;
-        }
-        const count = !/\D/.test(text) ? parseInt(text) : 0;
-
-        heatmapData.push({
-          day: date,
-          value: count,
-        });
-      });
-    });
-  } else {
-    console.error("Tbody not found in the HTML content");
-  }
-  // find <img src="https://avatars.githubusercontent.com/u/39114868?v=4" alt="" size="32" height="32" width="32" data-view-component="true" class="avatar circle"/>
-  const avatar = doc.querySelector("img.avatar")?.getAttribute("src");
-  return {
-    avatar,
-    heatmapData,
-  };
-}
 
 // If succeeded
 type SuccessResponse = {
@@ -171,6 +114,7 @@ async function fetchFromSocialData(input: {
   if ("status" in json) {
     throw new Error(json.message);
   }
+
   const oldestSnowflake = json.tweets[json.tweets.length - 1]?.id_str;
 
   if (!oldestSnowflake) {
@@ -221,7 +165,12 @@ async function fetchTweetsFromUser(name: string): Promise<HeatmapData[]> {
 
 export default async function Page() {
   const githubName = "RhysSullivan";
-  const { avatar, heatmapData: pageData } = await fetchGithubPage(githubName);
+  const {
+    avatar,
+    heatmapData: pageData,
+    twitter,
+  } = await fetchGithubPage(githubName);
+  console.log(twitter);
   const tweets = await fetchTweetsFromUser("RhysSullivan");
 
   const pageDataMap = new Map(pageData.map((d) => [d.day, d.value]));
@@ -236,7 +185,7 @@ export default async function Page() {
   });
 
   const mergedAsArray = Array.from(mergedData).map(([day, value]) => {
-    return { day, value };
+    return { date: day, count: value };
   });
 
   const tweetCount = tweets.reduce((acc, tweet) => {
@@ -257,14 +206,20 @@ export default async function Page() {
       <br />
       <span>Commit count: {commitCount}</span>
       <div className="h-[400px] max-w-[70%]">
-        <ClientHeatmap
-          data={mergedAsArray}
-          from="2023-01-01"
-          to="2023-12-31"
-          margin={{ top: 40, right: 40, bottom: 100, left: 40 }}
-          dayBorderWidth={2}
+        <HeatmapCalendar
+          values={mergedAsArray}
+          startDate={"2023-01-01"}
+          endDate="2023-12-31"
         />
       </div>
+
+      {/* 70% green 30% blue from top left to bottom right */}
+      <div
+        className="size-[32px]"
+        style={{
+          background: `linear-gradient(45deg, #1DA1F2 70%, #28a745 30%)`,
+        }}
+      />
     </div>
   );
 }

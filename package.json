@@ -14,6 +14,9 @@
   "dependencies": {
     "@clerk/nextjs": "^4.29.1",
     "@nivo/calendar": "^0.84.0",
+    "@nivo/core": "^0.84.0",
+    "@nivo/legends": "^0.84.0",
+    "@nivo/tooltip": "^0.84.0",
     "@octokit/core": "^5.1.0",
     "@octokit/rest": "^20.0.2",
     "@octokit/types": "^12.4.0",
