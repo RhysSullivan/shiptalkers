@@ -284,7 +284,7 @@ export default async function Page(props: {
     0,
   );
   return (
-    <div className="flex min-h-full min-w-full flex-grow flex-col items-center justify-center">
+    <div className="flex min-h-full min-w-full flex-grow flex-col items-center py-8">
       <div className="mx-auto flex w-[1200px] flex-row items-center justify-between gap-4">
         <div className="flex flex-col">
           <span className="text-lg">{githubName}</span>
