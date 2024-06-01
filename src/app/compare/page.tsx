@@ -206,6 +206,7 @@ async function fetchTweetsFromUser(
 
 import { RatioPie } from "./pie";
 import { GithubIcon, TwitterIcon } from "lucide-react";
+import { RatioBarChart } from "./bar-chart";
 
 // import { createStreamableUI } from "ai/rsc";
 // // @ts-expect-error boo
@@ -318,6 +319,15 @@ export default async function Page(props: {
       </div>
       <div className="h-[170px] w-[1200px]">
         <Heatmap data={chunked} />
+      </div>
+      <div className="h-[170px] w-[1200px]">
+        <RatioBarChart
+          data={chunked.map((chunk) => ({
+            day: `${chunk[0]!.day} - ${chunk.at(-1)!.day}`,
+            tweets: chunk.reduce((acc, data) => acc + data.tweets, 0),
+            commits: chunk.reduce((acc, data) => acc + data.commits, 0),
+          }))}
+        />
       </div>
 
       {/* <Suspense>
