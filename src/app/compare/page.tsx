@@ -1,13 +1,15 @@
 import type { HeatmapData } from "~/lib/utils";
-import { HeatmapCalendar } from "../_components/heatmap";
+
 import { Redis } from "@upstash/redis";
 import { fetchGithubPage } from "~/lib/github";
-
+import { Heatmap } from "./heatmap";
+import { chunk } from "lodash";
+import { Suspense } from "react";
 const redis = new Redis({
   url: process.env.UPSTASH_URL!,
   token: process.env.UPSTASH_TOKEN!,
 });
-// export const runtime = "edge";
+export const runtime = "edge";
 
 // If succeeded
 type SuccessResponse = {
@@ -163,63 +165,85 @@ async function fetchTweetsFromUser(name: string): Promise<HeatmapData[]> {
   return asArray;
 }
 
+import { createStreamableUI } from "ai/rsc";
+
+// @ts-expect-error boo
+export async function GetWeather() {
+  const weatherUI = createStreamableUI();
+
+  weatherUI.update(<div style={{ color: "gray" }}>Loading...</div>);
+
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  setTimeout(async () => {
+    // wait 3 seconds
+    weatherUI.update(<div style={{ color: "red" }}>Still Loading...</div>);
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+    weatherUI.done(<div>It's a sunny day!</div>);
+  }, 1000);
+
+  return weatherUI.value;
+}
+
 export default async function Page() {
   const githubName = "RhysSullivan";
   const {
     avatar,
-    heatmapData: pageData,
+    heatmapData: githubData,
     twitter,
   } = await fetchGithubPage(githubName);
-  console.log(twitter);
   const tweets = await fetchTweetsFromUser("RhysSullivan");
 
-  const pageDataMap = new Map(pageData.map((d) => [d.day, d.value]));
-  const tweetsMap = new Map(tweets.map((d) => [d.day, d.value]));
-
-  const keys = new Set([...pageDataMap.keys(), ...tweetsMap.keys()]);
-  const mergedData = new Map<string, number>();
-  keys.forEach((key) => {
-    const pageValue = pageDataMap.get(key) ?? 0;
-    const tweetValue = tweetsMap.get(key) ?? 0;
-    mergedData.set(key, pageValue > tweetValue ? pageValue : -tweetValue);
+  const merged = new Map<
+    string,
+    {
+      tweets: number;
+      commits: number;
+    }
+  >();
+  githubData.forEach((data) => {
+    merged.set(data.day, {
+      tweets: 0,
+      commits: data.value,
+    });
+  });
+  tweets.forEach((data) => {
+    const existing = merged.get(data.day);
+    if (existing) {
+      existing.tweets = data.value;
+    } else {
+      merged.set(data.day, {
+        tweets: data.value,
+        commits: 0,
+      });
+    }
   });
 
-  const mergedAsArray = Array.from(mergedData).map(([day, value]) => {
-    return { date: day, count: value };
-  });
+  const keysInOrder = [...merged.keys()].sort(
+    (a, b) => new Date(a).getTime() - new Date(b).getTime(),
+  );
 
-  const tweetCount = tweets.reduce((acc, tweet) => {
-    return acc + tweet.value;
-  }, 0);
-  const commitCount = pageData.reduce((acc, commit) => {
-    return acc + commit.value;
-  }, 0);
+  const dataInOrder = keysInOrder.map((key) => ({
+    day: key,
+    commits: merged.get(key)!.commits,
+    tweets: merged.get(key)!.tweets,
+  }));
+
+  const chunked = chunk(dataInOrder, 7);
+
   return (
-    <div>
+    <div className="flex min-h-full min-w-full flex-grow flex-col items-center justify-center">
       <a href={`https://github.com/${githubName}`}>
         <div>
           <span>{githubName}</span>
-          <img src={avatar} alt="avatar" />
+          <img src={avatar} alt="avatar" className="h-32 w-32" />
         </div>
       </a>
-      <span>Tweet count: {tweetCount}</span>
-      <br />
-      <span>Commit count: {commitCount}</span>
-      <div className="h-[400px] max-w-[70%]">
-        <HeatmapCalendar
-          values={mergedAsArray}
-          startDate={"2023-01-01"}
-          endDate="2023-12-31"
-        />
+      <div className="h-[170px] w-[1200px]">
+        <Heatmap data={chunked} />
       </div>
-
-      {/* 70% green 30% blue from top left to bottom right */}
-      <div
-        className="size-[32px]"
-        style={{
-          background: `linear-gradient(45deg, #1DA1F2 70%, #28a745 30%)`,
-        }}
-      />
+      <Suspense>
+        <GetWeather />
+      </Suspense>
     </div>
   );
 }

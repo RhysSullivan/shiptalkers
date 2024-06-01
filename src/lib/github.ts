@@ -3,7 +3,13 @@ import type { HeatmapData } from "./utils";
 
 export async function fetchGithubPage(name: string) {
     const data = await fetch(
-        `https://github.com/${name}?tab=overview&from=2023-01-01`,
+        `https://github.com/${name}?action=show&controller=profiles&tab=contributions&user_id=${name}`,
+        {
+            headers: {
+                connection: "keep-alive",
+                "X-Requested-With": "XMLHttpRequest",
+            }
+        }
     );
     const htmlContent = await data.text();
     const doc = parse(htmlContent);
