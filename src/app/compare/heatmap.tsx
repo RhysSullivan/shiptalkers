@@ -149,7 +149,7 @@ export function HeatmapSized({
           {(heatmap) =>
             heatmap.map((heatmapBins) =>
               heatmapBins.map((bin) => {
-                const { commits, tweets } = data
+                const { commits, tweets, day } = data
                   .at(bin.column)
                   ?.at(bin.row) ?? {
                   commits: 0,
@@ -177,6 +177,7 @@ export function HeatmapSized({
                             bin: bin.bin,
                             commits,
                             tweets,
+                            day,
                           }),
                         );
                       }}
@@ -201,6 +202,7 @@ export function HeatmapSized({
                             row,
                             column,
                             bin: bin.bin,
+                            day,
                             commits,
                             tweets,
                           }),
@@ -226,6 +228,8 @@ export function HeatmapSized({
                         alert(
                           JSON.stringify({
                             row,
+                            day,
+
                             column,
                             bin: bin.bin,
                             commits,
@@ -256,6 +260,8 @@ export function HeatmapSized({
                             row,
                             column,
                             bin: bin.bin,
+                            day,
+
                             commits,
                             tweets,
                           }),
@@ -281,6 +287,7 @@ export function HeatmapSized({
                             bin: bin.bin,
                             commits,
                             tweets,
+                            day,
                           }),
                         );
                       }}

@@ -85,23 +85,25 @@ async function fetchFromSocialData(input: {
   username: string;
   max_id?: string;
   runs?: number;
-  collectedTweets?: number;
+  collection: Map<string, Tweet>;
   stopDate: Date;
-}): Promise<Tweet[]> {
-  if (input.runs && input.runs > 200) {
-    return []; // base case
+}) {
+  if (input.runs && input.runs > 1000) {
+    console.log("Too many runs, stopping");
+    return;
   }
+
   let query = `from:${input.username}`;
   if (input.max_id) {
-    query += ` max_id:${input.max_id}`;
+    query += ` max_id:${BigInt(input.max_id) - 1n}`;
   }
 
   const queryParams = new URLSearchParams({
     query,
     type: "Latest",
   });
-
   const apiUrl = `https://api.socialdata.tools/twitter/search?${queryParams.toString()}`;
+  console.log(queryParams.toString());
   const res = await fetch(apiUrl, {
     method: "GET",
     headers: {
@@ -110,41 +112,54 @@ async function fetchFromSocialData(input: {
     },
     cache: "force-cache",
   });
-  console.log(
-    `Fetching from snowflake ${input.max_id}, on run ${input.runs}, collected ${input.collectedTweets} tweets`,
-  );
   const json = (await res.json()) as SuccessResponse | ErrorResponse;
 
   if ("status" in json) {
     throw new Error(json.message);
   }
+  const oldestTweet = json.tweets
+    .sort((a, b) => (BigInt(a.id_str) < BigInt(b.id_str) ? 1 : -1))
+    .at(-1);
+  console.log(
+    `Fetching from snowflake ${input.max_id}, on run ${input.runs}, collected ${input.collection.size} tweets, oldest tweet created at ${oldestTweet?.tweet_created_at}`,
+  );
 
-  const lastTweet = json.tweets.at(-1);
-  const oldestSnowflake = json.tweets[json.tweets.length - 1]?.id_str;
-
+  const hasAnyNewTweets = json.tweets.some(
+    (tweet) => !input.collection.has(tweet.id_str),
+  );
+  json.tweets.forEach((tweet) => {
+    console.log(
+      tweet.tweet_created_at,
+      `https://twitter.com/${input.username}/status/${tweet.id_str}`,
+    );
+    input.collection.set(tweet.id_str, tweet);
+  });
   if (
-    !lastTweet?.id_str ||
-    new Date(lastTweet.tweet_created_at) < input.stopDate
+    !oldestTweet?.id_str ||
+    new Date(oldestTweet.tweet_created_at) < input.stopDate ||
+    !hasAnyNewTweets
   ) {
-    if (!lastTweet?.id_str) {
+    if (!oldestTweet?.id_str) {
       console.log("No more tweets to fetch");
-    } else if (new Date(lastTweet.tweet_created_at) < input.stopDate) {
+    } else if (new Date(oldestTweet.tweet_created_at) < input.stopDate) {
       console.log(
         `Reached stop date ${input.stopDate.toISOString()} at tweet created at ${
-          lastTweet.tweet_created_at
+          oldestTweet.tweet_created_at
         }`,
       );
+    } else if (!hasAnyNewTweets) {
+      console.log("Did not find any new tweets");
     }
-    return json.tweets;
+    return;
   }
-  const nextTweets = await fetchFromSocialData({
+  await fetchFromSocialData({
     username: input.username,
-    max_id: oldestSnowflake,
+    max_id: oldestTweet.id_str,
     runs: (input.runs ?? 0) + 1,
-    collectedTweets: (input.collectedTweets ?? 0) + json.tweets.length,
     stopDate: input.stopDate,
+    collection: input.collection,
   });
-  return [...json.tweets, ...nextTweets];
+  return;
 }
 
 async function fetchTweetsFromUser(
@@ -157,12 +172,15 @@ async function fetchTweetsFromUser(
     return cached;
   }
   console.log(`Cache miss for ${name}, fetching tweets`);
-  const allData = await fetchFromSocialData({
+  const collection = new Map<string, Tweet>();
+  await fetchFromSocialData({
     username: name,
     stopDate: stop,
+    collection,
   });
+  const tweets = Array.from(collection.values());
+  console.log(tweets.length);
 
-  const tweets = allData;
   const tweetsByDay = tweets.reduce(
     (acc, tweet) => {
       const date = new Date(tweet.tweet_created_at)
@@ -186,37 +204,41 @@ async function fetchTweetsFromUser(
   return asArray;
 }
 
-import { createStreamableUI } from "ai/rsc";
+import { RatioPie } from "./pie";
+import { GithubIcon, TwitterIcon } from "lucide-react";
 
-// @ts-expect-error boo
-export async function GetWeather() {
-  const weatherUI = createStreamableUI();
+// import { createStreamableUI } from "ai/rsc";
+// // @ts-expect-error boo
+// export async function GetWeather() {
+//   const weatherUI = createStreamableUI();
 
-  weatherUI.update(<div style={{ color: "gray" }}>Loading...</div>);
+//   weatherUI.update(<div style={{ color: "gray" }}>Loading...</div>);
 
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  setTimeout(async () => {
-    // wait 3 seconds
-    weatherUI.update(<div style={{ color: "red" }}>Still Loading...</div>);
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-    weatherUI.done(<div>It's a sunny day!</div>);
-  }, 1000);
+//   // eslint-disable-next-line @typescript-eslint/no-misused-promises
+//   setTimeout(async () => {
+//     // wait 3 seconds
+//     weatherUI.update(<div style={{ color: "red" }}>Still Loading...</div>);
+//     await new Promise((resolve) => setTimeout(resolve, 3000));
+//     weatherUI.done(<div>It's a sunny day!</div>);
+//   }, 1000);
 
-  return weatherUI.value;
-}
+//   return weatherUI.value;
+// }
 
-export default async function Page() {
-  const githubName = "RhysSullivan";
+export default async function Page(props: {
+  searchParams: {
+    github: string;
+    twitter: string;
+  };
+}) {
+  const { github: githubName, twitter: twitterName } = props.searchParams;
   const {
     avatar,
     heatmapData: githubData,
     twitter,
   } = await fetchGithubPage(githubName);
   const tweetsStop = githubData[0]!.day;
-  const tweets = await fetchTweetsFromUser(
-    "RhysSullivan",
-    new Date(tweetsStop),
-  );
+  const tweets = await fetchTweetsFromUser(twitterName, new Date(tweetsStop));
 
   const merged = new Map<
     string,
@@ -262,25 +284,42 @@ export default async function Page() {
   );
   return (
     <div className="flex min-h-full min-w-full flex-grow flex-col items-center justify-center">
-      <a
-        href={`https://github.com/${githubName}`}
-        className="mx-auto w-[1200px]"
-      >
-        <div className="flex flex-col gap-4">
+      <div className="mx-auto flex w-[1200px] flex-row items-center justify-between gap-4">
+        <div className="flex flex-col">
           <span className="text-lg">{githubName}</span>
           <img
-            src={"https://avatars.githubusercontent.com/u/39114868?v=4"}
+            src={`https://github.com/${githubName}.png`}
             alt="avatar"
             className="h-32 w-32"
           />
+          <div className="flex flex-row gap-4">
+            <a
+              href={`https://twitter.com/${twitterName}`}
+              className="flex flex-row items-center gap-2 hover:underline"
+            >
+              <TwitterIcon size={24} />
+              {twitterName}
+            </a>
+            <a
+              href={`
+              https://github.com/${githubName}
+              `}
+              className="flex flex-row items-center gap-2 hover:underline"
+            >
+              <GithubIcon size={24} />
+              {githubName}
+            </a>
+          </div>
           <span className="text-lg">
             {totalCommits} commits and {totalTweets} tweets
           </span>
         </div>
-      </a>
+        <RatioPie commits={totalCommits} tweets={totalTweets} />
+      </div>
       <div className="h-[170px] w-[1200px]">
         <Heatmap data={chunked} />
       </div>
+
       {/* <Suspense>
         <GetWeather />
       </Suspense> */}

@@ -17,11 +17,17 @@ export default function Component() {
         className="flex w-full max-w-2xl flex-col items-center justify-center space-y-4"
         onSubmit={(e) => {
           e.preventDefault();
-          const githubUrl = e.target[0].value;
-          const twitterUrl = e.target[1].value;
-
+          // @ts-expect-error asd
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+          const githubUrl = e.target[0].value as string;
+          // @ts-expect-error asd
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+          const twitterUrl = e.target[1].value as string;
+          // just get the names of both
+          const githubName = githubUrl.split("/").pop();
+          const twitterName = twitterUrl.split("/").pop();
           void router.push(
-            `/compare?github=${githubUrl}&twitter=${twitterUrl}`,
+            `/compare?github=${githubName}&twitter=${twitterName}`,
           );
         }}
       >
