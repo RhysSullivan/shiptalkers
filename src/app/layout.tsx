@@ -29,7 +29,7 @@ export default function RootLayout({
         <TRPCReactProvider cookies={cookies().toString()}>
           <nav className="flex items-center justify-between bg-white p-6 shadow-lg dark:bg-gray-900">
             <a href="/">
-              <h1 className="text-2xl font-bold">Shiptalk</h1>
+              <h1 className="text-2xl font-bold">Shiptalkers</h1>
             </a>
             <div className="space-x-4">
               <a
