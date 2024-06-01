@@ -35,6 +35,7 @@
     "@visx/mock-data": "^3.3.0",
     "@visx/responsive": "^3.10.2",
     "@visx/scale": "^3.5.0",
+    "@visx/shape": "^3.5.0",
     "@visx/visx": "^3.11.0",
     "ai": "^3.1.22",
     "arktype": "1.0.28-alpha",

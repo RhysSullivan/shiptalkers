@@ -77,6 +77,9 @@ importers:
       '@visx/scale':
         specifier: ^3.5.0
         version: 3.5.0
+      '@visx/shape':
+        specifier: ^3.5.0
+        version: 3.5.0(react@18.2.0)
       '@visx/visx':
         specifier: ^3.11.0
         version: 3.11.0(@react-spring/web@9.7.3(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -4138,7 +4141,7 @@ snapshots:
   css-tree@2.3.1:
     dependencies:
       mdn-data: 2.0.30
-      source-map-js: 1.0.2
+      source-map-js: 1.2.0
 
   css-what@6.1.0: {}
 
@@ -5261,7 +5264,7 @@ snapshots:
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@jridgewell/sourcemap-codec': 1.4.15
-      '@jridgewell/trace-mapping': 0.3.20
+      '@jridgewell/trace-mapping': 0.3.25
       '@types/estree': 1.0.5
       acorn: 8.11.2
       aria-query: 5.3.0

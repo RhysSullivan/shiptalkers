@@ -35,30 +35,32 @@ export type HeatmapProps = {
 
 const defaultMargin = { top: 20, left: 0, right: 0, bottom: 0 };
 
-export function HeatmapSized({
-  width,
-  height,
-  events = false,
-  data,
-  margin = defaultMargin,
-  separation = 20,
-}: HeatmapProps) {
+// accessors
+const bins = (d: Bins) => d.bins;
+const count = (d: Bin) => d.count;
+
+function getStuff(args: {
+  data: {
+    day: string;
+    commits: number;
+    tweets: number;
+  }[][];
+  getProperty: (d: { day: string; commits: number; tweets: number }) => number;
+  colorScale: string[];
+}) {
+  const { data, getProperty } = args;
   const binData = data.map((section, index) => {
     return {
       bins: Array.from({ length: 7 }, (_, i) => {
-        const tweets = (section[i]?.tweets ?? 0) * -1;
-        const commits = section[i]?.commits ?? 0;
+        const point = section[i];
         return {
-          count: tweets + commits,
+          count: point ? getProperty(point) : 0,
           bin: i,
         };
       }),
       bin: index,
     };
   });
-  // accessors
-  const bins = (d: Bins) => d.bins;
-  const count = (d: Bin) => d.count;
 
   const colorMax = max(binData, (d) => max(bins(d), count));
   const colorMin = min(binData, (d) => min(bins(d), count));
@@ -72,18 +74,51 @@ export function HeatmapSized({
     domain: [0, bucketSizeMax],
   });
   const colorScale = scaleLinear<string>({
-    range: [
-      lightGreenGitHubCommits,
-      darkGreenGitHubCommits,
-      darkBlueTweets,
-      lightBlueTweets,
-    ],
+    range: args.colorScale,
     domain: [colorMin, colorMax],
   });
   const opacityScale = scaleLinear<number>({
-    range: [0.3, 1],
+    range: [0.4, 1],
     domain: [0, colorMax],
   });
+  return {
+    xScale,
+    yScale,
+    colorScale,
+    opacityScale,
+    colorMax,
+    colorMin,
+    binData,
+  };
+}
+
+export function HeatmapSized({
+  width,
+  height,
+  events = false,
+  data,
+  margin = defaultMargin,
+  separation = 20,
+}: HeatmapProps) {
+  const {
+    colorScale: commitColorScale,
+    binData: commitBinData,
+    opacityScale: commitOpacityScale,
+    xScale,
+    yScale,
+  } = getStuff({
+    data,
+    getProperty: (d) => d.commits,
+    colorScale: [darkGreenGitHubCommits, lightGreenGitHubCommits],
+  });
+
+  const { colorScale: tweetColorScale, opacityScale: tweetOpacityScale } =
+    getStuff({
+      data,
+      getProperty: (d) => d.tweets,
+      colorScale: [darkBlueTweets, lightBlueTweets],
+    });
+
   // bounds
   const size =
     width > margin.left + margin.right
@@ -91,9 +126,8 @@ export function HeatmapSized({
       : width;
   const xMax = size;
   const yMax = height - margin.bottom - margin.top;
+  const binWidth = xMax / commitBinData.length;
 
-  const binWidth = xMax / binData.length;
-  console.log(colorScale(-50));
   xScale.range([0, xMax]);
   yScale.range([yMax, 0]);
 
@@ -107,17 +141,7 @@ export function HeatmapSized({
         <HeatmapRect
           xScale={(d) => xScale(d) ?? 0}
           yScale={(d) => xScale(d) ?? 0}
-          colorScale={(d) => colorScale(d)}
-          opacityScale={
-            // if it's 0, make it .1
-            (d) => {
-              if (!d) return 0.1;
-              // @ts-expect-error baaa
-              if (d > 10) return 1;
-              return opacityScale(d);
-            }
-          }
-          data={binData}
+          data={commitBinData}
           binWidth={binWidth}
           binHeight={binWidth}
           gap={4}
@@ -125,32 +149,143 @@ export function HeatmapSized({
           {(heatmap) =>
             heatmap.map((heatmapBins) =>
               heatmapBins.map((bin) => {
-                const { commits, tweets } = data[bin.column]![bin.row]!;
-                console.log(commits, tweets);
+                const { commits, tweets } = data
+                  .at(bin.column)
+                  ?.at(bin.row) ?? {
+                  commits: 0,
+                  tweets: 0,
+                };
+
+                if (commits <= 0 && tweets <= 0)
+                  return (
+                    <rect
+                      key={`heatmap-rect-${bin.row}-${bin.column}`}
+                      className="visx-heatmap-rect "
+                      width={bin.width}
+                      height={bin.height}
+                      x={bin.x}
+                      y={bin.y}
+                      opacity={0.05}
+                      fill={commits + tweets > 0 ? bin.color : "#000"}
+                      onClick={() => {
+                        if (!events) return;
+                        const { row, column } = bin;
+                        alert(
+                          JSON.stringify({
+                            row,
+                            column,
+                            bin: bin.bin,
+                            commits,
+                            tweets,
+                          }),
+                        );
+                      }}
+                    />
+                  );
+                if (tweets > 0 && commits <= 0) {
+                  return (
+                    <rect
+                      key={`heatmap-rect-${bin.row}-${bin.column}`}
+                      className="visx-heatmap-rect "
+                      width={bin.width}
+                      height={bin.height}
+                      x={bin.x}
+                      y={bin.y}
+                      opacity={tweetOpacityScale(tweets)}
+                      fill={tweetColorScale(tweets)}
+                      onClick={() => {
+                        if (!events) return;
+                        const { row, column } = bin;
+                        alert(
+                          JSON.stringify({
+                            row,
+                            column,
+                            bin: bin.bin,
+                            commits,
+                            tweets,
+                          }),
+                        );
+                      }}
+                    />
+                  );
+                }
+                if (commits > 0 && tweets <= 0) {
+                  return (
+                    <rect
+                      key={`heatmap-rect-${bin.row}-${bin.column}`}
+                      className="visx-heatmap-rect "
+                      width={bin.width}
+                      height={bin.height}
+                      x={bin.x}
+                      y={bin.y}
+                      opacity={commitOpacityScale(commits)}
+                      fill={commitColorScale(commits)}
+                      onClick={() => {
+                        if (!events) return;
+                        const { row, column } = bin;
+                        alert(
+                          JSON.stringify({
+                            row,
+                            column,
+                            bin: bin.bin,
+                            commits,
+                            tweets,
+                          }),
+                        );
+                      }}
+                    />
+                  );
+                }
+                // both commits and tweets, do a square with the ratio of commits to tweets
                 return (
-                  <rect
-                    key={`heatmap-rect-${bin.row}-${bin.column}`}
-                    className="visx-heatmap-rect "
-                    width={bin.width}
-                    height={bin.height}
-                    x={bin.x}
-                    y={bin.y}
-                    opacity={bin.opacity}
-                    fill={commits + tweets > 0 ? bin.color : "#000"}
-                    onClick={() => {
-                      if (!events) return;
-                      const { row, column } = bin;
-                      alert(
-                        JSON.stringify({
-                          row,
-                          column,
-                          bin: bin.bin,
-                          commits,
-                          tweets,
-                        }),
-                      );
-                    }}
-                  />
+                  <>
+                    <rect
+                      key={`heatmap-rect-${bin.row}-${bin.column}`}
+                      className="visx-heatmap-rect "
+                      width={bin.width}
+                      height={bin.height}
+                      x={bin.x}
+                      y={bin.y}
+                      opacity={0.5}
+                      fill={commitColorScale(commits)}
+                      onClick={() => {
+                        if (!events) return;
+                        const { row, column } = bin;
+                        alert(
+                          JSON.stringify({
+                            row,
+                            column,
+                            bin: bin.bin,
+                            commits,
+                            tweets,
+                          }),
+                        );
+                      }}
+                    />
+                    <rect
+                      key={`heatmap-rect-${bin.row}-${bin.column}`}
+                      className="visx-heatmap-rect "
+                      width={bin.width}
+                      height={bin.height}
+                      x={bin.x}
+                      y={bin.y}
+                      opacity={0.5}
+                      fill={tweetColorScale(tweets)}
+                      onClick={() => {
+                        if (!events) return;
+                        const { row, column } = bin;
+                        alert(
+                          JSON.stringify({
+                            row,
+                            column,
+                            bin: bin.bin,
+                            commits,
+                            tweets,
+                          }),
+                        );
+                      }}
+                    />
+                  </>
                 );
               }),
             )

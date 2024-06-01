@@ -86,8 +86,9 @@ async function fetchFromSocialData(input: {
   max_id?: string;
   runs?: number;
   collectedTweets?: number;
+  stopDate: Date;
 }): Promise<Tweet[]> {
-  if (input.runs && input.runs > 5) {
+  if (input.runs && input.runs > 200) {
     return []; // base case
   }
   let query = `from:${input.username}`;
@@ -107,6 +108,7 @@ async function fetchFromSocialData(input: {
       Authorization: `Bearer ${process.env.SOCIAL_DATA_API_KEY}`,
       Accept: "application/json",
     },
+    cache: "force-cache",
   });
   console.log(
     `Fetching from snowflake ${input.max_id}, on run ${input.runs}, collected ${input.collectedTweets} tweets`,
@@ -117,9 +119,22 @@ async function fetchFromSocialData(input: {
     throw new Error(json.message);
   }
 
+  const lastTweet = json.tweets.at(-1);
   const oldestSnowflake = json.tweets[json.tweets.length - 1]?.id_str;
 
-  if (!oldestSnowflake) {
+  if (
+    !lastTweet?.id_str ||
+    new Date(lastTweet.tweet_created_at) < input.stopDate
+  ) {
+    if (!lastTweet?.id_str) {
+      console.log("No more tweets to fetch");
+    } else if (new Date(lastTweet.tweet_created_at) < input.stopDate) {
+      console.log(
+        `Reached stop date ${input.stopDate.toISOString()} at tweet created at ${
+          lastTweet.tweet_created_at
+        }`,
+      );
+    }
     return json.tweets;
   }
   const nextTweets = await fetchFromSocialData({
@@ -127,11 +142,15 @@ async function fetchFromSocialData(input: {
     max_id: oldestSnowflake,
     runs: (input.runs ?? 0) + 1,
     collectedTweets: (input.collectedTweets ?? 0) + json.tweets.length,
+    stopDate: input.stopDate,
   });
   return [...json.tweets, ...nextTweets];
 }
 
-async function fetchTweetsFromUser(name: string): Promise<HeatmapData[]> {
+async function fetchTweetsFromUser(
+  name: string,
+  stop: Date,
+): Promise<HeatmapData[]> {
   const cached = await redis.get<HeatmapData[]>(`${name}-tweets`);
   if (cached) {
     console.log(`Using cached tweets for ${name}`);
@@ -140,8 +159,9 @@ async function fetchTweetsFromUser(name: string): Promise<HeatmapData[]> {
   console.log(`Cache miss for ${name}, fetching tweets`);
   const allData = await fetchFromSocialData({
     username: name,
-    max_id: "1742008566487003505",
+    stopDate: stop,
   });
+
   const tweets = allData;
   const tweetsByDay = tweets.reduce(
     (acc, tweet) => {
@@ -162,6 +182,7 @@ async function fetchTweetsFromUser(name: string): Promise<HeatmapData[]> {
     value: tweetsByDay[day]!,
   }));
   await redis.set<HeatmapData[]>(`${name}-tweets`, asArray);
+  // await redis.set(`${name}-tweets-raw`, tweets);
   return asArray;
 }
 
@@ -191,7 +212,11 @@ export default async function Page() {
     heatmapData: githubData,
     twitter,
   } = await fetchGithubPage(githubName);
-  const tweets = await fetchTweetsFromUser("RhysSullivan");
+  const tweetsStop = githubData[0]!.day;
+  const tweets = await fetchTweetsFromUser(
+    "RhysSullivan",
+    new Date(tweetsStop),
+  );
 
   const merged = new Map<
     string,
@@ -230,20 +255,35 @@ export default async function Page() {
 
   const chunked = chunk(dataInOrder, 7);
 
+  const totalTweets = tweets.reduce((acc, tweet) => acc + tweet.value, 0);
+  const totalCommits = githubData.reduce(
+    (acc, commit) => acc + commit.value,
+    0,
+  );
   return (
     <div className="flex min-h-full min-w-full flex-grow flex-col items-center justify-center">
-      <a href={`https://github.com/${githubName}`}>
-        <div>
-          <span>{githubName}</span>
-          <img src={avatar} alt="avatar" className="h-32 w-32" />
+      <a
+        href={`https://github.com/${githubName}`}
+        className="mx-auto w-[1200px]"
+      >
+        <div className="flex flex-col gap-4">
+          <span className="text-lg">{githubName}</span>
+          <img
+            src={"https://avatars.githubusercontent.com/u/39114868?v=4"}
+            alt="avatar"
+            className="h-32 w-32"
+          />
+          <span className="text-lg">
+            {totalCommits} commits and {totalTweets} tweets
+          </span>
         </div>
       </a>
       <div className="h-[170px] w-[1200px]">
         <Heatmap data={chunked} />
       </div>
-      <Suspense>
+      {/* <Suspense>
         <GetWeather />
-      </Suspense>
+      </Suspense> */}
     </div>
   );
 }
