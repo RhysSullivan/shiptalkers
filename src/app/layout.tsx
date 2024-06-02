@@ -30,27 +30,7 @@ export default function RootLayout({
           <nav className="flex items-center justify-between bg-white p-6 shadow-lg dark:bg-gray-900">
             <a href="/">
               <h1 className="text-2xl font-bold">Shiptalkers</h1>
-            </a>
-            <div className="space-x-4">
-              <a
-                className="text-gray-600 hover:text-gray-800 dark:hover:text-gray-200"
-                href="#"
-              >
-                Home
-              </a>
-              <a
-                className="text-gray-600 hover:text-gray-800 dark:hover:text-gray-200"
-                href="#"
-              >
-                About
-              </a>
-              <a
-                className="text-gray-600 hover:text-gray-800 dark:hover:text-gray-200"
-                href="#"
-              >
-                Contact
-              </a>
-            </div>
+            </a>           
           </nav>
           {children}
         </TRPCReactProvider>

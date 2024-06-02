@@ -16,6 +16,7 @@ function chunk<T>(array: T[], size: number): T[][] {
   }, [] as T[][]);
 }
 
+
 export function Profile(props: { githubName: string; twitterName: string }) {
   const { githubName, twitterName } = props;
   const [pageData, setPageData] = useState<PageData | null>(null);
@@ -45,6 +46,16 @@ export function Profile(props: { githubName: string; twitterName: string }) {
     0,
   );
 
+  console.log(chunked)
+
+  const ogUrl = new URLSearchParams({
+    github: githubName,
+    displayName: githubName,
+    twitter: twitterName,
+    commits: totalCommits.toString(),
+    tweets: totalTweets.toString(),
+  });
+  const ogImageUrl = `/api/og/compare?${ogUrl.toString()}`;
   return (
     <div className="flex min-h-full min-w-full flex-grow flex-col items-center py-8">
       <div className="mx-auto flex w-[1200px] flex-row items-center justify-between gap-4">
@@ -94,7 +105,7 @@ export function Profile(props: { githubName: string; twitterName: string }) {
       <div className="h-[170px] w-[1200px]">
         <Heatmap data={chunked} />
       </div>
-      <div className="h-[170px] w-[1200px]">
+      <div className="w-[1200px]">
         <RatioBarChart
           data={chunked.map((chunk) => ({
             day: `${chunk[0]!.day} - ${chunk.at(-1)!.day}`,
@@ -102,6 +113,12 @@ export function Profile(props: { githubName: string; twitterName: string }) {
             commits: chunk.reduce((acc, data) => acc + data.commits, 0),
           }))}
         />
+      </div>
+      <div className='flex flex-col'>
+        <span>Tweet the result</span>
+        <img src={ogImageUrl} alt="og" className='max-w-[600px] border-2' key={
+          process.env.NODE_ENV === 'development' ? new Date().toISOString() : undefined
+        } />
       </div>
     </div>
   );
