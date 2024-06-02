@@ -1,3 +1,5 @@
+
+import { fetchGithubPage } from "../../server/lib/github";
 import { Profile } from "./profile";
 
 export default async function Page(props: {
@@ -8,16 +10,13 @@ export default async function Page(props: {
     name: string;
   };
 }) {
-  if ('name' in props.searchParams) {
-    return <Profile 
-      githubName={props.searchParams.name} 
-      twitterName={props.searchParams.name}
-     />;
-  }
+  const {github, twitter} = 'name' in props.searchParams ? { github: props.searchParams.name, twitter: props.searchParams.name } : props.searchParams;
+  const placeholder = await fetchGithubPage(github);
+  
   return (
     <Profile
-      githubName={props.searchParams.github}
-      twitterName={props.searchParams.twitter}
+      githubName={github}
+      twitterName={twitter}
     />
   );
 }
