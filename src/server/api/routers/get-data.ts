@@ -1,80 +1,10 @@
-import { Redis } from "@upstash/redis";
-import { HeatmapData } from "../../../lib/utils";
+
+import type { HeatmapData } from "../../../lib/utils";
 import { fetchGithubPage } from "../../../lib/github";
+import type { ErrorResponse, SuccessResponse, Tweet } from "./types";
+import { writeToCache } from "lib/cache";
 
-const redis = new Redis({
-  url: process.env.UPSTASH_URL!,
-  token: process.env.UPSTASH_TOKEN!,
-});
 
-// If succeeded
-type SuccessResponse = {
-  next_cursor: string;
-  tweets: Tweet[];
-};
-
-type Tweet = {
-  tweet_created_at: string;
-  id_str: string;
-  text: null | string;
-  full_text: string;
-  source: string;
-  truncated: boolean;
-  in_reply_to_status_id_str: string | null;
-  in_reply_to_user_id_str: string;
-  in_reply_to_screen_name: string;
-  user: User;
-  quoted_status_id_str: string | null;
-  is_quote_status: boolean;
-  quoted_status: null;
-  retweeted_status: null;
-  quote_count: number;
-  reply_count: number;
-  retweet_count: number;
-  favorite_count: number;
-  lang: string;
-  entities: {
-    user_mentions: UserMention[];
-    urls: unknown[]; // You may want to define a type for URLs
-    hashtags: unknown[]; // You may want to define a type for hashtags
-    symbols: unknown[]; // You may want to define a type for symbols
-  };
-  views_count: number;
-  bookmark_count: number;
-};
-
-type User = {
-  id_str: string;
-  name: string;
-  screen_name: string;
-  location: string;
-  url: null;
-  description: string;
-  protected: boolean;
-  verified: boolean;
-  followers_count: number;
-  friends_count: number;
-  listed_count: number;
-  favourites_count: number;
-  statuses_count: number;
-  created_at: string;
-  profile_banner_url: string;
-  profile_image_url_https: string;
-  can_dm: boolean;
-};
-
-type UserMention = {
-  id_str: string;
-  name: string;
-  screen_name: string;
-  indices: [number, number];
-};
-
-// If failed
-type ErrorResponse = {
-  status: "error";
-  message: string;
-};
 
 // sorted by ID in descending order
 async function fetchFromSocialData(input: {
@@ -85,7 +15,7 @@ async function fetchFromSocialData(input: {
   stopDate: Date;
   callback: (collection: Map<string, Tweet>) => void;
 }) {
-  if (input.runs && input.runs > 10000) {
+  if (input.runs && input.runs > 10) {
     console.log("Too many runs, stopping");
     return;
   }
@@ -252,7 +182,7 @@ export const getData = async (input: {
     input.emit(parseCollection(collection, githubData));
   }).then(async (data) => {
     input.onComplete(parseCollection(data, githubData));
-    await redis.set<PageData>(`${githubName}-${twitterName}-page-data`, {
+    await writeToCache<PageData>(`${twitterName}-tweets`, {
       isDataLoading: false,
       data: parseCollection(data, githubData),
     });
@@ -262,6 +192,3 @@ export type PageData = {
   isDataLoading: boolean;
   data: TweetCommitData;
 };
-export function getCachedData(key: string) {
-  return redis.get<PageData>(`${key}-page-data`);
-}
