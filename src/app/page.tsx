@@ -41,7 +41,7 @@ export default function Component() {
             className="w-full"
             required
             name="github-url"
-            placeholder="GitHub Profile URL"
+            placeholder="GitHub Profile Name"
           />
         </div>
         <div className="flex w-full max-w-sm items-center space-x-2">
@@ -50,7 +50,7 @@ export default function Component() {
             className="w-full"
             name="twitter-url"
             required
-            placeholder="Twitter Profile URL"
+            placeholder="Twitter Profile Name"
           />
         </div>
         <Button className="mt-4" type="submit">
