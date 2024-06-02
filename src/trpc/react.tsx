@@ -13,9 +13,11 @@ import { useState } from "react";
 // create persistent WebSocket connection
 const wsClient = createWSClient({
   url:
-    process.env.NODE_ENV === "development"
-      ? `ws://localhost:3001`
-      : `wss://shiptalkers.rhyssul.com`,
+    process.env.NODE_ENV === "development" 
+    ? `ws://localhost:3001` 
+    :  process.env.NEXT_PUBLIC_ENVIRONMENT === "local" 
+    ? `ws://localhost:3000` 
+    : `wss://shiptalkers.rhyssul.com`
 });
 
 import { getUrl, transformer } from "./shared";

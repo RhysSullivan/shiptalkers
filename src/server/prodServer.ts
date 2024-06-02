@@ -18,6 +18,7 @@ void app.prepare().then(() => {
     const server = createServer(async (req, res) => {
         if (!req.url) return;
         const parsedUrl = parse(req.url, true);
+        console.log(parsedUrl.pathname);
         await handle(req, res, parsedUrl);
     });
     const wss = new WebSocketServer({ server });

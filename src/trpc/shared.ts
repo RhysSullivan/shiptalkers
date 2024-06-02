@@ -8,7 +8,10 @@ export const transformer = superjson;
 
 function getBaseUrl() {
   if (typeof window !== "undefined") return "";
-  if (process.env.NODE_ENV === "production") return "https://shiptalkers.rhyssul.com"
+  if (process.env.NODE_ENV === "production") {
+    if (process.env.NEXT_PUBLIC_ENVIRONMENT === "local") return "http://localhost:3000";
+    return "https://shiptalkers.rhyssul.com"
+  }
   return `http://localhost:${process.env.PORT ?? 3000}`;
 }
 
