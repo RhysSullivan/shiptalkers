@@ -1,10 +1,9 @@
 "use client";
 import React from "react";
 import { Group } from "@visx/group";
-import genBins, { Bin, Bins } from "@visx/mock-data/lib/generators/genBins";
+import type { Bin, Bins } from "@visx/mock-data/lib/generators/genBins";
 import { scaleLinear } from "@visx/scale";
-import { HeatmapCircle, HeatmapRect } from "@visx/heatmap";
-import { getSeededRandom } from "@visx/mock-data";
+import { HeatmapRect } from "@visx/heatmap";
 
 const darkGreenGitHubCommits = "#156a40";
 const lightGreenGitHubCommits = "#39d353";
@@ -26,11 +25,7 @@ export type HeatmapProps = {
   margin?: { top: number; right: number; bottom: number; left: number };
   separation?: number;
   events?: boolean;
-  data: {
-    day: string;
-    commits: number;
-    tweets: number;
-  }[][];
+  data: TweetCommitData[];
 };
 
 const defaultMargin = { top: 20, left: 0, right: 0, bottom: 0 };
@@ -304,6 +299,7 @@ export function HeatmapSized({
 }
 
 import ParentSize from "@visx/responsive/lib/components/ParentSize";
+import type { TweetCommitData } from "../../server/api/routers/get-data";
 export function Heatmap(props: Pick<HeatmapProps, "data">) {
   return (
     <ParentSize>

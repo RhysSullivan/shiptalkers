@@ -1,18 +1,22 @@
 "use client";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Github, Twitter } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { Input } from "../components/ui/input";
+import { Button } from "../components/ui/button";
 
 export default function Component() {
   const router = useRouter();
   return (
     <main className="flex flex-grow flex-col items-center justify-center py-6">
-      <div className="flex w-full max-w-2xl items-center justify-center space-x-4 py-8">
+      <div className="flex w-full max-w-2xl items-center justify-center space-x-4 py-4">
         <Github size={64} />
-        <h2 className="text-4xl font-bold">vs.</h2>
+        <h2 className="text-4xl font-bold">/</h2>
         <Twitter size={64} />
       </div>
+      <span className="max-w-[600px] text-balance pb-4 text-center text-xl ">
+        Find out if the person you're losing an argument to on Twitter actually
+        ships code or if it's all just shiptalk
+      </span>
       <form
         className="flex w-full max-w-2xl flex-col items-center justify-center space-y-4"
         onSubmit={(e) => {

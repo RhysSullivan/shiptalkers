@@ -1,10 +1,15 @@
-/**
- * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially useful
- * for Docker builds.
- */
-await import("./src/env.js");
-
 /** @type {import("next").NextConfig} */
-const config = {};
+const config = {
+  serverRuntimeConfig: {
+    // Will only be available on the server side
+  },
+  publicRuntimeConfig: {
+    // Will be available on both server and client
+    APP_URL: process.env.APP_URL,
+    WS_URL: process.env.WS_URL,
+  },
+  /** We run eslint as a separate task in CI */
+  eslint: { ignoreDuringBuilds: !!process.env.CI },
+};
 
-export default config;
+module.exports = config;

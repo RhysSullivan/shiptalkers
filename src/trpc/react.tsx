@@ -1,12 +1,25 @@
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { loggerLink, unstable_httpBatchStreamLink } from "@trpc/client";
+import {
+  createWSClient,
+  loggerLink,
+  unstable_httpBatchStreamLink,
+  wsLink,
+} from "@trpc/client";
 import { createTRPCReact } from "@trpc/react-query";
 import { useState } from "react";
 
-import { type AppRouter } from "~/server/api/root";
+// create persistent WebSocket connection
+const wsClient = createWSClient({
+  url:
+    process.env.NODE_ENV === "development"
+      ? `ws://localhost:3001`
+      : `ws://localhost:3000`,
+});
+
 import { getUrl, transformer } from "./shared";
+import { AppRouter } from "../server/api/root";
 
 export const api = createTRPCReact<AppRouter>();
 
@@ -25,6 +38,9 @@ export function TRPCReactProvider(props: {
             process.env.NODE_ENV === "development" ||
             (op.direction === "down" && op.result instanceof Error),
         }),
+        wsLink({
+          client: wsClient,
+        }),
         unstable_httpBatchStreamLink({
           url: getUrl(),
           headers() {
@@ -35,7 +51,7 @@ export function TRPCReactProvider(props: {
           },
         }),
       ],
-    })
+    }),
   );
 
   return (
