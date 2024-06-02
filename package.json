@@ -15,6 +15,10 @@
     "dev": "run-p dev:*",
     "lint": "next lint"
   },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "packageManager": "pnpm@9.1.2",
   "dependencies": {
     "@clerk/nextjs": "^4.29.1",
     "@headlessui/react": "^2.0.4",
