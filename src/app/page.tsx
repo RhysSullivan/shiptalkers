@@ -30,9 +30,13 @@ export default function Component() {
           // just get the names of both
           const githubName = githubUrl.split("/").pop();
           const twitterName = twitterUrl.split("/").pop();
-          void router.push(
-            `/compare?github=${githubName}&twitter=${twitterName}`,
-          );
+          if(githubName == twitterName){
+            void router.push(`/compare?name=${githubName}`);
+          } else {
+            void router.push(
+              `/compare?github=${githubName}&twitter=${twitterName}`,
+            );
+          }
         }}
       >
         <div className="flex w-full max-w-sm items-center space-x-2">
