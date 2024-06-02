@@ -32,7 +32,12 @@ void app.prepare().then(() => {
         console.log('SIGTERM');
         handler.broadcastReconnectNotification();
     });
-
+    wss.on('connection', (ws) => {
+        console.log(`➕➕ Connection (${wss.clients.size})`);
+        ws.once('close', () => {
+            console.log(`➖➖ Connection (${wss.clients.size})`);
+        });
+    });
     server.on('upgrade', (req, socket, head) => {
         wss.handleUpgrade(req, socket as Socket, head, (ws) => {
             wss.emit('connection', ws, req);
