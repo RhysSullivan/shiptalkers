@@ -15,7 +15,7 @@ const wsClient = createWSClient({
   url:
     process.env.NODE_ENV === "development"
       ? `ws://localhost:3001`
-      : `ws://localhost:3000`,
+      : `ws://shiptalkers.rhyssul.com`,
 });
 
 import { getUrl, transformer } from "./shared";

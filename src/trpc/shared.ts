@@ -9,6 +9,7 @@ export const transformer = superjson;
 function getBaseUrl() {
   if (typeof window !== "undefined") return "";
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  if (process.env.NODE_ENV === "production") return "https://shiptalkers.rhyssul.com"
   return `http://localhost:${process.env.PORT ?? 3000}`;
 }
 
