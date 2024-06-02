@@ -2,7 +2,8 @@
 import type { HeatmapData } from "../../../lib/utils";
 import { fetchGithubPage } from "../../../lib/github";
 import type { ErrorResponse, SuccessResponse, Tweet } from "./types";
-import { writeToCache } from "lib/cache";
+import { writeToCache } from "../../lib/cache";
+
 
 
 

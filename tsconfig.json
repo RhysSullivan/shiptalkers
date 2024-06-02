@@ -27,7 +27,6 @@
         "name": "next"
       }
     ],
-    "baseUrl": "./src",
     "incremental": true,
     "downlevelIteration": true
   },
