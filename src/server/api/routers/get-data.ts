@@ -4,7 +4,7 @@ import { fetchGithubPage } from "../../lib/github";
 import type { ErrorResponse, SuccessResponse, Tweet } from "./types";
 import { writeToCache } from "../../lib/cache";
 
-const SAFETY_STOP = 10;
+const SAFETY_STOP = 10000;
 
 // sorted by ID in descending order
 async function fetchFromSocialData(input: {
