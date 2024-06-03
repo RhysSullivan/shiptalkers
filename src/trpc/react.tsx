@@ -13,11 +13,11 @@ import { useState } from "react";
 // create persistent WebSocket connection
 const wsClient = createWSClient({
   url:
-    process.env.NODE_ENV === "development" 
-    ? `ws://localhost:3001` 
-    :  process.env.NEXT_PUBLIC_ENVIRONMENT === "local" 
-    ? `ws://localhost:3000` 
-    : `wss://shiptalkers.rhyssul.com`
+    process.env.NODE_ENV === "development"
+      ? `ws://localhost:3001`
+      : process.env.NEXT_PUBLIC_ENVIRONMENT === "local"
+        ? `ws://localhost:3000`
+        : `wss://shiptalkers.dev`,
 });
 
 import { getUrl, transformer } from "./shared";
@@ -36,9 +36,7 @@ export function TRPCReactProvider(props: {
       transformer,
       links: [
         loggerLink({
-          enabled: (op) =>
-            process.env.NODE_ENV === "development" ||
-            (op.direction === "down" && op.result instanceof Error),
+          enabled: (op) => true,
         }),
         wsLink({
           client: wsClient,
