@@ -34,7 +34,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
       cached?.data?.reduce((acc, { tweets }) => acc + tweets, 0) ?? 0
     ).toString(),
   });
-  const ogImageUrl = `/api/og/compare?${ogUrl.toString()}`;
+  const ogImageUrl = `https://shiptalkers.dev/api/og/compare?${ogUrl.toString()}`;
   return {
     openGraph: {
       images: cached ? [{ url: ogImageUrl }] : [],
