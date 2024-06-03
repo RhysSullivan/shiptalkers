@@ -18,8 +18,13 @@ void app.prepare().then(() => {
     const server = createServer(async (req, res) => {
         if (!req.url) return;
         const parsedUrl = parse(req.url, true);
-        console.log(req.method, req.url)
-        await handle(req, res, parsedUrl);
+        try {
+            await handle(req, res, parsedUrl);
+            console.log(req.method, req.url, res.statusCode)
+        } catch (err) {
+            console.log(req.method, req.url, "ERROR")
+            throw err;
+        }
     });
     const wss = new WebSocketServer({ server });
     const handler = applyWSSHandler({

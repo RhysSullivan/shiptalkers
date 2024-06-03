@@ -51,6 +51,7 @@ export const postRouter = createTRPCRouter({
   data: publicProcedure.input(z.object({ github: z.string(), twitter: z.string() })).subscription(({ input }) => {
     return observable<PageData>((emit) => {
       const key = `${input.github}-${input.twitter}`;
+      console.log(`Subscribing to ${key}`)
       const listenToTweets = (input: {
         key: string;
         data: TweetCommitData;
