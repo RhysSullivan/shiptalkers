@@ -2,7 +2,6 @@
 import { ImageResponse } from "next/og";
 
 import * as d3 from "d3";
-import { GithubIcon } from "lucide-react";
 
 // Data for the pie chart
 const data = [

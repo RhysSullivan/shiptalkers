@@ -16,7 +16,6 @@ function chunk<T>(array: T[], size: number): T[][] {
   }, [] as T[][]);
 }
 
-
 export function Profile(props: { githubName: string; twitterName: string }) {
   const { githubName, twitterName } = props;
   const [pageData, setPageData] = useState<PageData | null>(null);
@@ -45,8 +44,6 @@ export function Profile(props: { githubName: string; twitterName: string }) {
     (acc, data) => acc + data.reduce((acc, data) => acc + data.tweets, 0),
     0,
   );
-
-  console.log(chunked)
 
   const ogUrl = new URLSearchParams({
     github: githubName,
@@ -114,12 +111,23 @@ export function Profile(props: { githubName: string; twitterName: string }) {
           }))}
         />
       </div>
-      <div className='flex flex-col'>
-        <span>Tweet the result</span>
-        <img src={ogImageUrl} alt="og" className='max-w-[600px] border-2' key={
-          process.env.NODE_ENV === 'development' ? new Date().toISOString() : undefined
-        } />
-      </div>
+      {!isDataLoading && (
+        <>
+          <div className="flex flex-col">
+            <span>Tweet the result</span>
+            <img
+              src={ogImageUrl}
+              alt="og"
+              className="max-w-[600px] border-2"
+              key={
+                process.env.NODE_ENV === "development"
+                  ? new Date().toISOString()
+                  : undefined
+              }
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 }
