@@ -56,7 +56,7 @@ async function fetchGithubHeatmap(name: string) {
 }
 
 
-type GithubMetadata = {
+export type GithubMetadata = {
     login: string;
     id: number;
     node_id: string;

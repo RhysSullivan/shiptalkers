@@ -44,7 +44,16 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
 export default async function Page(props: Props) {
   const { github, twitter } = parse(props);
-  const placeholder = await fetchGithubPage(github);
-
-  return <Profile githubName={github} twitterName={twitter} />;
+  const { metadata, heatmapData } = await fetchGithubPage(github);
+  if (!metadata) return null;
+  const cached = await readFromCache<PageData>(`${twitter}-tweets`);
+  return (
+    <Profile
+      githubName={github}
+      twitterName={twitter}
+      metadata={metadata}
+      ghHeatmap={heatmapData}
+      initialData={cached ?? null}
+    />
+  );
 }

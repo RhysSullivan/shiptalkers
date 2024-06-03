@@ -4,7 +4,7 @@ import { fetchGithubPage } from "../../lib/github";
 import type { ErrorResponse, SuccessResponse, Tweet } from "./types";
 import { writeToCache } from "../../lib/cache";
 
-
+const SAFETY_STOP = 10;
 
 // sorted by ID in descending order
 async function fetchFromSocialData(input: {
@@ -15,7 +15,7 @@ async function fetchFromSocialData(input: {
   stopDate: Date;
   callback: (collection: Map<string, Tweet>) => void;
 }) {
-  if (input.runs && input.runs > 10) {
+  if (input.runs && input.runs > SAFETY_STOP) {
     console.log("Too many runs, stopping");
     return;
   }

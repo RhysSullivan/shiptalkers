@@ -6,6 +6,8 @@ import { RatioPie } from "./pie";
 import { useState } from "react";
 import type { PageData } from "../../server/api/routers/get-data";
 import { api } from "../../trpc/react";
+import { GithubMetadata } from "../../server/lib/github";
+import { HeatmapData } from "../../lib/utils";
 
 function chunk<T>(array: T[], size: number): T[][] {
   return array.reduce((acc, _, i) => {
@@ -16,9 +18,15 @@ function chunk<T>(array: T[], size: number): T[][] {
   }, [] as T[][]);
 }
 
-export function Profile(props: { githubName: string; twitterName: string }) {
-  const { githubName, twitterName } = props;
-  const [pageData, setPageData] = useState<PageData | null>(null);
+export function Profile(props: {
+  githubName: string;
+  twitterName: string;
+  metadata: GithubMetadata;
+  ghHeatmap: HeatmapData[];
+  initialData: PageData | null;
+}) {
+  const { githubName, twitterName, ghHeatmap } = props;
+  const [pageData, setPageData] = useState<PageData | null>(props.initialData);
   api.post.data.useSubscription(
     { github: githubName, twitter: twitterName },
     {
@@ -28,13 +36,18 @@ export function Profile(props: { githubName: string; twitterName: string }) {
       onError(err) {
         console.error(err);
       },
+      enabled: !props.initialData,
     },
   );
 
-  if (!pageData) {
-    return;
-  }
-  const { data, isDataLoading } = pageData;
+  const { data, isDataLoading } = pageData ?? {
+    data: ghHeatmap.map((x) => ({
+      day: x.day,
+      commits: x.value,
+      tweets: 0,
+    })),
+    isDataLoading: true,
+  };
   const chunked = chunk(data, 7);
   const totalCommits = chunked.reduce(
     (acc, data) => acc + data.reduce((acc, data) => acc + data.commits, 0),
@@ -92,13 +105,20 @@ export function Profile(props: { githubName: string; twitterName: string }) {
           <RatioPie commits={totalCommits} tweets={totalTweets} />
         </div>
       </div>
-      {isDataLoading && (
-        <div className="flex flex-row gap-4 text-center text-2xl font-bold">
-          We're loading in the data, this may take some time
-          {/* spinner */}
-          <div className="h-6 w-6 animate-spin rounded-full border-b-2 border-blue-500"></div>
-        </div>
-      )}
+      {isDataLoading &&
+        (pageData ? (
+          <div className="flex flex-row gap-4 text-center text-2xl font-bold">
+            We're streaming in the data now
+            {/* spinner */}
+            <div className="h-6 w-6 animate-spin rounded-full border-b-2 border-blue-500"></div>
+          </div>
+        ) : (
+          <div className="flex flex-row gap-4 text-center text-2xl font-bold">
+            We're waiting for the data stream to start
+            {/* spinner */}
+            <div className="h-6 w-6 animate-spin rounded-full border-b-2 border-blue-500"></div>
+          </div>
+        ))}
       <div className="h-[170px] w-[1200px]">
         <Heatmap data={chunked} />
       </div>
