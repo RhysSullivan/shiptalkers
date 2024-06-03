@@ -4,7 +4,7 @@ import { fetchGithubPage } from "../../lib/github";
 import type { ErrorResponse, SuccessResponse, Tweet } from "./types";
 import { writeToCache } from "../../lib/cache";
 
-const SAFETY_STOP = 10000;
+const SAFETY_STOP = 10;
 
 // sorted by ID in descending order
 async function fetchFromSocialData(input: {
@@ -146,12 +146,13 @@ function parseCollection(
   return dataInOrder;
 }
 
+
+
 async function fetchTweetsFromUser(
   name: string,
   stop: Date,
   callback: (collection: Map<string, Tweet>) => void,
 ) {
-  console.log(`Cache miss for ${name}, fetching tweets`);
   const collection = new Map<string, Tweet>();
   await fetchFromSocialData({
     username: name,
@@ -159,6 +160,7 @@ async function fetchTweetsFromUser(
     collection,
     callback,
   });
+
   return collection;
 }
 

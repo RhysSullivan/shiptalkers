@@ -1,12 +1,10 @@
 import { type Config } from "drizzle-kit";
 
-import { env } from "./src/env.js"
-
 export default {
   schema: "./src/server/db/schema.ts",
   driver: "mysql2",
   dbCredentials: {
-    connectionString: env.DATABASE_URL,
+    connectionString: process.env.DATABASE_URL ?? "mysql://youruser:yourpassword@localhost:3306/yourdatabase",
   },
   tablesFilter: ["tweetstocommits_*"],
 } satisfies Config;

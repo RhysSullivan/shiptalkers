@@ -14,6 +14,23 @@ services:
       - redis-data:/data
     mem_limit: 96m
 
+  mysql-server:
+    restart: always
+    image: mysql:5.7
+    container_name: mysql-server
+    environment:
+      MYSQL_ROOT_PASSWORD: yourpassword
+      MYSQL_DATABASE: yourdatabase
+      MYSQL_USER: youruser
+      MYSQL_PASSWORD: yourpassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    mem_limit: 512m
+
 volumes:
   redis-data:
+    driver: local
+  mysql-data:
     driver: local

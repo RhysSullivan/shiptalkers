@@ -19,6 +19,7 @@ export function RatioBarChart(props: {
         index="day"
         showLegend={false}
         showXAxis={false}
+        showYAxis={true}
         categories={["tweets", "commits"]}
         colors={["#1DA1F2", "#26a641"]}
         valueFormatter={dataFormatter}

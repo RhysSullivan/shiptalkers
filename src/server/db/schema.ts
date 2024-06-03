@@ -26,7 +26,9 @@ export const posts = mysqlTable(
     createdAt: timestamp("created_at")
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
-    updatedAt: timestamp("updatedAt").onUpdateNow(),
+    updatedAt: timestamp("updatedAt").onUpdateNow().default(
+      sql`CURRENT_TIMESTAMP`,
+    ),
   },
   (example) => ({
     createdByIdIdx: index("createdById_idx").on(example.createdById),
