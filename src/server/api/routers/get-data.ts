@@ -2,7 +2,8 @@
 import type { HeatmapData } from "../../../lib/utils";
 import { fetchGithubPage } from "../../lib/github";
 import type { ErrorResponse, SuccessResponse, Tweet } from "./types";
-import { writeToCache } from "../../lib/cache";
+import { readFromCache, writeToCache } from "../../lib/cache";
+import { fetchTwitterProfile } from "../../lib/twitter";
 
 const SAFETY_STOP = 10;
 
@@ -13,7 +14,7 @@ async function fetchFromSocialData(input: {
   runs?: number;
   collection: Map<string, Tweet>;
   stopDate: Date;
-  callback: (collection: Map<string, Tweet>) => void;
+  callback: (collection: PartialTweet[]) => void;
 }) {
   if (input.runs && input.runs > SAFETY_STOP) {
     console.log("Too many runs, stopping");
@@ -56,7 +57,19 @@ async function fetchFromSocialData(input: {
   json.tweets.forEach((tweet) => {
     input.collection.set(tweet.id_str, tweet);
   });
-  input.callback(input.collection);
+  input.callback(
+    Array.from(input.collection.values()).map((tweet) => ({
+      id: tweet.id_str,
+      full_text: tweet.full_text,
+      text: tweet.text,
+      created_at: tweet.tweet_created_at,
+      retweet_count: tweet.retweet_count,
+      favorite_count: tweet.favorite_count,
+      bookmark_count: tweet.bookmark_count,
+      reply_count: tweet.reply_count,
+      view_count: tweet.views_count
+    })),
+  );
   if (
     !oldestTweet?.id_str ||
     new Date(oldestTweet.tweet_created_at) < input.stopDate ||
@@ -85,15 +98,25 @@ async function fetchFromSocialData(input: {
   return;
 }
 
+type PartialTweet = {
+  id: string;
+  full_text: string;
+  text: string | null;
+  created_at: string;
+  retweet_count: number;
+  favorite_count: number;
+  bookmark_count: number;
+  reply_count: number;
+  view_count: number;
+}
+
 function parseCollection(
-  collection: Map<string, Tweet>,
+  tweets: PartialTweet[],
   githubData: HeatmapData[],
 ) {
-  const tweets = Array.from(collection.values());
-
   const tweetsByDay = tweets.reduce(
     (acc, tweet) => {
-      const date = new Date(tweet.tweet_created_at)
+      const date = new Date(tweet.created_at)
         .toISOString()
         .split("T")[0]!;
       if (acc[date]) {
@@ -146,13 +169,19 @@ function parseCollection(
   return dataInOrder;
 }
 
-
+async function getCachedTweets(name: string) {
+  return readFromCache<PartialTweet[]>(`${name}-tweets-v2`);
+}
 
 async function fetchTweetsFromUser(
   name: string,
   stop: Date,
-  callback: (collection: Map<string, Tweet>) => void,
+  callback: (collection: PartialTweet[]) => void,
 ) {
+  const cached = await getCachedTweets(name);
+  if (cached) {
+    return cached
+  };
   const collection = new Map<string, Tweet>();
   await fetchFromSocialData({
     username: name,
@@ -160,8 +189,22 @@ async function fetchTweetsFromUser(
     collection,
     callback,
   });
-
-  return collection;
+  const tweets = Array.from(collection.values()).map(
+    tweet => ({
+      id: tweet.id_str,
+      full_text: tweet.full_text,
+      text: tweet.text,
+      created_at: tweet.tweet_created_at,
+      retweet_count: tweet.retweet_count,
+      favorite_count: tweet.favorite_count,
+      bookmark_count: tweet.bookmark_count,
+      reply_count: tweet.reply_count,
+      view_count: tweet.views_count
+    })
+  );
+  console.log(`Caching ${tweets.length} tweets for ${name}`);
+  await writeToCache<PartialTweet[]>(`${name}-tweets-v2`, tweets);
+  return tweets;
 }
 
 export type TweetCommitData = {
@@ -170,7 +213,7 @@ export type TweetCommitData = {
   tweets: number;
 }[];
 
-export const getData = async (input: {
+export const getUserDataStreamed = async (input: {
   githubName: string;
   twitterName: string;
   emit: (chunked: TweetCommitData) => void;
@@ -179,17 +222,26 @@ export const getData = async (input: {
   const { githubName, twitterName } = input;
   const { heatmapData: githubData } = await fetchGithubPage(githubName);
   const tweetsStop = githubData[0]!.day;
-
-  void fetchTweetsFromUser(twitterName, new Date(tweetsStop), (collection) => {
+  return fetchTweetsFromUser(twitterName, new Date(tweetsStop), (collection) => {
     input.emit(parseCollection(collection, githubData));
   }).then(async (data) => {
     input.onComplete(parseCollection(data, githubData));
-    await writeToCache<PageData>(`${twitterName}-tweets`, {
-      isDataLoading: false,
-      data: parseCollection(data, githubData),
-    });
   });
 };
+export async function getCachedUserData(input: { githubName: string, twitterName: string }) {
+  const { githubName, twitterName } = input;
+  const [gh, twitterProfile] = await Promise.all([
+    fetchGithubPage(githubName),
+    fetchTwitterProfile(twitterName),
+  ]);
+  const tweets = await getCachedTweets(twitterName);
+  return {
+    ...gh,
+    twitterProfile,
+    data: tweets ? parseCollection(tweets, gh.heatmapData) : null,
+  };
+}
+
 export type PageData = {
   isDataLoading: boolean;
   data: TweetCommitData;

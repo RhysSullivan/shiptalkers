@@ -1,9 +1,8 @@
 import { z } from "zod";
 import { Observer, observable } from '@trpc/server/observable';
 import { EventEmitter } from 'events';
-import { PageData, TweetCommitData, getData } from "./get-data";
+import { PageData, TweetCommitData, getUserDataStreamed } from "./get-data";
 import { createTRPCRouter, publicProcedure } from "../trpc";
-import { readFromCache } from "../../lib/cache";
 
 const ee = new EventEmitter();
 
@@ -16,17 +15,10 @@ async function handleSubscribe(input: {
   key: string;
 }
 ) {
-  const { emit, key } = input;
-  const cached = await readFromCache<PageData>(`${input.twitter}-tweets`);
-  if (cached) {
-    console.log(`Cache hit for ${input.twitter}`)
-    emit.next(cached);
-    emit.complete();
-    return;
-  }
+  const { key } = input;
   if (!activeQueries.has(key)) {
     activeQueries.add(key);
-    void getData({
+    void getUserDataStreamed({
       githubName: input.github, twitterName: input.twitter, emit:
         (chunk) => {
           ee.emit('tweetsGathered', {

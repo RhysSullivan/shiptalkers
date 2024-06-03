@@ -8,6 +8,7 @@ import type { PageData } from "../../server/api/routers/get-data";
 import { api } from "../../trpc/react";
 import { GithubMetadata } from "../../server/lib/github";
 import { HeatmapData } from "../../lib/utils";
+import { TwitterUser } from "../../server/api/routers/types";
 
 function chunk<T>(array: T[], size: number): T[][] {
   return array.reduce((acc, _, i) => {
@@ -24,8 +25,9 @@ export function Profile(props: {
   metadata: GithubMetadata;
   ghHeatmap: HeatmapData[];
   initialData: PageData | null;
+  twitterProfile: TwitterUser;
 }) {
-  const { githubName, twitterName, ghHeatmap } = props;
+  const { githubName, twitterName, ghHeatmap, twitterProfile } = props;
   const [pageData, setPageData] = useState<PageData | null>(props.initialData);
   api.post.data.useSubscription(
     { github: githubName, twitter: twitterName },
@@ -60,7 +62,8 @@ export function Profile(props: {
 
   const ogUrl = new URLSearchParams({
     github: githubName,
-    displayName: githubName,
+    displayName: twitterProfile.name ?? githubName,
+    twtrId: twitterProfile.id_str,
     twitter: twitterName,
     commits: totalCommits.toString(),
     tweets: totalTweets.toString(),

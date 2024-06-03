@@ -15,7 +15,7 @@ export type Tweet = {
     in_reply_to_status_id_str: string | null;
     in_reply_to_user_id_str: string;
     in_reply_to_screen_name: string;
-    user: User;
+    user: TwitterUser;
     quoted_status_id_str: string | null;
     is_quote_status: boolean;
     quoted_status: null;
@@ -35,7 +35,7 @@ export type Tweet = {
     bookmark_count: number;
 };
 
-export type User = {
+export type TwitterUser = {
     id_str: string;
     name: string;
     screen_name: string;

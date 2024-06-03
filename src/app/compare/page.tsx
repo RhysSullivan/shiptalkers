@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { fetchGithubPage } from "../../server/lib/github";
 import { Profile } from "./profile";
 import { readFromCache } from "../../server/lib/cache";
-import { PageData } from "../../server/api/routers/get-data";
+import { PageData, getCachedUserData } from "../../server/api/routers/get-data";
 type Props = {
   searchParams:
     | {
@@ -22,38 +22,53 @@ function parse(props: Props) {
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const { github, twitter } = parse(props);
-  const cached = await readFromCache<PageData>(`${twitter}-tweets`);
+  const { data, twitterProfile } = await getCachedUserData({
+    githubName: github,
+    twitterName: twitter,
+  });
+
   const ogUrl = new URLSearchParams({
     github,
-    displayName: github,
+    displayName: twitterProfile?.name ?? twitter,
     twitter,
+    twtrId: twitterProfile?.id_str ?? "",
     commits: (
-      cached?.data?.reduce((acc, { commits }) => acc + commits, 0) ?? 0
+      data?.reduce((acc, { commits }) => acc + commits, 0) ?? 0
     ).toString(),
     tweets: (
-      cached?.data?.reduce((acc, { tweets }) => acc + tweets, 0) ?? 0
+      data?.reduce((acc, { tweets }) => acc + tweets, 0) ?? 0
     ).toString(),
   });
   const ogImageUrl = `https://shiptalkers.dev/api/og/compare?${ogUrl.toString()}`;
   return {
     openGraph: {
-      images: cached ? [{ url: ogImageUrl }] : [],
+      images: data ? [{ url: ogImageUrl }] : [],
     },
   };
 }
 
 export default async function Page(props: Props) {
   const { github, twitter } = parse(props);
-  const { metadata, heatmapData } = await fetchGithubPage(github);
-  if (!metadata) return null;
-  const cached = await readFromCache<PageData>(`${twitter}-tweets`);
+  const {
+    metadata,
+    data: cached,
+    heatmapData,
+    twitterProfile,
+  } = await getCachedUserData({ githubName: github, twitterName: twitter });
+  if (!metadata || !twitterProfile) return null;
   return (
     <Profile
       githubName={github}
       twitterName={twitter}
+      twitterProfile={twitterProfile}
       metadata={metadata}
       ghHeatmap={heatmapData}
-      initialData={cached ?? null}
+      initialData={
+        cached && {
+          data: cached,
+          isDataLoading: false,
+        }
+      }
     />
   );
 }

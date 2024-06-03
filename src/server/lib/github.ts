@@ -12,7 +12,7 @@ async function fetchGithubHeatmap(name: string) {
                 "X-Requested-With": "XMLHttpRequest",
             },
             next: {
-                revalidate: 120
+                revalidate: 60 * 10
             }
         }
     );
@@ -92,7 +92,11 @@ export type GithubMetadata = {
 };
 
 async function fetchGithubMetadata(name: string): Promise<GithubMetadata | undefined> {
-    const data = await fetch(`https://api.github.com/users/${name}`);
+    const data = await fetch(`https://api.github.com/users/${name}`, {
+        next: {
+            revalidate: 60 * 10
+        }
+    });
     return data.json() as Promise<GithubMetadata | undefined>;
 }
 
