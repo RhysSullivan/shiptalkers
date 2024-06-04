@@ -54,7 +54,7 @@ export const getUserDataStreamed = async (input: {
         twitterName: twitterName,
         twitterInGithubBio: metadata.twitter_username?.toLowerCase() === twitterName.toLowerCase(),
         tweetsSent: totalTweets,
-        heatmapData: [],
+        heatmapData: merged,
       },
 
     })
