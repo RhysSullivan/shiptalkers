@@ -72,14 +72,15 @@ export async function GET(req: Request) {
   }
   const commits = Number(commitsS);
   const tweets = Number(tweetsS);
-
-  // i.e name tweets 32.1x more than they commit!
-  const percentageTweets = ((tweets / commits) * 100).toFixed();
-  const percentageCommits = ((commits / tweets) * 100).toFixed();
+  const percentageTweets = Math.abs((tweets / commits) * 100 - 100).toFixed();
+  const percentageCommits = Math.abs((commits / tweets) * 100 - 100).toFixed();
+  console.log(percentageTweets, percentageCommits);
   const txt =
-    tweets > commits
-      ? `${displayName} spends ${percentageTweets}% more time tweeting than coding`
-      : `${displayName} spends ${percentageCommits}% more time coding than tweeting`;
+    percentageCommits == percentageTweets
+      ? ` ${displayName} spends equal time tweeting and coding`
+      : tweets > commits
+        ? `${displayName} spends ${percentageTweets}% more time tweeting than coding`
+        : `${displayName} spends ${percentageCommits}% more time coding than tweeting`;
 
   const UserMetadata = () => (
     <div

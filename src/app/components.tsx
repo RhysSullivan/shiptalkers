@@ -129,11 +129,13 @@ export function Hero() {
             <LoaderIcon size={24} className="spin-slow animate-spin" />
           )}
         </div>
-        {profileData?.twitter_username && (
-          <span className="mx-auto w-full  text-sm text-gray-400">
-            *Autofilled with twitter from GitHub bio
-          </span>
-        )}
+        <div className="h-[30px] w-full">
+          {profileData?.twitter_username && (
+            <span className="mx-auto w-full  text-sm text-gray-500">
+              *Autofilled with twitter from GitHub bio
+            </span>
+          )}
+        </div>
       </div>
 
       <Button className="mt-4" type="submit">
