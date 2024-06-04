@@ -2,6 +2,8 @@ import { Metadata } from "next";
 import { Profile } from "./profile";
 import { getCachedUserData } from "../../server/api/routers/get-data";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
+import { RecentlyComparedSection } from "../components.server";
 type Props = {
   searchParams:
     | {
@@ -76,6 +78,11 @@ export default async function Page(props: Props) {
           data: cached,
           isDataLoading: false,
         }
+      }
+      recentlyCompared={
+        <Suspense>
+          <RecentlyComparedSection />
+        </Suspense>
       }
     />
   );

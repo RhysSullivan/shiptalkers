@@ -1,16 +1,11 @@
 import { Github, Twitter } from "lucide-react";
-import { ComparisonCard, Hero } from "./components";
+import { ComparisonCard, Hero } from "./components.client";
 import { db } from "../server/db";
 import { users } from "../server/db/schema";
 import { desc } from "drizzle-orm";
+import { RecentlyComparedSection } from "./components.server";
 
 export default async function Component() {
-  const recentComparisons = await db
-    .select()
-    .from(users)
-    .orderBy(desc(users.createdAt))
-    .limit(50)
-    .execute();
   const topTweeters = await db
     .select()
     .from(users)
@@ -36,17 +31,7 @@ export default async function Component() {
         ships code or if it's all just shiptalk
       </span>
       <Hero />
-
-      <section className="mt-40 flex w-full max-w-6xl flex-col items-center justify-center gap-4 rounded-md px-4 py-6 text-center">
-        <h2 className="text-2xl font-bold">Recently Compared</h2>
-        <div className="grid w-full grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {recentComparisons.map((comparison) => {
-            return (
-              <ComparisonCard key={comparison.twitterId} user={comparison} />
-            );
-          })}
-        </div>
-      </section>
+      <RecentlyComparedSection />
     </main>
   );
 }

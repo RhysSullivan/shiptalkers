@@ -26,6 +26,7 @@ export function Profile(props: {
   ghHeatmap: HeatmapData[];
   initialData: PageData | null | undefined;
   twitterProfile: TwitterUser;
+  recentlyCompared: React.ReactNode;
 }) {
   const { githubName, twitterName, ghHeatmap, twitterProfile } = props;
   const [pageData, setPageData] = useState<PageData | null | undefined>(
@@ -164,6 +165,7 @@ export function Profile(props: {
           </div>
         </>
       )}
+      {props.recentlyCompared}
     </div>
   );
 }
