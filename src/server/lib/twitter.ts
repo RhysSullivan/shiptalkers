@@ -13,7 +13,7 @@ export async function fetchTwitterProfile(name: string) {
     return userInfo.json() as Promise<TwitterUser | undefined>;
 }
 
-const SAFETY_STOP = 10000;
+const SAFETY_STOP = 15;
 
 export type PartialTweet = {
     id: string;
