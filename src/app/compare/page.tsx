@@ -14,8 +14,14 @@ type Props = {
 
 function parse(props: Props) {
   return "name" in props.searchParams
-    ? { github: props.searchParams.name, twitter: props.searchParams.name }
-    : props.searchParams;
+    ? {
+        github: props.searchParams.name.toLowerCase(),
+        twitter: props.searchParams.name.toLowerCase(),
+      }
+    : {
+        github: props.searchParams.github.toLowerCase(),
+        twitter: props.searchParams.twitter.toLowerCase(),
+      };
 }
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
