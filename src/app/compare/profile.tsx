@@ -10,6 +10,7 @@ import { GithubMetadata } from "../../server/lib/github";
 import { HeatmapData } from "../../lib/utils";
 import { TwitterUser } from "../../server/lib/twitter.types";
 import { SocialData } from "../../components/ui/socialdata";
+import { TwitterAvatar } from "../../components/ui/twitter-avatar";
 
 function chunk<T>(array: T[], size: number): T[][] {
   return array.reduce((acc, _, i) => {
@@ -77,13 +78,7 @@ export function Profile(props: {
     <div className="mx-auto flex w-full max-w-screen-xl flex-grow flex-col items-center justify-center py-8">
       <div className="flex w-full flex-row items-center justify-between gap-4 md:mx-auto">
         <div className="flex flex-col items-start justify-start gap-2 px-2">
-          <img
-            src={`https://unavatar.io/twitter/${twitterName}`}
-            width="128"
-            height="128"
-            alt="avatar"
-            className="size-20 rounded-full md:size-32"
-          />
+          <TwitterAvatar name={twitterName} className="size-20 md:size-32" />
           <div className="flex flex-col justify-between gap-4 py-4">
             <div className="flex flex-col">
               <div className="flex flex-col">

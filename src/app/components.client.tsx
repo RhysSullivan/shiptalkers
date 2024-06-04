@@ -9,6 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ChangeEvent, useEffect, useState } from "react";
 import { GithubMetadata } from "../server/lib/github";
 import { GitTweetBars } from "../components/ui/git-tweet-bars";
+import { TwitterAvatar } from "../components/ui/twitter-avatar";
 
 // Debounce function
 // eslint-disable-next-line @typescript-eslint/ban-types
@@ -123,7 +124,7 @@ export function Hero() {
             <LoaderIcon size={24} className="spin-slow animate-spin" />
           )}
         </div>
-        <div className="h-[30px] w-full">
+        <div className="h-[15px] w-full">
           {profileData?.twitter_username && (
             <span className="mx-auto w-full  text-sm text-gray-500">
               *Autofilled with twitter from GitHub bio
@@ -147,12 +148,7 @@ export function ComparisonCard(props: { user: User }) {
       href={`/compare?github=${user.githubName}&twitter=${user.twitterName}`}
     >
       <div className="flex flex-row items-start justify-center gap-4 ">
-        <img
-          src={`https://unavatar.io/twitter/${user.twitterName}`}
-          width="100"
-          height="100"
-          className="rounded-full"
-        />
+        <TwitterAvatar name={user.twitterName} className="size-24" />
         <div className="flex h-full flex-col  items-start justify-start text-start">
           <h3 className="text-lg font-bold">{user.twitterDisplayName}</h3>
           <span className="text-sm text-gray-500">@{user.twitterName}</span>

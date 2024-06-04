@@ -4,6 +4,7 @@ import { getCachedUserData } from "../../server/api/routers/get-data";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { RecentlyComparedSection } from "../components.server";
+import { cookies } from "next/headers";
 type Props = {
   searchParams:
     | {
@@ -59,6 +60,9 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 export const revalidate = 60; // 1 minute
 
 export default async function Page(props: Props) {
+  if (!(cookies().get("token")?.value === "preview")) {
+    return redirect("/not-ready");
+  }
   const { github, twitter } = parse(props);
   const {
     metadata,

@@ -13,7 +13,7 @@ export async function RecentlyComparedSection(props: {
       .limit(50)
       .execute();
     return (
-      <section className="mt-40 flex w-full max-w-6xl flex-col items-center justify-center gap-4 rounded-md px-4 py-6 text-center">
+      <section className="flex w-full max-w-6xl flex-col items-center justify-center gap-4 rounded-md px-4 py-6 text-center">
         <h2 className="text-2xl font-bold">Recently Compared</h2>
         <div className="grid w-full grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
           {recentComparisons
