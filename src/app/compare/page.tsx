@@ -81,7 +81,7 @@ export default async function Page(props: Props) {
       }
       recentlyCompared={
         <Suspense>
-          <RecentlyComparedSection />
+          <RecentlyComparedSection filterTwitterNames={[twitter]} />
         </Suspense>
       }
     />
