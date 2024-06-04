@@ -56,6 +56,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     },
   };
 }
+export const revalidate = 60; // 1 minute
 
 export default async function Page(props: Props) {
   const { github, twitter } = parse(props);
@@ -80,9 +81,12 @@ export default async function Page(props: Props) {
         }
       }
       recentlyCompared={
-        <Suspense>
-          <RecentlyComparedSection filterTwitterNames={[twitter]} />
-        </Suspense>
+        <div>
+          {new Date().toISOString()}
+          <Suspense>
+            <RecentlyComparedSection filterTwitterNames={[twitter]} />
+          </Suspense>
+        </div>
       }
     />
   );

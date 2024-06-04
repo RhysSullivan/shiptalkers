@@ -16,6 +16,7 @@ export const metadata = {
     "Find out if people on Twitter actually ship code or if they're just shiptalking.",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
+export const revalidate = 60; // 1 minute
 
 export default function RootLayout({
   children,
