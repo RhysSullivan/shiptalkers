@@ -1,12 +1,14 @@
-import { sql } from "drizzle-orm";
 import {
-  bigint,
-  index,
+  boolean,
   mysqlTableCreator,
-  timestamp,
   varchar,
+  timestamp,
+  customType,
+  json,
+  primaryKey
 } from "drizzle-orm/mysql-core";
-
+import { sql } from "drizzle-orm"
+import { HeatmapData } from "../../lib/utils";
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
  * database instance for multiple projects.
@@ -17,32 +19,45 @@ export const mysqlTable = mysqlTableCreator(
   (name) => `tweetstocommits_${name}`,
 );
 
-export const posts = mysqlTable(
-  "post",
-  {
-    id: bigint("id", { mode: "number" }).primaryKey().autoincrement(),
-    name: varchar("name", { length: 256 }),
-    createdById: varchar("createdById", { length: 255 }).notNull(),
-    createdAt: timestamp("created_at")
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-    updatedAt: timestamp("updatedAt").onUpdateNow().default(
-      sql`CURRENT_TIMESTAMP`,
-    ),
+const int11 = customType<{ data: number }>({
+  dataType() {
+    return "int(11)";
   },
-  (example) => ({
-    createdByIdIdx: index("createdById_idx").on(example.createdById),
-    nameIndex: index("name_idx").on(example.name),
-  }),
-);
+});
+
+
+export type TweetCommitData = {
+  day: string;
+  commits: number;
+  tweets: number;
+}[];
 
 export const users = mysqlTable("user", {
-  id: varchar("id", { length: 255 }).notNull().primaryKey(),
-  name: varchar("name", { length: 255 }),
-  email: varchar("email", { length: 255 }).notNull(),
-  emailVerified: timestamp("emailVerified", {
-    mode: "date",
-    fsp: 3,
-  }).default(sql`CURRENT_TIMESTAMP(3)`),
-  image: varchar("image", { length: 255 }),
-});
+  twitterFollowerCount: int11("twitterFollowerCount").notNull().default(0),
+  githubFollowerCount: int11("githubFollowerCount").notNull().default(0),
+  tweetsSent: int11("tweetsSent").notNull().default(0),
+  commitsMade: int11("commitsMade").notNull().default(0),
+  twitterId: varchar("twitterId", {
+    length: 255,
+  }).notNull(),
+  twitterDisplayName: varchar("twitterDisplayName", {
+    length: 255,
+  }).notNull(),
+  githubName: varchar("githubName", {
+    length: 255,
+  }).notNull(),
+  twitterName: varchar("twitterName", {
+    length: 255,
+  }).notNull(),
+  twitterInGithubBio: boolean("twitterInGithubBio").notNull(),
+  createdAt: timestamp("createdAt").notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: timestamp("updated_at").default(
+    sql`CURRENT_TIMESTAMP`
+  ),
+  heatmapData: json("heatmapData").notNull().$type<TweetCommitData>(),
+}, (t) => ({
+  pk: primaryKey(t.githubName, t.twitterName)
+}));
+
+
+export type User = typeof users.$inferSelect;

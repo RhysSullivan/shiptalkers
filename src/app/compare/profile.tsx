@@ -8,7 +8,7 @@ import type { PageData } from "../../server/api/routers/get-data";
 import { api } from "../../trpc/react";
 import { GithubMetadata } from "../../server/lib/github";
 import { HeatmapData } from "../../lib/utils";
-import { TwitterUser } from "../../server/api/routers/types";
+import { TwitterUser } from "../../server/lib/twitter.types";
 
 function chunk<T>(array: T[], size: number): T[][] {
   return array.reduce((acc, _, i) => {
@@ -24,11 +24,13 @@ export function Profile(props: {
   twitterName: string;
   metadata: GithubMetadata;
   ghHeatmap: HeatmapData[];
-  initialData: PageData | null;
+  initialData: PageData | null | undefined;
   twitterProfile: TwitterUser;
 }) {
   const { githubName, twitterName, ghHeatmap, twitterProfile } = props;
-  const [pageData, setPageData] = useState<PageData | null>(props.initialData);
+  const [pageData, setPageData] = useState<PageData | null | undefined>(
+    props.initialData,
+  );
   api.post.data.useSubscription(
     { github: githubName, twitter: twitterName },
     {
@@ -78,26 +80,35 @@ export function Profile(props: {
             alt="avatar"
             className="h-32 w-32 rounded-full"
           />
-          <div className="flex flex-col justify-between gap-2 py-4">
+          <div className="flex flex-col justify-between gap-4 py-4">
             <div className="flex flex-col">
-              <a
-                href={`https://twitter.com/${twitterName}`}
-                className="flex flex-row items-center gap-1 hover:underline"
-                target="_blank"
-              >
-                <TwitterIcon size={20} />
-                {twitterName}
-              </a>
-              <a
-                target="_blank"
-                href={`
-              https://github.com/${githubName}
-              `}
-                className="flex flex-row items-center gap-1 hover:underline"
-              >
-                <GithubIcon size={20} />
-                {githubName}
-              </a>
+              <div className="flex flex-col">
+                <div className="flex flex-row items-center gap-1">
+                  <TwitterIcon size={20} />
+                  <a
+                    className="font-semibold hover:underline"
+                    target="_blank"
+                    href={`https://twitter.com/${twitterName}`}
+                  >
+                    {twitterName}
+                  </a>
+                </div>
+                {`${twitterProfile.followers_count.toLocaleString()} followers`}
+              </div>
+              <div className="flex flex-col">
+                <div className="flex flex-row items-center gap-1">
+                  <GithubIcon size={20} />
+                  <a
+                    className="font-semibold hover:underline"
+                    target="_blank"
+                    href={`
+                  https://github.com/${githubName}`}
+                  >
+                    {githubName}
+                  </a>
+                </div>
+                {`${props.metadata.followers.toLocaleString()} followers`}
+              </div>
             </div>
             <span>
               {totalCommits} commits and {totalTweets} tweets

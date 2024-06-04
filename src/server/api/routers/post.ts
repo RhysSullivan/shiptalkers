@@ -1,8 +1,9 @@
 import { z } from "zod";
 import { Observer, observable } from '@trpc/server/observable';
 import { EventEmitter } from 'events';
-import { PageData, TweetCommitData, getUserDataStreamed } from "./get-data";
+import { PageData, getUserDataStreamed } from "./get-data";
 import { createTRPCRouter, publicProcedure } from "../trpc";
+import { TweetCommitData } from "../../db/schema";
 
 const ee = new EventEmitter();
 

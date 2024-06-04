@@ -14,6 +14,14 @@ services:
       - redis-data:/data
     mem_limit: 96m
 
+  redis-insight:
+    image: redislabs/redisinsight:latest
+    container_name: redis-insight
+    ports:
+      - "8001:8001"
+    depends_on:
+      - redis-server
+      
   mysql-server:
     restart: always
     image: mysql:5.7

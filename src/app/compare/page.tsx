@@ -1,8 +1,6 @@
 import { Metadata } from "next";
-import { fetchGithubPage } from "../../server/lib/github";
 import { Profile } from "./profile";
-import { readFromCache } from "../../server/lib/cache";
-import { PageData, getCachedUserData } from "../../server/api/routers/get-data";
+import { getCachedUserData } from "../../server/api/routers/get-data";
 type Props = {
   searchParams:
     | {

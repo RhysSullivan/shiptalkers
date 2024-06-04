@@ -275,7 +275,7 @@ export function HeatmapSized({
 }
 
 import ParentSize from "@visx/responsive/lib/components/ParentSize";
-import type { TweetCommitData } from "../../server/api/routers/get-data";
+import { TweetCommitData } from "../../server/db/schema";
 
 export function Heatmap(props: Pick<HeatmapProps, "data">) {
   return (

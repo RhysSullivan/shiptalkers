@@ -18,7 +18,7 @@ export const env = createEnv({
    */
   server: {
     DATABASE_URL: defaultInDevEnv(
-      "mysql://youruser:yourpassword@mysql-server:3306/yourdatabase",
+      "mysql://youruser:yourpassword@localhost:3306/yourdatabase",
     ),
     NODE_ENV: z
       .enum(["development", "test", "production"])
