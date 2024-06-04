@@ -37,16 +37,15 @@ export default async function Component() {
       </span>
       <Hero />
 
-      <section className="mt-40 flex w-full max-w-6xl flex-col items-center justify-center rounded-md px-4 py-6 text-center">
-        <h2 className="mb-4 text-2xl font-bold">Recently Compared</h2>
-        <p className="text-lg">
-          See some of the recent comparisons made by users:
-        </p>
-        {recentComparisons.map((comparison) => {
-          return (
-            <ComparisonCard key={comparison.twitterId} user={comparison} />
-          );
-        })}
+      <section className="mt-40 flex w-full max-w-6xl flex-col items-center justify-center gap-4 rounded-md px-4 py-6 text-center">
+        <h2 className="text-2xl font-bold">Recently Compared</h2>
+        <div className="grid w-full grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+          {recentComparisons.map((comparison) => {
+            return (
+              <ComparisonCard key={comparison.twitterId} user={comparison} />
+            );
+          })}
+        </div>
       </section>
     </main>
   );

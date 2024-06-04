@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { Profile } from "./profile";
 import { getCachedUserData } from "../../server/api/routers/get-data";
+import { redirect } from "next/navigation";
 type Props = {
   searchParams:
     | {
@@ -26,6 +27,9 @@ function parse(props: Props) {
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const { github, twitter } = parse(props);
+  if (github == twitter && !("name" in props.searchParams)) {
+    redirect(`/compare?name=${github}`);
+  }
   const { data, twitterProfile } = await getCachedUserData({
     githubName: github,
     twitterName: twitter,

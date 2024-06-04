@@ -4,17 +4,11 @@ import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import { Github, LoaderIcon, Twitter } from "lucide-react";
 import type { User } from "../server/db/schema";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "../components/ui/card";
+
 import { useQuery } from "@tanstack/react-query";
 import { ChangeEvent, useEffect, useState } from "react";
 import { GithubMetadata } from "../server/lib/github";
+import { GitTweetBars } from "../components/ui/git-tweet-bars";
 
 // Debounce function
 // eslint-disable-next-line @typescript-eslint/ban-types
@@ -148,22 +142,35 @@ export function Hero() {
 export function ComparisonCard(props: { user: User }) {
   const { user } = props;
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Card Title</CardTitle>
-        <CardDescription>Card Description</CardDescription>
-      </CardHeader>
-      <CardContent>
+    <a
+      className="flex flex-row items-center  justify-between rounded-md border-2 px-4 py-2 drop-shadow-sm transition-all hover:scale-105 hover:border-blue-500 hover:shadow-lg"
+      href={`/compare?github=${user.githubName}&twitter=${user.twitterName}`}
+    >
+      <div className="flex flex-row items-start justify-center gap-4 ">
         <img
           src={`https://unavatar.io/twitter/${user.twitterName}`}
           width="100"
           height="100"
+          className="rounded-full"
         />
-        <p>Card Content</p>
-      </CardContent>
-      <CardFooter>
-        <p>Card Footer</p>
-      </CardFooter>
-    </Card>
+        <div className="flex h-full flex-col  items-start justify-start text-start">
+          <h3 className="text-lg font-bold">{user.twitterDisplayName}</h3>
+          <span className="text-sm text-gray-500">@{user.twitterName}</span>
+          <span className="text-sm text-gray-500">
+            {user.twitterFollowerCount.toLocaleString()} followers
+          </span>
+
+          <span className="text-sm text-gray-500">
+            {user.tweetsSent.toLocaleString()} tweets
+          </span>
+          <span className="text-sm text-gray-500">
+            {user.commitsMade.toLocaleString()} commits
+          </span>
+        </div>
+      </div>
+      <div className="flex h-full flex-col items-center justify-end pl-4">
+        <GitTweetBars user={user} barHeight={60} iconSize={24} barWidth={20} />
+      </div>
+    </a>
   );
 }
