@@ -155,7 +155,9 @@ export async function GET(req: Request) {
         }}
       >
         <img
-          src={`https://github.com/${github}.png`}
+          src={`https://unavatar.io/twitter/${twitter}`}
+          width="220"
+          height="220"
           alt="avatar"
           style={{
             width: "220px",

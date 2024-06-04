@@ -76,7 +76,9 @@ export function Profile(props: {
       <div className="mx-auto flex w-[1200px] flex-row items-center justify-between gap-4">
         <div className="flex flex-row gap-2">
           <img
-            src={`https://github.com/${githubName}.png`}
+            src={`https://unavatar.io/twitter/${twitterName}`}
+            width="128"
+            height="128"
             alt="avatar"
             className="h-32 w-32 rounded-full"
           />
