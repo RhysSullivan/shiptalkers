@@ -1,3 +1,4 @@
+import { readFromCache, writeToCache } from "./cache";
 import { ErrorResponse, SuccessResponse, Tweet, TwitterUser } from "./twitter.types";
 
 export async function fetchTwitterProfile(name: string) {
@@ -12,7 +13,7 @@ export async function fetchTwitterProfile(name: string) {
     return userInfo.json() as Promise<TwitterUser | undefined>;
 }
 
-const SAFETY_STOP = 10;
+const SAFETY_STOP = 15;
 
 export type PartialTweet = {
     id: string;
@@ -30,7 +31,7 @@ async function fetchFromSocialData(input: {
     username: string;
     max_id?: string;
     runs?: number;
-    collection: Map<string, Tweet>;
+    collection: Map<string, PartialTweet>;
     stopDate: Date;
     callback: (collection: PartialTweet[]) => void;
 }) {
@@ -73,21 +74,27 @@ async function fetchFromSocialData(input: {
         (tweet) => !input.collection.has(tweet.id_str),
     );
     json.tweets.forEach((tweet) => {
-        input.collection.set(tweet.id_str, tweet);
+        input.collection.set(tweet.id_str,
+            {
+                id: tweet.id_str,
+                full_text: tweet.full_text,
+                text: tweet.text,
+                created_at: tweet.tweet_created_at,
+                retweet_count: tweet.retweet_count,
+                favorite_count: tweet.favorite_count,
+                bookmark_count: tweet.bookmark_count,
+                reply_count: tweet.reply_count,
+                view_count: tweet.views_count
+            });
     });
+    const array = Array.from(input.collection.values());
     input.callback(
-        Array.from(input.collection.values()).map((tweet) => ({
-            id: tweet.id_str,
-            full_text: tweet.full_text,
-            text: tweet.text,
-            created_at: tweet.tweet_created_at,
-            retweet_count: tweet.retweet_count,
-            favorite_count: tweet.favorite_count,
-            bookmark_count: tweet.bookmark_count,
-            reply_count: tweet.reply_count,
-            view_count: tweet.views_count
-        })),
+        array
     );
+    if (input.runs && (input.runs % 5 === 0)) {
+        console.log('Setting partial cache')
+        void setCachedTweets(input.username, array);
+    }
     if (
         !oldestTweet?.id_str ||
         new Date(oldestTweet.tweet_created_at) < input.stopDate ||
@@ -116,32 +123,32 @@ async function fetchFromSocialData(input: {
     return;
 }
 
+function getCachedTweets(name: string) {
+    return readFromCache<PartialTweet[]>(name);
+}
+
+function setCachedTweets(name: string, tweets: PartialTweet[]) {
+    return writeToCache(name, tweets);
+}
 
 export async function fetchTweetsFromUser(
     name: string,
     stop: Date,
     callback: (collection: PartialTweet[]) => void,
 ) {
-    const collection = new Map<string, Tweet>();
+    const cached = await getCachedTweets(name);
+    const oldestTweet = cached?.sort((a, b) => (BigInt(a.id) < BigInt(b.id) ? 1 : -1)).at(-1);
+    const collection = new Map<string, PartialTweet>(
+        cached?.map(tweet => [tweet.id, tweet]) ?? []
+    );
     await fetchFromSocialData({
         username: name,
         stopDate: stop,
         collection,
+        max_id: oldestTweet?.id,
         callback,
     });
-    const tweets = Array.from(collection.values()).map(
-        tweet => ({
-            id: tweet.id_str,
-            full_text: tweet.full_text,
-            text: tweet.text,
-            created_at: tweet.tweet_created_at,
-            retweet_count: tweet.retweet_count,
-            favorite_count: tweet.favorite_count,
-            bookmark_count: tweet.bookmark_count,
-            reply_count: tweet.reply_count,
-            view_count: tweet.views_count
-        })
-    );
+    const tweets = Array.from(collection.values());
     console.log(`Caching ${tweets.length} tweets for ${name}`);
     return tweets;
 }
