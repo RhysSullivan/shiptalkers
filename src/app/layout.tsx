@@ -28,14 +28,14 @@ export default function RootLayout({
         className={`font-sans ${inter.variable} flex min-h-screen flex-col bg-gray-100 dark:bg-gray-800`}
       >
         <TRPCReactProvider cookies={cookies().toString()}>
-          <nav className="flex items-center justify-between bg-white p-6 shadow-lg dark:bg-gray-900">
+          <div className="bg-white shadow-lg">
+            You're here early! We're still developing the site, it will be
+            buggy.
+          </div>
+          <nav className="flex items-center justify-between bg-white p-2 shadow-lg  dark:bg-gray-900">
             <a href="/">
               <h1 className="text-2xl font-bold">Shiptalkers</h1>
             </a>
-            <div>
-              You're here early! We're still developing the site, it will be
-              buggy.
-            </div>
             <div className="flex flex-row items-center gap-4">
               <a
                 href="https://github.com/RhysSullivan/shiptalkers"

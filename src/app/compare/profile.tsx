@@ -9,6 +9,7 @@ import { api } from "../../trpc/react";
 import { GithubMetadata } from "../../server/lib/github";
 import { HeatmapData } from "../../lib/utils";
 import { TwitterUser } from "../../server/lib/twitter.types";
+import { SocialData } from "../../components/ui/socialdata";
 
 function chunk<T>(array: T[], size: number): T[][] {
   return array.reduce((acc, _, i) => {
@@ -73,15 +74,15 @@ export function Profile(props: {
   });
   const ogImageUrl = `/api/og/compare?${ogUrl.toString()}`;
   return (
-    <div className="flex min-h-full min-w-full flex-grow flex-col items-center py-8">
-      <div className="mx-auto flex w-[1200px] flex-row items-center justify-between gap-4">
-        <div className="flex flex-row gap-2">
+    <div className="mx-auto flex w-full max-w-screen-xl flex-grow flex-col items-center justify-center py-8">
+      <div className="flex w-full flex-row items-center justify-between gap-4 md:mx-auto">
+        <div className="flex flex-col items-start justify-start gap-2 px-2">
           <img
             src={`https://unavatar.io/twitter/${twitterName}`}
             width="128"
             height="128"
             alt="avatar"
-            className="h-32 w-32 rounded-full"
+            className="size-20 rounded-full md:size-32"
           />
           <div className="flex flex-col justify-between gap-4 py-4">
             <div className="flex flex-col">
@@ -113,13 +114,25 @@ export function Profile(props: {
                 {`${props.metadata.followers.toLocaleString()} followers`}
               </div>
             </div>
-            <span>
-              {totalCommits} commits and {totalTweets} tweets
-            </span>
           </div>
         </div>
-        <div className="flex flex-col items-center justify-center">
-          <RatioPie commits={totalCommits} tweets={totalTweets} />
+        <div className="flex flex-col items-start justify-start gap-2 px-2">
+          <div className="size-22 md:size-32">
+            <RatioPie commits={totalCommits} tweets={totalTweets} />
+          </div>
+          <div className="flex flex-col justify-between gap-4 py-4">
+            <div className="flex flex-col">
+              <div className="flex flex-row items-center gap-1">
+                <TwitterIcon size={20} />
+                {`${totalTweets.toLocaleString()} tweets`}
+              </div>
+
+              <div className="flex flex-row items-center gap-1">
+                <GithubIcon size={20} />
+                {`${totalCommits.toLocaleString()} commits`}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       {isDataLoading &&
@@ -136,26 +149,34 @@ export function Profile(props: {
             <div className="h-6 w-6 animate-spin rounded-full border-b-2 border-blue-500"></div>
           </div>
         ))}
-      <div className="h-[170px] w-[1200px]">
+      <div className="mx-auto flex w-full max-w-[90vw] justify-start overflow-x-auto xl:justify-center">
         <Heatmap data={chunked} />
       </div>
-      <div className="w-[1200px]">
-        <RatioBarChart
-          data={chunked.map((chunk) => ({
-            day: `${chunk[0]!.day} - ${chunk.at(-1)!.day}`,
-            tweets: chunk.reduce((acc, data) => acc + data.tweets, 0),
-            commits: chunk.reduce((acc, data) => acc + data.commits, 0),
-          }))}
-        />
+      <a
+        className="flex w-full flex-row gap-2 text-start font-semibold"
+        target="_blank"
+        href="https://socialdata.tools/?ref=shiptalkers.dev"
+      >
+        Powered by <SocialData />
+      </a>
+      <div className="max-w-[90vw] overflow-x-auto">
+        <div className="w-[1280px]">
+          <RatioBarChart
+            data={chunked.map((chunk) => ({
+              day: `${chunk[0]!.day} - ${chunk.at(-1)!.day}`,
+              tweets: chunk.reduce((acc, data) => acc + data.tweets, 0),
+              commits: chunk.reduce((acc, data) => acc + data.commits, 0),
+            }))}
+          />
+        </div>
       </div>
       {!isDataLoading && (
         <>
-          <div className="flex flex-col">
-            <span>Tweet the result</span>
+          <div className="flex flex-col py-4">
             <img
               src={ogImageUrl}
               alt="og"
-              className="max-w-[600px] border-2"
+              className="max-w-[90vw] border-2 md:max-w-[600px]"
               key={
                 process.env.NODE_ENV === "development"
                   ? new Date().toISOString()

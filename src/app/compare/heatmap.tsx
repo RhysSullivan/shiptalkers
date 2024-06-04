@@ -279,10 +279,17 @@ import { TweetCommitData } from "../../server/db/schema";
 
 export function Heatmap(props: Pick<HeatmapProps, "data">) {
   return (
-    <ParentSize>
-      {({ width, height }) => (
-        <HeatmapSized width={width} height={height} events data={props.data} />
-      )}
-    </ParentSize>
+    <div className="h-[170px] w-[1280px]">
+      <ParentSize>
+        {({ width, height }) => (
+          <HeatmapSized
+            width={width}
+            height={height}
+            events
+            data={props.data}
+          />
+        )}
+      </ParentSize>
+    </div>
   );
 }

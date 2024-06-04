@@ -18,7 +18,7 @@ export function RatioPie(props: { tweets: number; commits: number }) {
         index="name"
         valueFormatter={valueFormatter}
         colors={["#1DA1F2", "#26a641"]}
-        className="w-32"
+        className="h-full w-full"
         // showLabel={false}
         // variant="pie"
       />
