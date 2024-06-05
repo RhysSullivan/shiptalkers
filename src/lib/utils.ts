@@ -1,5 +1,6 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { User } from "../server/db/schema";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -37,4 +38,9 @@ export function getPageUrl(input: {
     return `/compare?name=${lwrGh}`
   }
   return `/compare?github=${lwrGh}&twitter=${lwrTw}`
+}
+
+// Verified users are users who have their Twitter handle in their GitHub bio, or have the same Twitter and GitHub handle
+export function isVerifiedUser(user: User) {
+  return user.twitterInGithubBio || user.twitterName === user.githubName;
 }

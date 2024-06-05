@@ -1,16 +1,46 @@
 
 import type { HeatmapData } from "../../../lib/utils";
 import { db } from "../../db";
-import { TweetCommitData, users } from "../../db/schema";
+import { TweetCommitData, User, users } from "../../db/schema";
 import { fetchGithubPage } from "../../lib/github";
 import { PartialTweet, fetchTweetsFromUser, fetchTwitterProfile } from "../../lib/twitter";
 
+export function toUserSchema(props: {
+  githubName: string;
+  twitterName: string;
+  metadata: { followers: number; twitter_username: string | null };
+  twitterPage: { name: string; id_str: string; followers_count: number };
+  merged: TweetCommitData;
+}): User {
+  const totalCommits = props.merged.reduce(
+    (acc, data) => acc + data.commits,
+    0,
+  );
+  const totalTweets = props.merged.reduce(
+    (acc, data) => acc + data.tweets,
+    0,
+  );
+  return {
+    createdAt: new Date(),
+    updatedAt: null,
+    twitterDisplayName: props.twitterPage.name,
+    twitterId: props.twitterPage.id_str,
+    twitterFollowerCount: props.twitterPage.followers_count,
+    githubFollowerCount: props.metadata.followers,
+    commitsMade: totalCommits,
+    githubName: props.githubName,
+    twitterInGithubBio: props.metadata.twitter_username?.toLowerCase() === props.twitterName.toLowerCase(),
+    twitterName: props.twitterName,
+    tweetsSent: totalTweets,
+    heatmapData: props.merged,
+  };
+}
 
 export const getUserDataStreamed = async (input: {
   githubName: string;
   twitterName: string;
-  emit: (chunked: TweetCommitData) => void;
-  onComplete: (chunked: TweetCommitData) => void;
+  emit: (streamed: User) => void;
+  onComplete: (streamed: User) => void;
 }) => {
   const { githubName, twitterName } = input;
   const { heatmapData: githubData, metadata } = await fetchGithubPage(githubName);
@@ -20,43 +50,32 @@ export const getUserDataStreamed = async (input: {
   }
   const tweetsStop = githubData[0]!.day;
   return fetchTweetsFromUser(twitterName, new Date(tweetsStop), (collection) => {
-    input.emit(parseCollection(collection, githubData));
+    input.emit(
+      toUserSchema({
+        githubName,
+        twitterName,
+        merged: parseCollection(collection, githubData),
+        metadata,
+        twitterPage,
+      })
+    );
   }).then(async (data) => {
     const merged = parseCollection(data, githubData);
-    input.onComplete(merged);
-    const totalCommits = merged.reduce(
-      (acc, data) => acc + data.commits,
-      0,
+    const asUser = toUserSchema({
+      githubName,
+      twitterName,
+      merged,
+      metadata,
+      twitterPage,
+    });
+    input.onComplete(
+      asUser
     );
-    const totalTweets = merged.reduce(
-      (acc, data) => acc + data.tweets,
-      0,
-    );
-    await db.insert(users).values({
-      twitterDisplayName: twitterPage.name,
-      twitterId: twitterPage.id_str,
-      twitterFollowerCount: twitterPage.followers_count,
-      githubFollowerCount: metadata.followers,
-      commitsMade: totalCommits,
-      githubName: githubName,
-      twitterInGithubBio: metadata.twitter_username?.toLowerCase() === twitterName.toLowerCase(),
-      twitterName: twitterName,
-      tweetsSent: totalTweets,
-      heatmapData: merged,
-    }).onDuplicateKeyUpdate({
-      set: {
-        twitterDisplayName: twitterPage.name,
-        twitterId: twitterPage.id_str,
-        twitterFollowerCount: twitterPage.followers_count,
-        githubFollowerCount: metadata.followers,
-        commitsMade: totalCommits,
-        githubName: githubName,
-        twitterName: twitterName,
-        twitterInGithubBio: metadata.twitter_username?.toLowerCase() === twitterName.toLowerCase(),
-        tweetsSent: totalTweets,
-        heatmapData: merged,
-      },
 
+    const { createdAt, updatedAt, ...rest } = asUser;
+
+    await db.insert(users).values(rest).onDuplicateKeyUpdate({
+      set: rest,
     })
   });
 };
@@ -123,24 +142,16 @@ import { and, eq } from "drizzle-orm";
 
 export async function getCachedUserData(input: { githubName: string, twitterName: string }) {
   const { githubName, twitterName } = input;
-  const [gh, twitterProfile] = await Promise.all([
-    fetchGithubPage(githubName),
-    fetchTwitterProfile(twitterName),
-  ]);
   const user = await db.select().from(users).where(
     and(
       eq(users.githubName, githubName),
       eq(users.twitterName, twitterName)
     )
   ).execute().then(x => x.at(0));
-  return {
-    ...gh,
-    twitterProfile,
-    data: user?.heatmapData,
-  };
+  return user;
 }
 
 export type PageData = {
   isDataLoading: boolean;
-  data: TweetCommitData;
+  user: User;
 };

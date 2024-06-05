@@ -1,17 +1,32 @@
 "use client";
-import { GithubIcon, TwitterIcon } from "lucide-react";
+import {
+  BadgeMinusIcon,
+  GithubIcon,
+  TwitterIcon,
+  VerifiedIcon,
+} from "lucide-react";
 import { RatioBarChart } from "./bar-chart";
 import { Heatmap } from "./heatmap";
 import { RatioPie } from "./pie";
 import { useState } from "react";
 import type { PageData } from "../../server/api/routers/get-data";
 import { api } from "../../trpc/react";
-import { GithubMetadata } from "../../server/lib/github";
-import { HeatmapData, getPageUrl, getRatioText } from "../../lib/utils";
+import {
+  HeatmapData,
+  getPageUrl,
+  getRatioText,
+  isVerifiedUser,
+} from "../../lib/utils";
 import { TwitterUser } from "../../server/lib/twitter.types";
 import { SocialData } from "../../components/ui/socialdata";
 import { TwitterAvatar } from "../../components/ui/twitter-avatar";
 import { TweetBox } from "../../components/ui/tweet-box";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../../components/ui/tooltip";
 
 function chunk<T>(array: T[], size: number): T[][] {
   return array.reduce((acc, _, i) => {
@@ -23,18 +38,23 @@ function chunk<T>(array: T[], size: number): T[][] {
 }
 
 export function Profile(props: {
-  githubName: string;
-  twitterName: string;
-  metadata: GithubMetadata;
-  ghHeatmap: HeatmapData[];
-  initialData: PageData | null | undefined;
-  twitterProfile: TwitterUser;
+  initialData: PageData;
   recentlyCompared: React.ReactNode;
+  fetchTweets: boolean;
 }) {
-  const { githubName, twitterName, ghHeatmap, twitterProfile } = props;
-  const [pageData, setPageData] = useState<PageData | null | undefined>(
-    props.initialData,
-  );
+  const [pageData, setPageData] = useState<PageData>(props.initialData);
+  const {
+    githubName,
+    twitterName,
+    commitsMade,
+    githubFollowerCount,
+    heatmapData,
+    tweetsSent,
+    twitterDisplayName,
+    twitterId,
+    twitterFollowerCount,
+  } = pageData.user;
+
   api.post.data.useSubscription(
     { github: githubName, twitter: twitterName },
     {
@@ -44,32 +64,20 @@ export function Profile(props: {
       onError(err) {
         console.error(err);
       },
-      enabled: !props.initialData,
+      enabled: props.fetchTweets,
     },
   );
 
-  const { data, isDataLoading } = pageData ?? {
-    data: ghHeatmap.map((x) => ({
-      day: x.day,
-      commits: x.value,
-      tweets: 0,
-    })),
-    isDataLoading: true,
-  };
-  const chunked = chunk(data, 7);
-  const totalCommits = chunked.reduce(
-    (acc, data) => acc + data.reduce((acc, data) => acc + data.commits, 0),
-    0,
-  );
-  const totalTweets = chunked.reduce(
-    (acc, data) => acc + data.reduce((acc, data) => acc + data.tweets, 0),
-    0,
-  );
+  const isDataLoading = pageData?.isDataLoading ?? true;
+
+  const chunked = chunk(heatmapData, 7);
+  const totalCommits = commitsMade;
+  const totalTweets = tweetsSent;
 
   const ogUrl = new URLSearchParams({
     github: githubName,
-    displayName: twitterProfile.name ?? githubName,
-    twtrId: twitterProfile.id_str,
+    displayName: twitterDisplayName,
+    twtrId: twitterId,
     twitter: twitterName,
     commits: totalCommits.toString(),
     tweets: totalTweets.toString(),
@@ -97,7 +105,7 @@ export function Profile(props: {
                     {twitterName}
                   </a>
                 </div>
-                {`${twitterProfile.followers_count.toLocaleString()} followers`}
+                {`${twitterFollowerCount.toLocaleString()} followers`}
               </div>
               <div className="flex flex-col">
                 <div className="flex flex-row items-center gap-1">
@@ -111,8 +119,28 @@ export function Profile(props: {
                     {githubName}
                   </a>
                 </div>
-                {`${props.metadata.followers.toLocaleString()} followers`}
+                {`${githubFollowerCount.toLocaleString()} followers`}
               </div>
+
+              <TooltipProvider>
+                <Tooltip delayDuration={100}>
+                  <TooltipTrigger className="flex flex-row items-center gap-1">
+                    {isVerifiedUser(pageData.user) ? (
+                      <>
+                        <VerifiedIcon size={20} /> Verified
+                      </>
+                    ) : (
+                      <>
+                        <BadgeMinusIcon size={20} /> Not Verified
+                      </>
+                    )}
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-[260px]">
+                    Verified users have their Twitter in their GitHub bio, or
+                    have the same handle on both platforms.
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
           </div>
         </div>
@@ -177,11 +205,7 @@ export function Profile(props: {
             displayName: `@${twitterName}`,
             tweets: totalTweets,
           })}\n\n${pageUrl}`}
-          src={
-            isDataLoading
-              ? "https://generated.vusercontent.net/placeholder.svg"
-              : ogImageUrl
-          }
+          src={ogImageUrl}
         />
       </div>
       {props.recentlyCompared}

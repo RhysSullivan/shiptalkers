@@ -1,13 +1,12 @@
 import { Github, Twitter } from "lucide-react";
-import { ComparisonCard, Hero } from "./components.client";
+import { Hero } from "./components.client";
 import { db } from "../server/db";
-import { users } from "../server/db/schema";
+import { User, users } from "../server/db/schema";
 import { desc } from "drizzle-orm";
 import { RecentlyComparedSection } from "./components.server";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -18,19 +17,9 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { ScrollArea } from "../components/ui/scroll-area";
 import Link from "next/link";
-import { getPageUrl } from "../lib/utils";
+import { getPageUrl, isVerifiedUser } from "../lib/utils";
 
-function TopTable(props: {
-  mode: "commits" | "tweets";
-  users: {
-    twitterId: string;
-    twitterName: string;
-    githubName: string;
-    twitterDisplayName: string;
-    tweetsSent: number;
-    commitsMade: number;
-  }[];
-}) {
+function TopTable(props: { mode: "commits" | "tweets"; users: User[] }) {
   return (
     <div className="pt-4">
       <h2 className="text-center font-bold">
@@ -47,7 +36,7 @@ function TopTable(props: {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {props.users.map((user) => (
+            {props.users.filter(isVerifiedUser).map((user) => (
               <TableRow key={user.twitterId}>
                 <TableCell className="w-[300px]">
                   <Link

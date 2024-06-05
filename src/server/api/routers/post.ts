@@ -3,7 +3,7 @@ import { Observer, observable } from '@trpc/server/observable';
 import { EventEmitter } from 'events';
 import { PageData, getUserDataStreamed } from "./get-data";
 import { createTRPCRouter, publicProcedure } from "../trpc";
-import { TweetCommitData } from "../../db/schema";
+import { TweetCommitData, User } from "../../db/schema";
 
 const ee = new EventEmitter();
 
@@ -47,7 +47,7 @@ export const postRouter = createTRPCRouter({
       console.log(`Subscribing to ${key}`)
       const listenToTweets = (input: {
         key: string;
-        data: TweetCommitData;
+        data: User;
         finished: boolean;
       }) => {
         if (input.key !== key) {
@@ -55,7 +55,7 @@ export const postRouter = createTRPCRouter({
         }
         emit.next({
           isDataLoading: !input.finished,
-          data: input.data,
+          user: input.data,
         });
       };
       void handleSubscribe({ ...input, emit, key });

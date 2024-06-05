@@ -9,9 +9,10 @@ import { Button } from "./button";
 import { LinkButton } from "./link-button";
 import { Textarea } from "./textarea";
 import { useQuery } from "@tanstack/react-query";
+import { ClipboardIcon, ClipboardCheckIcon } from "lucide-react";
 
 export function TweetBox(props: { src: string; text: string }) {
-  const [copySuccess, setCopySuccess] = useState("");
+  const [copySuccess, setCopySuccess] = useState<boolean>(false);
   const { data } = useQuery(["copy-image"], async () => {
     const response = await fetch(props.src);
     const blob = await response.blob();
@@ -28,9 +29,12 @@ export function TweetBox(props: { src: string; text: string }) {
       }
       const item = new ClipboardItem({ "image/png": data });
       await navigator.clipboard.write([item]);
-      setCopySuccess("Image copied to clipboard!");
+      // todo handle error
+      setCopySuccess(true);
+      setTimeout(() => {
+        setCopySuccess(false);
+      }, 2000);
     } catch (error) {
-      setCopySuccess("Failed to copy image.");
       console.error("Error copying image: ", error);
     }
   };
@@ -42,8 +46,9 @@ export function TweetBox(props: { src: string; text: string }) {
           src={props.src}
           width={300}
           height={200}
+          key={props.src}
           alt="Placeholder"
-          className="aspect-[2/1] max-h-[270px] w-full max-w-[516px] object-cover"
+          className="aspect-[2/1] h-[270px] w-[516px] w-full object-cover"
         />
         <Textarea
           placeholder="What's on your mind?"
@@ -53,8 +58,12 @@ export function TweetBox(props: { src: string; text: string }) {
         />
       </div>
       <div className="mt-4 flex w-full items-center justify-end space-x-2">
-        <Button onClick={copyToClipboard} variant={"blue"}>
-          Copy Image
+        <Button
+          onClick={copyToClipboard}
+          variant={"secondary"}
+          className="flex flex-row gap-2"
+        >
+          {copySuccess ? <ClipboardCheckIcon /> : <ClipboardIcon />} Copy Image
         </Button>
         <LinkButton
           href={"https://twitter.com/intent/tweet?" + queryParams.toString()}

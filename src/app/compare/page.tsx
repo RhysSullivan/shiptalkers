@@ -1,10 +1,15 @@
 import { Metadata } from "next";
 import { Profile } from "./profile";
-import { getCachedUserData } from "../../server/api/routers/get-data";
+import {
+  getCachedUserData,
+  toUserSchema,
+} from "../../server/api/routers/get-data";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { RecentlyComparedSection } from "../components.server";
 import { cookies } from "next/headers";
+import { fetchGithubPage } from "../../server/lib/github";
+import { fetchTwitterProfile } from "../../server/lib/twitter";
 type Props = {
   searchParams:
     | {
@@ -33,27 +38,27 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   if (github == twitter && !("name" in props.searchParams)) {
     redirect(`/compare?name=${github}`);
   }
-  const { data, twitterProfile } = await getCachedUserData({
+  const user = await getCachedUserData({
     githubName: github,
     twitterName: twitter,
   });
 
+  if (!user) {
+    return {};
+  }
+
   const ogUrl = new URLSearchParams({
     github,
-    displayName: twitterProfile?.name ?? twitter,
+    displayName: user.twitterDisplayName,
     twitter,
-    twtrId: twitterProfile?.id_str ?? "",
-    commits: (
-      data?.reduce((acc, { commits }) => acc + commits, 0) ?? 0
-    ).toString(),
-    tweets: (
-      data?.reduce((acc, { tweets }) => acc + tweets, 0) ?? 0
-    ).toString(),
+    twtrId: user.twitterId,
+    commits: user.commitsMade.toString(),
+    tweets: user.tweetsSent.toString(),
   });
   const ogImageUrl = `https://shiptalkers.dev/api/og/compare?${ogUrl.toString()}`;
   return {
     openGraph: {
-      images: data ? [{ url: ogImageUrl }] : [],
+      images: [{ url: ogImageUrl }],
     },
   };
 }
@@ -64,26 +69,48 @@ export default async function Page(props: Props) {
     return redirect("/not-ready");
   }
   const { github, twitter } = parse(props);
-  const {
-    metadata,
-    data: cached,
-    heatmapData,
-    twitterProfile,
-  } = await getCachedUserData({ githubName: github, twitterName: twitter });
-  if (!metadata || !twitterProfile) return null;
+  const user = await getCachedUserData({
+    githubName: github,
+    twitterName: twitter,
+  });
+  if (user) {
+    return (
+      <Profile
+        initialData={{ isDataLoading: false, user }}
+        fetchTweets={false}
+        recentlyCompared={
+          <Suspense>
+            <RecentlyComparedSection filterTwitterNames={[twitter]} />
+          </Suspense>
+        }
+      />
+    );
+  }
+  const [{ heatmapData, metadata: githubMetadata }, twitterProfile] =
+    await Promise.all([fetchGithubPage(github), fetchTwitterProfile(twitter)]);
+  if (!twitterProfile) {
+    return <div>Twitter profile not found</div>;
+  }
+  if (!githubMetadata) {
+    return <div>GitHub profile not found</div>;
+  }
   return (
     <Profile
-      githubName={github}
-      twitterName={twitter}
-      twitterProfile={twitterProfile}
-      metadata={metadata}
-      ghHeatmap={heatmapData}
-      initialData={
-        cached && {
-          data: cached,
-          isDataLoading: false,
-        }
-      }
+      initialData={{
+        isDataLoading: true,
+        user: toUserSchema({
+          githubName: github,
+          merged: heatmapData.map((x) => ({
+            day: x.day,
+            commits: x.value,
+            tweets: 0,
+          })),
+          metadata: githubMetadata,
+          twitterPage: twitterProfile,
+          twitterName: twitter,
+        }),
+      }}
+      fetchTweets={true}
       recentlyCompared={
         <Suspense>
           <RecentlyComparedSection filterTwitterNames={[twitter]} />

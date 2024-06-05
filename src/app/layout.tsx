@@ -73,14 +73,14 @@ export default function RootLayout({
         <TRPCReactProvider cookies={cookies().toString()}>
           <PHProvider>
             <PostHogPageView />
-            <nav className="flex items-center justify-between bg-white p-2 shadow-lg  dark:bg-gray-900">
+            <nav className="flex items-center justify-between bg-white py-2 shadow-lg md:p-2  dark:bg-gray-900">
               <a href="/">
                 <h1 className="text-2xl font-bold">Shiptalkers</h1>
               </a>
               <div className="flex items-center space-x-4">
                 <Link
                   href="https://github.com/RhysSullivan/shiptalkers"
-                  className="inline-flex h-9 items-center justify-center rounded-md bg-gray-50 px-4 py-2 text-sm font-medium text-gray-900 shadow transition-colors hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-700 disabled:pointer-events-none disabled:opacity-50"
+                  className="hidden h-9 items-center justify-center rounded-md bg-gray-50 px-4 py-2 text-sm font-medium text-gray-900 shadow transition-colors hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-700 disabled:pointer-events-none disabled:opacity-50 sm:inline-flex"
                   target="_blank"
                   prefetch={false}
                 >
