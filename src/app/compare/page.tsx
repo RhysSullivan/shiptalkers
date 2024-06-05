@@ -73,7 +73,7 @@ export default async function Page(props: Props) {
   if (user) {
     return (
       <Profile
-        initialData={{ isDataLoading: true, user }}
+        initialData={{ isDataLoading: false, user }}
         fetchTweets={false}
         recentlyCompared={
           <Suspense>
