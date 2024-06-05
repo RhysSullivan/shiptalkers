@@ -13,7 +13,7 @@
     "dev:next": "pnpm with-env next dev --turbo",
     "start:wss": "pnpm with-env cross-env NODE_ENV=production node dist/server/prodServer.js",
     "start:next": "pnpm with-env cross-env NODE_ENV=production next start",
-    "local:start": "run-p start:*", 
+    "local:start": "run-p start:*",
     "dev": "run-p dev:*",
     "lint": "next lint"
   },
@@ -25,6 +25,7 @@
     "@headlessui/react": "^2.0.4",
     "@headlessui/tailwindcss": "^0.2.1",
     "@planetscale/database": "^1.11.0",
+    "@radix-ui/react-scroll-area": "^1.0.5",
     "@radix-ui/react-slot": "^1.0.2",
     "@radix-ui/react-tooltip": "^1.0.7",
     "@remixicon/react": "^4.2.0",
