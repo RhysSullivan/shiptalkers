@@ -281,7 +281,7 @@ export function Heatmap(props: Pick<HeatmapProps, "data">) {
   return (
     <div className="h-[170px] w-[1280px]">
       <ParentSize>
-        {({ width, height }) => (
+        {() => (
           <HeatmapSized width={1280} height={170} events data={props.data} />
         )}
       </ParentSize>

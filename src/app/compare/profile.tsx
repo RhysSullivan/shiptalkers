@@ -11,13 +11,7 @@ import { RatioPie } from "./pie";
 import { useState } from "react";
 import type { PageData } from "../../server/api/routers/get-data";
 import { api } from "../../trpc/react";
-import {
-  HeatmapData,
-  getPageUrl,
-  getRatioText,
-  isVerifiedUser,
-} from "../../lib/utils";
-import { TwitterUser } from "../../server/lib/twitter.types";
+import { getPageUrl, getRatioText, isVerifiedUser } from "../../lib/utils";
 import { SocialData } from "../../components/ui/socialdata";
 import { TwitterAvatar } from "../../components/ui/twitter-avatar";
 import { TweetBox } from "../../components/ui/tweet-box";
@@ -27,6 +21,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../../components/ui/tooltip";
+import Link from "next/link";
 
 function chunk<T>(array: T[], size: number): T[][] {
   return array.reduce((acc, _, i) => {
@@ -35,6 +30,36 @@ function chunk<T>(array: T[], size: number): T[][] {
     }
     return acc;
   }, [] as T[][]);
+}
+
+function StreamingCTAs() {
+  return (
+    <div className="flex w-full flex-col justify-start py-2">
+      <div className="flex flex-row gap-4 text-center text-xl  font-semibold">
+        We're streaming in the data now
+        <div className="h-6 w-6 animate-spin rounded-full border-b-2 border-blue-500"></div>
+      </div>
+      <span>
+        While you wait you can{" "}
+        <Link
+          href="https://twitter.com/intent/follow?screen_name=RhysSullivan"
+          className="text-blue-500 hover:underline"
+          target="_blank"
+        >
+          follow me on Twitter
+        </Link>{" "}
+        and{" "}
+        <Link
+          href="https://github.com/RhysSullivan/shiptalkers"
+          target="_blank"
+          className="text-blue-500 hover:underline"
+        >
+          star the project
+        </Link>{" "}
+        on GitHub
+      </span>
+    </div>
+  );
 }
 
 export function Profile(props: {
@@ -163,25 +188,12 @@ export function Profile(props: {
           </div>
         </div>
       </div>
-      {isDataLoading &&
-        (pageData ? (
-          <div className="flex flex-row gap-4 text-center text-2xl font-bold">
-            We're streaming in the data now
-            {/* spinner */}
-            <div className="h-6 w-6 animate-spin rounded-full border-b-2 border-blue-500"></div>
-          </div>
-        ) : (
-          <div className="flex flex-row gap-4 text-center text-2xl font-bold">
-            We're waiting for the data stream to start
-            {/* spinner */}
-            <div className="h-6 w-6 animate-spin rounded-full border-b-2 border-blue-500"></div>
-          </div>
-        ))}
+      {isDataLoading && <StreamingCTAs />}
       <div className="mx-auto flex w-full max-w-[90vw] justify-start overflow-x-auto xl:justify-center">
         <Heatmap data={chunked} />
       </div>
       <a
-        className="flex w-full flex-row gap-2 text-start font-semibold"
+        className="flex w-full flex-row gap-2 py-4 text-start font-semibold"
         target="_blank"
         href="https://socialdata.tools/?ref=shiptalkers.dev"
       >

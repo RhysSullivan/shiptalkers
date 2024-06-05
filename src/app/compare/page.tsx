@@ -65,9 +65,6 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 export const revalidate = 60; // 1 minute
 
 export default async function Page(props: Props) {
-  if (!(cookies().get("token")?.value === "preview")) {
-    return redirect("/not-ready");
-  }
   const { github, twitter } = parse(props);
   const user = await getCachedUserData({
     githubName: github,
@@ -76,7 +73,7 @@ export default async function Page(props: Props) {
   if (user) {
     return (
       <Profile
-        initialData={{ isDataLoading: false, user }}
+        initialData={{ isDataLoading: true, user }}
         fetchTweets={false}
         recentlyCompared={
           <Suspense>

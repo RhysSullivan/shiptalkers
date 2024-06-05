@@ -79,8 +79,8 @@ export default function RootLayout({
               </a>
               <div className="flex items-center space-x-4">
                 <Link
-                  href="https://github.com/RhysSullivan/shiptalkers"
                   className="hidden h-9 items-center justify-center rounded-md bg-gray-50 px-4 py-2 text-sm font-medium text-gray-900 shadow transition-colors hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-700 disabled:pointer-events-none disabled:opacity-50 sm:inline-flex"
+                  href="https://github.com/RhysSullivan/shiptalkers"
                   target="_blank"
                   prefetch={false}
                 >

@@ -3,7 +3,7 @@ import { Observer, observable } from '@trpc/server/observable';
 import { EventEmitter } from 'events';
 import { PageData, getUserDataStreamed } from "./get-data";
 import { createTRPCRouter, publicProcedure } from "../trpc";
-import { TweetCommitData, User } from "../../db/schema";
+import { User } from "../../db/schema";
 
 const ee = new EventEmitter();
 

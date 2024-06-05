@@ -65,9 +65,6 @@ function TopTable(props: { mode: "commits" | "tweets"; users: User[] }) {
 }
 
 export default async function Component() {
-  if (!(cookies().get("token")?.value === "preview")) {
-    return redirect("/not-ready");
-  }
   const topTweeters = await db
     .select()
     .from(users)
