@@ -9,8 +9,8 @@ export const transformer = superjson;
 function getBaseUrl() {
   if (typeof window !== "undefined") return "";
   if (process.env.NODE_ENV === "production") {
-    if (process.env.NEXT_PUBLIC_ENVIRONMENT === "local") return "http://localhost:3000";
-    return "https://shiptalkers.dev"
+    if (process.env.NEXT_PUBLIC_ENVIRONMENT === "local") return "http://localhost:3001";
+    return "https://api.shiptalkers.dev"
   }
   return `http://localhost:${process.env.PORT ?? 3000}`;
 }

@@ -16,8 +16,8 @@ const wsClient = createWSClient({
     process.env.NODE_ENV === "development"
       ? `ws://localhost:3001`
       : process.env.NEXT_PUBLIC_ENVIRONMENT === "local"
-        ? `ws://localhost:3000`
-        : `wss://shiptalkers.dev`,
+        ? `ws://localhost:3001`
+        : `wss://api.shiptalkers.dev`,
 });
 
 import { getUrl, transformer } from "./shared";

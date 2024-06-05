@@ -11,7 +11,9 @@
     "build:next": "pnpm with-env cross-env NODE_ENV=production next build",
     "build:wss": "pnpm with-env tsc --project tsconfig.server.json",
     "dev:next": "pnpm with-env next dev --turbo",
-    "start": "pnpm with-env cross-env NODE_ENV=production node dist/server/prodServer.js",
+    "start:wss": "pnpm with-env cross-env NODE_ENV=production node dist/server/prodServer.js",
+    "start:next": "pnpm with-env cross-env NODE_ENV=production next start",
+    "local:start": "run-p start:*", 
     "dev": "run-p dev:*",
     "lint": "next lint"
   },
