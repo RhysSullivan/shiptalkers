@@ -40,7 +40,7 @@ export function TweetBox(props: { src: string; text: string }) {
   };
 
   return (
-    <div className="mx-auto max-w-2xl rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-950">
+    <div className="mx-auto max-w-[100vw] rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-950">
       <div className="overflow-hidden  border-b-2 border-gray-200 dark:border-gray-800">
         <img
           src={props.src}
@@ -48,7 +48,7 @@ export function TweetBox(props: { src: string; text: string }) {
           height={200}
           key={props.src}
           alt="Placeholder"
-          className="aspect-[2/1] h-[270px] w-[516px] w-full object-cover"
+          className="aspect-[2/1] w-[100vw] object-cover sm:h-[270px] md:w-[516px]"
         />
         <Textarea
           placeholder="What's on your mind?"

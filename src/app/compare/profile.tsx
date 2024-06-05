@@ -217,7 +217,11 @@ export function Profile(props: {
             displayName: `@${twitterName}`,
             tweets: totalTweets,
           })}\n\n${pageUrl}`}
-          src={ogImageUrl}
+          src={
+            isDataLoading
+              ? "https://generated.vusercontent.net/placeholder.svg"
+              : ogImageUrl
+          }
         />
       </div>
       {props.recentlyCompared}
