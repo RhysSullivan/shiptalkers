@@ -10,6 +10,7 @@ import { ChangeEvent, useEffect, useState } from "react";
 import { GithubMetadata } from "../server/lib/github";
 import { GitTweetBars } from "../components/ui/git-tweet-bars";
 import { TwitterAvatar } from "../components/ui/twitter-avatar";
+import { getPageUrl } from "../lib/utils";
 
 // Debounce function
 // eslint-disable-next-line @typescript-eslint/ban-types
@@ -89,13 +90,10 @@ export function Hero() {
         // just get the names of both
         const githubName = githubUrl.split("/").pop();
         const twitterName = twitterUrl.split("/").pop();
-        if (githubName == twitterName) {
-          void router.push(`/compare?name=${githubName}`);
-        } else {
-          void router.push(
-            `/compare?github=${githubName}&twitter=${twitterName}`,
-          );
-        }
+        if (!githubName || !twitterName) return;
+        void router.push(
+          getPageUrl({ github: githubName, twitter: twitterName }),
+        );
       }}
     >
       <div className="flex w-full max-w-sm items-center space-x-2">
@@ -145,7 +143,10 @@ export function ComparisonCard(props: { user: User }) {
   return (
     <a
       className="flex flex-row items-center  justify-between rounded-md border-2 px-4 py-2 drop-shadow-sm transition-all hover:scale-105 hover:border-blue-500 hover:shadow-lg"
-      href={`/compare?github=${user.githubName}&twitter=${user.twitterName}`}
+      href={getPageUrl({
+        github: user.githubName,
+        twitter: user.twitterName,
+      })}
     >
       <div className="flex flex-row items-start justify-center gap-4 ">
         <TwitterAvatar name={user.twitterName} className="size-24" />

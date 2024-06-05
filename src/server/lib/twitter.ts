@@ -1,3 +1,4 @@
+import { env } from "../../env";
 import { readFromCache, writeToCache } from "./cache";
 import { ErrorResponse, SuccessResponse, Tweet, TwitterUser } from "./twitter.types";
 
@@ -13,7 +14,7 @@ export async function fetchTwitterProfile(name: string) {
     return userInfo.json() as Promise<TwitterUser | undefined>;
 }
 
-const SAFETY_STOP = 3000;
+const SAFETY_STOP = env.NODE_ENV === "development" ? 10 : 3000;
 
 export type PartialTweet = {
     id: string;

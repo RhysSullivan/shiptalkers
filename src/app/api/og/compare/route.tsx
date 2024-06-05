@@ -3,6 +3,7 @@ import { ImageResponse } from "next/og";
 
 import * as d3 from "d3";
 import { GitTweetBars } from "../../../../components/ui/git-tweet-bars";
+import { getPageUrl, getRatioText } from "../../../../lib/utils";
 
 // Data for the pie chart
 const data = [
@@ -73,15 +74,7 @@ export async function GET(req: Request) {
   }
   const commits = Number(commitsS);
   const tweets = Number(tweetsS);
-  const percentageTweets = Math.abs((tweets / commits) * 100 - 100).toFixed();
-  const percentageCommits = Math.abs((commits / tweets) * 100 - 100).toFixed();
-  console.log(percentageTweets, percentageCommits);
-  const txt =
-    percentageCommits == percentageTweets
-      ? ` ${displayName} spends equal time tweeting and coding`
-      : tweets > commits
-        ? `${displayName} spends ${percentageTweets}% more time tweeting than coding`
-        : `${displayName} spends ${percentageCommits}% more time coding than tweeting`;
+  const txt = getRatioText({ tweets, commits, displayName });
 
   const UserMetadata = () => (
     <div
@@ -165,6 +158,11 @@ export async function GET(req: Request) {
             width: "220px",
             height: "220px",
             borderRadius: "50%",
+
+            clipPath:
+              twitter == "rauchg"
+                ? "polygon(50% 0%, 0% 100%, 100% 100%)" /* adjust percentages as needed */
+                : "none",
           }}
         />
       </div>
@@ -172,9 +170,10 @@ export async function GET(req: Request) {
     </div>
   );
 
-  const url = `shiptalkers.dev/compare?${
-    github == twitter ? `name=${github}` : `github=${github}&twitter=${twitter}`
-  }`;
+  const url = `shiptalkers.dev${getPageUrl({
+    github,
+    twitter,
+  })}`;
   const barHeight = 500;
 
   return new ImageResponse(

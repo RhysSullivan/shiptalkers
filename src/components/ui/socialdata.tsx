@@ -56,9 +56,9 @@ export function SocialData() {
           width="843.718"
           height="843.718"
           filterUnits="userSpaceOnUse"
-          color-interpolation-filters="sRGB"
+          colorInterpolationFilters="sRGB"
         >
-          <feFlood flood-opacity="0" result="BackgroundImageFix"></feFlood>
+          <feFlood floodOpacity="0" result="BackgroundImageFix"></feFlood>
           <feColorMatrix
             in="SourceAlpha"
             type="matrix"
@@ -90,9 +90,9 @@ export function SocialData() {
           width="1314"
           height="1314"
           filterUnits="userSpaceOnUse"
-          color-interpolation-filters="sRGB"
+          colorInterpolationFilters="sRGB"
         >
-          <feFlood flood-opacity="0" result="BackgroundImageFix"></feFlood>
+          <feFlood floodOpacity="0" result="BackgroundImageFix"></feFlood>
           <feColorMatrix
             in="SourceAlpha"
             type="matrix"
@@ -132,8 +132,8 @@ export function SocialData() {
           y2="1036.5"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#43AFFD"></stop>
-          <stop offset="1" stop-color="#044E93"></stop>
+          <stop stopColor="#43AFFD"></stop>
+          <stop offset="1" stopColor="#044E93"></stop>
         </linearGradient>
         <linearGradient
           id="paint1_linear_79_2"
@@ -143,8 +143,8 @@ export function SocialData() {
           y2="949.5"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="white"></stop>
-          <stop offset="1" stop-color="#CAE3FA"></stop>
+          <stop stopColor="white"></stop>
+          <stop offset="1" stopColor="#CAE3FA"></stop>
         </linearGradient>
       </defs>
     </svg>

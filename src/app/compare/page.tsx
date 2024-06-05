@@ -85,12 +85,9 @@ export default async function Page(props: Props) {
         }
       }
       recentlyCompared={
-        <div>
-          {new Date().toISOString()}
-          <Suspense>
-            <RecentlyComparedSection filterTwitterNames={[twitter]} />
-          </Suspense>
-        </div>
+        <Suspense>
+          <RecentlyComparedSection filterTwitterNames={[twitter]} />
+        </Suspense>
       }
     />
   );

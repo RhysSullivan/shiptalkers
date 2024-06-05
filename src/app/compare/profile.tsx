@@ -7,10 +7,11 @@ import { useState } from "react";
 import type { PageData } from "../../server/api/routers/get-data";
 import { api } from "../../trpc/react";
 import { GithubMetadata } from "../../server/lib/github";
-import { HeatmapData } from "../../lib/utils";
+import { HeatmapData, getPageUrl, getRatioText } from "../../lib/utils";
 import { TwitterUser } from "../../server/lib/twitter.types";
 import { SocialData } from "../../components/ui/socialdata";
 import { TwitterAvatar } from "../../components/ui/twitter-avatar";
+import { TweetBox } from "../../components/ui/tweet-box";
 
 function chunk<T>(array: T[], size: number): T[][] {
   return array.reduce((acc, _, i) => {
@@ -74,6 +75,10 @@ export function Profile(props: {
     tweets: totalTweets.toString(),
   });
   const ogImageUrl = `/api/og/compare?${ogUrl.toString()}`;
+  const pageUrl = `https://shiptalkers.dev${getPageUrl({
+    github: githubName,
+    twitter: twitterName,
+  })}`;
   return (
     <div className="mx-auto flex w-full max-w-screen-xl flex-grow flex-col items-center justify-center py-8">
       <div className="flex w-full flex-row items-center justify-between gap-4 md:mx-auto">
@@ -165,22 +170,20 @@ export function Profile(props: {
           />
         </div>
       </div>
-      {!isDataLoading && (
-        <>
-          <div className="flex flex-col py-4">
-            <img
-              src={ogImageUrl}
-              alt="og"
-              className="max-w-[90vw] border-2 md:max-w-[600px]"
-              key={
-                process.env.NODE_ENV === "development"
-                  ? new Date().toISOString()
-                  : undefined
-              }
-            />
-          </div>
-        </>
-      )}
+      <div className="py-4">
+        <TweetBox
+          text={`${getRatioText({
+            commits: totalCommits,
+            displayName: `@${twitterName}`,
+            tweets: totalTweets,
+          })}\n\n${pageUrl}`}
+          src={
+            isDataLoading
+              ? "https://generated.vusercontent.net/placeholder.svg"
+              : ogImageUrl
+          }
+        />
+      </div>
       {props.recentlyCompared}
     </div>
   );
