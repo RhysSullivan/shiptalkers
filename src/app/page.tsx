@@ -32,16 +32,16 @@ function TopTable(props: {
   }[];
 }) {
   return (
-    <div className=" pt-4">
+    <div className="pt-4">
       <h2 className="text-center font-bold">
         {props.mode === "tweets" ? "Top Yappers" : "Top Contributors"}
       </h2>
-      <ScrollArea className="max-h-[500px] rounded-md border">
+      <ScrollArea className="h-[400px] rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>User</TableHead>
-              <TableHead>
+              <TableHead className="text-center">
                 {props.mode === "tweets" ? "Tweets Sent" : "Commits Made"}
               </TableHead>
             </TableRow>
@@ -104,7 +104,7 @@ export default async function Component() {
         ships code or if it's all just shiptalk
       </span>
       <Hero />
-      <div className="flex flex-row justify-center gap-16">
+      <div className="flex flex-col justify-center gap-4 px-2 md:flex-row md:gap-16">
         <TopTable mode="tweets" users={topTweeters} />
         <TopTable mode="commits" users={topCommitters} />
       </div>
