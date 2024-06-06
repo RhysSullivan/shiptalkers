@@ -18,7 +18,7 @@ const throttleProfile = throttledQueue({
 
 export async function fetchTwitterProfile(name: string) {
     const cached = await readFromCache<TwitterUser>(`twitter-profile-${name}`);
-    if (cached) {
+    if (cached && !('json' in cached) && 'name' in cached) {
         return cached;
     }
     const userInfo = await throttleProfile(async () => {
@@ -39,9 +39,9 @@ export async function fetchTwitterProfile(name: string) {
         }
         throw new Error(`Failed to fetch twitter profile for ${name} ${userInfo.status}`);
     }
-    const data = userInfo.json();
+    const data = await userInfo.json() as Promise<TwitterUser>;
     await writeToCache(`twitter-profile-${name}`, data);
-    return data as Promise<TwitterUser | undefined>;
+    return data;
 }
 
 const SAFETY_STOP = env.NODE_ENV === "development" ? 10 : 3000;
