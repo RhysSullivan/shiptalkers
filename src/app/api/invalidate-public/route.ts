@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
     try {
         await rateLimiter.consume(ip, 1)
     } catch (error) {
-        console.error(`Rate limited ${github} ${twitter} ${ip}`)
+        console.error(`Rate limited ${github} ${twitter} ${ip} ${error}`)
         return new Response("Rate limited", { status: 429 });
     }
     if (reset) {
