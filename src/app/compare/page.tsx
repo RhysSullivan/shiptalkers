@@ -109,27 +109,34 @@ export default async function Page(props: Props) {
     return <div>GitHub profile not found</div>;
   }
   return (
-    <Profile
-      initialData={{
-        isDataLoading: true,
-        user: toUserSchema({
-          githubName: github,
-          merged: heatmapData.map((x) => ({
-            day: x.day,
-            commits: x.value,
-            tweets: 0,
-          })),
-          metadata: githubMetadata,
-          twitterPage: twitterProfile,
-          twitterName: twitter,
-        }),
-      }}
-      fetchTweets={true}
-      recentlyCompared={
-        <Suspense>
-          <BrowseSection filterTwitterNames={[twitter]} sort="recent" />
-        </Suspense>
-      }
-    />
+    <div>
+      We're being rate limited at the moment, the site will be back in 10
+      minutes in the mean time explore the existing profiles!
+      <BrowseSection filterTwitterNames={[twitter]} sort="recent" />
+    </div>
   );
+  // return (
+  //   <Profile
+  //     initialData={{
+  //       isDataLoading: true,
+  //       user: toUserSchema({
+  //         githubName: github,
+  //         merged: heatmapData.map((x) => ({
+  //           day: x.day,
+  //           commits: x.value,
+  //           tweets: 0,
+  //         })),
+  //         metadata: githubMetadata,
+  //         twitterPage: twitterProfile,
+  //         twitterName: twitter,
+  //       }),
+  //     }}
+  //     fetchTweets={true}
+  //     recentlyCompared={
+  //       <Suspense>
+  //         <BrowseSection filterTwitterNames={[twitter]} sort="recent" />
+  //       </Suspense>
+  //     }
+  //   />
+  // );
 }
