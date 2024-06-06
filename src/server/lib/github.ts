@@ -46,7 +46,6 @@ async function fetchTotalContributions(name: string) {
         const doc2 = parse(content);
         const h2 = doc2.querySelector("h2");
         const match = h2?.innerText.trim().split(" ").at(0)?.replace(',', '')
-        console.log(h2?.innerText, match)
         if (match) {
             total += parseInt(match);
         } else {
