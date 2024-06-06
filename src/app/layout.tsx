@@ -1,11 +1,9 @@
 import "../styles/globals.css";
 
 import { Inter } from "next/font/google";
-import { cookies } from "next/headers";
 import { TRPCReactProvider } from "../trpc/react";
 import { PHProvider, PostHogPageView } from "../components/ui/posthog";
 import Link from "next/link";
-import ShineBorder from "../components/ui/shine-border";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -70,7 +68,7 @@ export default function RootLayout({
       <body
         className={`font-sans ${inter.variable} flex min-h-screen flex-col bg-gray-100 dark:bg-gray-800`}
       >
-        <TRPCReactProvider cookies={cookies().toString()}>
+        <TRPCReactProvider>
           <PHProvider>
             <PostHogPageView />
             <nav className="z-50 bg-white px-4 py-2 shadow-lg dark:bg-gray-900">
