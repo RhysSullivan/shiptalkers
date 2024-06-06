@@ -1,6 +1,7 @@
 import { env } from "../../env";
 import { readFromCache, writeToCache } from "./cache";
 import { ErrorResponse, SuccessResponse, Tweet, TwitterUser } from "./twitter.types";
+import { pThrottle } from "./throttle";
 
 
 const throttleProfile = pThrottle({
@@ -49,7 +50,6 @@ export type PartialTweet = {
     reply_count: number;
     view_count: number;
 }
-import { pThrottle } from "./throttle";
 
 
 const throttle = pThrottle({
