@@ -1,5 +1,7 @@
 # TODO:
 
+- Include a guide to setup the project in local environment
+
 - after comparing, give them a special name i.e "Indie Hacker, Reply Guy, etc"
 
   - Special name ideas:

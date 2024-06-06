@@ -1,7 +1,7 @@
 import { Github, Twitter } from "lucide-react";
 import { Hero } from "./components.client";
 import { db } from "../server/db";
-import { User, users } from "../server/db/schema";
+import { type User, users } from "../server/db/schema";
 import { desc } from "drizzle-orm";
 import { BrowseSection } from "./components.server";
 import {
