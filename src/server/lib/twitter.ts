@@ -11,6 +11,9 @@ export async function fetchTwitterProfile(name: string) {
         },
         cache: "force-cache",
     })
+    if (!userInfo.ok) {
+        throw new Error(`Failed to fetch twitter profile for ${name}`);
+    }
     return userInfo.json() as Promise<TwitterUser | undefined>;
 }
 

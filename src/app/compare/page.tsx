@@ -90,6 +90,16 @@ export default async function Page(props: Props) {
       />
     );
   }
+  try {
+    await fetchGithubPage(github);
+  } catch (error) {
+    return <div>GitHub profile not found</div>;
+  }
+  try {
+    await fetchTwitterProfile(twitter);
+  } catch (error) {
+    return <div>Twitter profile not found</div>;
+  }
   const [{ heatmapData, metadata: githubMetadata }, twitterProfile] =
     await Promise.all([fetchGithubPage(github), fetchTwitterProfile(twitter)]);
   if (!twitterProfile) {
