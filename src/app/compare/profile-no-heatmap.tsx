@@ -213,10 +213,7 @@ export function Profile(props: {
           Powered by <SocialData />
         </a>
       </div>
-      <span>
-        We've given up on showing heatmaps of contribution counts and instead
-        are just doing total all time tweets & commits
-      </span>
+
       {!isDataLoading && (
         <div className="py-4">
           <TweetBox
@@ -233,6 +230,10 @@ export function Profile(props: {
           />
         </div>
       )}
+      <span>
+        We've given up on showing heatmaps of contribution counts and instead
+        are just doing total all time tweets & commits
+      </span>
       {props.recentlyCompared}
     </div>
   );
