@@ -35,6 +35,7 @@ function parse(props: Props) {
         twitter: props.searchParams.twitter.toLowerCase(),
       };
 }
+export const revalidate = 60 * 60; // 1 hour
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const { github, twitter } = parse(props);
@@ -64,7 +65,6 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     },
   };
 }
-export const revalidate = 60; // 1 minute
 
 export default async function Page(props: Props) {
   let github: string;

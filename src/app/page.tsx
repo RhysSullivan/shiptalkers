@@ -17,6 +17,8 @@ import { ScrollArea } from "../components/ui/scroll-area";
 import Link from "next/link";
 import { getPageUrl, isVerifiedUser } from "../lib/utils";
 
+export const revalidate = 600; // 10 minutes
+
 function TopTable(props: { mode: "commits" | "tweets"; users: User[] }) {
   return (
     <div className="pt-4">

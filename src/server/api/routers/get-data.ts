@@ -87,11 +87,16 @@ export const getUserDataStreamed = async (input: {
       twitter: twitterName,
       token: process.env.INVALIDATE_TOKEN!,
     });
-    await fetch(
+    const invalidateRes = await fetch(
       process.env.NODE_ENV === "production"
-        ? "https://shiptalkers.dev/api/invalidate"
-        : "http://localhost:3000/api/invalidate",
-    )
+        ? "https://shiptalkers.dev/api/invalidate?" + queryParams.toString()
+        : "http://localhost:3000/api/invalidate?" + queryParams.toString(),
+    );
+    if (!invalidateRes.ok) {
+      console.error(`Failed to invalidate cache for ${githubName}`, await invalidateRes.text(), queryParams.toString());
+    } else {
+      console.log(`Invalidated cache ${githubName}`, queryParams.toString());
+    }
   });
 };
 

@@ -17,7 +17,6 @@ export const metadata = {
     "Find out if people on Twitter actually ship code or if they're just shiptalking.",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
-export const revalidate = 600; // 1 minute
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function GithubIcon(props: any) {
