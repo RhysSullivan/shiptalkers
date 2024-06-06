@@ -12,6 +12,7 @@ const vercelTwitterPeople = [
   "tomlienard",
   "delba_oliveira",
   "jaredpalmer",
+  "timneutkens"
 ];
 
 export function TwitterAvatar(props: {
