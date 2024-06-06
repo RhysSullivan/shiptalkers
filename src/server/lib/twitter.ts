@@ -74,7 +74,10 @@ async function fetchFromSocialData(input: {
     if ("status" in json) {
         throw new Error(json.message);
     }
-    json.tweets = json.tweets ?? [];
+    if (!('tweets' in json) || json.tweets === undefined) {
+        console.error('No tweets found in response', json);
+        throw new Error('No tweets found in response');
+    }
     const oldestTweet = json.tweets
         .sort((a, b) => (BigInt(a.id_str) < BigInt(b.id_str) ? 1 : -1))
         .at(-1);
