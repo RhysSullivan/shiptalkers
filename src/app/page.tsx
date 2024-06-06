@@ -40,7 +40,7 @@ function TopTable(props: { mode: "commits" | "tweets"; users: User[] }) {
               <TableRow key={user.twitterId}>
                 <TableCell className="w-[300px]">
                   <div className="flex flex-row items-center gap-2 font-medium">
-                    <TwitterAvatar name={user.twitterName} className="size-8" />
+                    <TwitterAvatar user={user} className="size-8" />
                     <Link
                       href={getPageUrl({
                         github: user.githubName,

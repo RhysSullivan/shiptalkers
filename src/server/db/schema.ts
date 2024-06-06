@@ -21,6 +21,10 @@ export const mysqlTable = mysqlTableCreator(
 
 const int11 = customType<{ data: number }>({
   dataType() {
+    // i have no idea
+    if (process.env.DATABASE_URL?.includes("localhost")) {
+      return "int(11)";
+    }
     return "int";
   },
 });
@@ -49,6 +53,9 @@ export const users = mysqlTable("user", {
   twitterName: varchar("twitterName", {
     length: 255,
   }).notNull(),
+  twitterAvatarUrl: varchar("twitterAvatarUrl", {
+    length: 255,
+  }),
   twitterInGithubBio: boolean("twitterInGithubBio").notNull(),
   createdAt: timestamp("createdAt").notNull().default(sql`CURRENT_TIMESTAMP`),
   updatedAt: timestamp("updated_at").default(

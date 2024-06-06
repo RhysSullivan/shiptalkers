@@ -58,6 +58,9 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     commits: user.commitsMade.toString(),
     tweets: user.tweetsSent.toString(),
   });
+  if (user.twitterAvatarUrl) {
+    ogUrl.set("avatar", user.twitterAvatarUrl);
+  }
   const ogImageUrl = `https://shiptalkers.dev/api/og/compare?${ogUrl.toString()}`;
   return {
     openGraph: {
@@ -116,6 +119,7 @@ export default async function Page(props: Props) {
               followers_count: 0,
               id_str: "0",
               name: twitter,
+              profile_image_url_https: null,
             },
             twitterName: twitter,
           }),

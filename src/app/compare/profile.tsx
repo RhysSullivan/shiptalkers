@@ -131,6 +131,9 @@ export function Profile(props: {
     commits: totalCommits.toString(),
     tweets: totalTweets.toString(),
   });
+  if (pageData.user.twitterAvatarUrl) {
+    ogUrl.set("avatar", pageData.user.twitterAvatarUrl);
+  }
   const ogImageUrl = `/api/og/compare?${ogUrl.toString()}`;
   const pageUrl = `https://shiptalkers.dev${getPageUrl({
     github: githubName,
@@ -140,7 +143,7 @@ export function Profile(props: {
     <div className="mx-auto flex w-full max-w-screen-xl flex-grow flex-col items-center justify-center py-8">
       <div className="flex w-full flex-row items-center justify-between gap-4 md:mx-auto">
         <div className="flex flex-col items-start justify-start gap-2 px-2">
-          <TwitterAvatar name={twitterName} className="size-20 md:size-32" />
+          <TwitterAvatar user={pageData.user} className="size-20 md:size-32" />
           <div className="flex flex-col justify-between gap-4 py-4">
             <div className="flex flex-col">
               <div className="flex flex-col">

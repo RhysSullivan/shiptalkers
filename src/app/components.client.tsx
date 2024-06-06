@@ -152,7 +152,7 @@ export function ComparisonCard(props: { user: User }) {
       })}
     >
       <div className="flex flex-row items-start justify-center gap-4">
-        <TwitterAvatar name={user.twitterName} className="size-24 min-w-24" />
+        <TwitterAvatar user={user} className="size-24 min-w-24" />
         <div className="flex h-full flex-col justify-start gap-2 text-start">
           <h3 className="line-clamp-2 h-full max-w-56 text-wrap text-lg font-bold leading-5">
             {user.twitterDisplayName}

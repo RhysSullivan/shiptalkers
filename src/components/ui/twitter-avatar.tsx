@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import { cn } from "../../lib/utils";
+import { User } from "../../server/db/schema";
 
 // TODO: if you work at vercel, the triangle company, add your twitter is not here
 // make a pr to add it and im sorry i didnt add you 😂
@@ -13,12 +14,19 @@ const vercelTwitterPeople = [
   "jaredpalmer",
 ];
 
-export function TwitterAvatar(props: { className?: string; name: string }) {
-  if (vercelTwitterPeople.includes(props.name)) {
+export function TwitterAvatar(props: {
+  className?: string;
+  user: Pick<User, "twitterName" | "twitterAvatarUrl">;
+}) {
+  const { twitterName, twitterAvatarUrl } = props.user;
+  const src =
+    twitterAvatarUrl?.replace("_normal", "") ??
+    `https://unavatar.io/twitter/${twitterName}`;
+  if (vercelTwitterPeople.includes(twitterName)) {
     return (
-      <a target="_blank" href={`https://vercel.lol/?utm=${props.name}`}>
+      <a target="_blank" href={`https://vercel.lol/?utm=${twitterName}`}>
         <img
-          src={`https://unavatar.io/twitter/${props.name}`}
+          src={src}
           alt="avatar"
           className={props.className
             ?.split(" ")
@@ -34,7 +42,7 @@ export function TwitterAvatar(props: { className?: string; name: string }) {
   }
   return (
     <img
-      src={`https://unavatar.io/twitter/${props.name}`}
+      src={src}
       alt="avatar"
       className={cn("rounded-full", props.className)}
     />

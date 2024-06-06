@@ -67,6 +67,7 @@ export async function GET(req: Request) {
   const twitter = parsed.get("twitter");
   const commitsS = parsed.get("commits");
   const tweetsS = parsed.get("tweets");
+  const twitterAvatarUrl = parsed.get("avatar");
   const displayName = parsed.get("displayName");
   if (!github || !twitter || !commitsS || !tweetsS || !displayName) {
     return new Response("Missing parameters", { status: 400 });
@@ -149,7 +150,10 @@ export async function GET(req: Request) {
         }}
       >
         <img
-          src={`https://unavatar.io/twitter/${twitter}`}
+          src={
+            twitterAvatarUrl?.replace("_normal", "") ??
+            `https://unavatar.io/twitter/${twitter}`
+          }
           width="220"
           height="220"
           alt="avatar"

@@ -13,7 +13,7 @@ export function toUserSchema(props: {
   githubName: string;
   twitterName: string;
   metadata: { followers: number; twitter_username: string | null };
-  twitterPage: { name: string; id_str: string; followers_count: number };
+  twitterPage: { name: string; id_str: string; followers_count: number; profile_image_url_https: string | null };
   merged: TweetCommitData;
 }): User {
   const totalCommits = props.merged.reduce(
@@ -37,6 +37,7 @@ export function toUserSchema(props: {
     twitterName: props.twitterName,
     tweetsSent: totalTweets ?? 0,
     heatmapData: props.merged,
+    twitterAvatarUrl: props.twitterPage.profile_image_url_https,
   };
 }
 
