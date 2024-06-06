@@ -102,7 +102,6 @@ export function Profile(props: {
   const ogUrl = new URLSearchParams({
     github: githubName,
     displayName: twitterDisplayName,
-    twtrId: twitterId,
     twitter: twitterName,
     commits: totalCommits.toString(),
     tweets: totalTweets.toString(),

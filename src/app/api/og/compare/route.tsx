@@ -68,8 +68,7 @@ export async function GET(req: Request) {
   const commitsS = parsed.get("commits");
   const tweetsS = parsed.get("tweets");
   const displayName = parsed.get("displayName");
-  const twtrId = parsed.get("twtrId");
-  if (!github || !twitter || !commitsS || !tweetsS || !displayName || !twtrId) {
+  if (!github || !twitter || !commitsS || !tweetsS || !displayName) {
     return new Response("Missing parameters", { status: 400 });
   }
   const commits = Number(commitsS);
