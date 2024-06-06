@@ -37,6 +37,17 @@ export type PartialTweet = {
     reply_count: number;
     view_count: number;
 }
+import pThrottle from 'p-throttle';
+
+
+const throttle = pThrottle({
+    limit: 110,
+    interval: 120000,
+    onDelay: () => {
+        console.log(`Hit rate limit throttling`);
+    },
+});
+
 // sorted by ID in descending order
 async function fetchFromSocialData(input: {
     username: string;
@@ -61,14 +72,17 @@ async function fetchFromSocialData(input: {
         type: "Latest",
     });
     const apiUrl = `https://api.socialdata.tools/twitter/search?${queryParams.toString()}`;
-    const res = await fetch(apiUrl, {
-        method: "GET",
-        headers: {
-            Authorization: `Bearer ${process.env.SOCIAL_DATA_API_KEY}`,
-            Accept: "application/json",
-        },
-        cache: "force-cache",
+    const throttled = throttle(async () => {
+        return await fetch(apiUrl, {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${process.env.SOCIAL_DATA_API_KEY}`,
+                Accept: "application/json",
+            },
+            cache: "force-cache",
+        })
     });
+    const res = await throttled();
     console.log(`Fetching tweets from ${apiUrl} with status ${res.status}`)
     const json = (await res.json()) as SuccessResponse | ErrorResponse;
     if ("status" in json) {
