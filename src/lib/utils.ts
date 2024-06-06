@@ -17,6 +17,18 @@ export function getRatioText(input: {
   displayName: string;
 }) {
   const { tweets, commits, displayName } = input;
+
+  // edge cases
+  if (tweets === 0) {
+    return `${displayName} is locked into coding`;
+  } else if (commits === 0) {
+    return `${displayName} is a Twitter addict`;
+  } else if (tweets === 0 && commits === 0) {
+    return `${displayName} is a mysterious creature`;
+  } else if (tweets === commits) {
+    return `${displayName}'s life is perfectly balanced, as all things should be`;
+  }
+
   const percentageTweets = Math.abs((tweets / commits) * 100 - 100).toFixed();
   const percentageCommits = Math.abs((commits / tweets) * 100 - 100).toFixed();
   const txt =
