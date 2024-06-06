@@ -64,7 +64,15 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 export const revalidate = 60; // 1 minute
 
 export default async function Page(props: Props) {
-  const { github, twitter } = parse(props);
+  let github: string;
+  let twitter: string;
+  try {
+    const p = parse(props);
+    github = p.github;
+    twitter = p.twitter;
+  } catch (error) {
+    return <div>Invalid URL {JSON.stringify(props.searchParams)}</div>;
+  }
   const user = await getCachedUserData({
     githubName: github,
     twitterName: twitter,
