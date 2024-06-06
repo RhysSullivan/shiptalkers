@@ -4,6 +4,7 @@ services:
   redis-server:
     restart: always
     image: redis:4.0
+    platform: "linux/amd64"
     container_name: redis-server
     command: /bin/bash -c 'redis-server --requirepass yourpassword --appendonly yes'
     sysctls:
@@ -16,6 +17,7 @@ services:
 
   redis-insight:
     image: redislabs/redisinsight:latest
+    platform: "linux/amd64"
     container_name: redis-insight
     ports:
       - "8001:8001"
@@ -26,6 +28,7 @@ services:
     restart: always
     image: mysql:5.7
     container_name: mysql-server
+    platform: "linux/amd64"
     environment:
       MYSQL_ROOT_PASSWORD: yourpassword
       MYSQL_DATABASE: yourdatabase
