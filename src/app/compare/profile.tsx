@@ -59,6 +59,16 @@ function StreamingCTAs() {
         on GitHub
       </span>
       <span>We're hitting rate limits so things may take a while</span>
+      <span>
+        If your profile does not look right, open an issue on{" "}
+        <Link
+          href="https://github.com/RhysSullivan/shiptalkers"
+          target="_blank"
+          className="text-blue-500 hover:underline"
+        >
+          GitHub
+        </Link>
+      </span>
     </div>
   );
 }
@@ -71,6 +81,7 @@ export function Profile(props: {
   const [pageData, setPageData] = useState<Omit<PageData, "twitterPage">>(
     props.initialData,
   );
+  const [error, setError] = useState<string | null>(null);
   const {
     githubName,
     twitterName,
@@ -87,6 +98,10 @@ export function Profile(props: {
     { github: githubName, twitter: twitterName },
     {
       onData(data) {
+        if (typeof data === "string") {
+          setError(data);
+          return;
+        }
         setPageData(data);
       },
       onError(err) {
@@ -191,6 +206,7 @@ export function Profile(props: {
         </div>
       </div>
       {isDataLoading && <StreamingCTAs />}
+      {error && <div className="text-red-500">{error}</div>}
       <div className="mx-auto flex w-full max-w-[90vw] justify-start overflow-x-auto xl:justify-center">
         <Heatmap data={chunked} />
       </div>

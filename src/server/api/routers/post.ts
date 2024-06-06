@@ -37,28 +37,45 @@ function handleSubscribe(input: {
           finished: true,
         });
       }
-    });
+    }).catch((err) => {
+      console.error(err);
+      activeQueries.delete(key);
+      ee!.emit('tweetsGathered', { key: key, error: "We encountered an error fetching this profile, please make sure the profile exists and try again. If this continues open an issue on GitHub", finished: true });
+    });;
   }
   return ee;
 }
 
+type ErrorOrUser = {
+  error: string;
+} | {
+  data: User;
+}
+
+type EmitData = {
+  key: string;
+  finished: boolean;
+} & ErrorOrUser
+
 export const postRouter = createTRPCRouter({
   data: publicProcedure.input(z.object({ github: z.string(), twitter: z.string() })).subscription(({ input }) => {
-    return observable<PageData>((emit) => {
+    return observable<PageData | string>((emit) => {
       const key = `${input.github}-${input.twitter}`;
       console.log(`Subscribing to ${key}`)
-      const listenToTweets = (input: {
-        key: string;
-        data: User;
-        finished: boolean;
-      }) => {
+      const listenToTweets = (input: EmitData) => {
         if (input.key !== key) {
           return;
         }
-        emit.next({
-          isDataLoading: !input.finished,
-          user: input.data,
-        });
+        if ('error' in input && input.error) {
+          emit.next(input.error);
+          return;
+        }
+        if ('data' in input && input.data) {
+          emit.next({
+            isDataLoading: !input.finished,
+            user: input.data,
+          });
+        }
       };
       const ee = handleSubscribe({ ...input, emit, key });
       ee.on('tweetsGathered', listenToTweets);
