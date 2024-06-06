@@ -20,4 +20,5 @@ export async function POST(req: Request) {
         github,
         twitter,
     }))
+    return Response.json({ revalidated: true, now: Date.now() })
 }
