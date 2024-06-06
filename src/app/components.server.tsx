@@ -2,6 +2,7 @@ import { db } from "../server/db";
 import { users } from "../server/db/schema";
 import { desc } from "drizzle-orm";
 import { ComparisonCard } from "./components.client";
+import { isVerifiedUser } from "../lib/utils";
 export async function RecentlyComparedSection(props: {
   filterTwitterNames?: string[];
 }) {
@@ -11,7 +12,8 @@ export async function RecentlyComparedSection(props: {
       .from(users)
       .orderBy(desc(users.createdAt))
       .limit(50)
-      .execute();
+      .execute()
+      .then((x) => x.filter(isVerifiedUser));
     return (
       <section className="flex w-full max-w-6xl flex-col items-center justify-center gap-4 rounded-md px-4 py-6 text-center">
         <h2 className="text-2xl font-bold">Recently Compared</h2>
