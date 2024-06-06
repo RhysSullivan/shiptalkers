@@ -15,7 +15,7 @@ export async function BrowseSection(props: {
             .from(users)
             .where(gt(users.commitsMade, 500))
             .orderBy(desc(users.twitterFollowerCount))
-            .limit(50)
+            .limit(200)
             .execute()
             .then((x) => x.filter(isVerifiedUser))
         : await db
