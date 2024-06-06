@@ -5,8 +5,8 @@ import { pThrottle } from "./throttle";
 
 
 const throttleProfile = pThrottle({
-    limit: 110,
-    interval: 120000,
+    limit: 100,
+    interval: 130000,
     onDelay: () => {
         console.log(`Hit profile fetch rate limit throttling`);
     },
@@ -57,8 +57,8 @@ export type PartialTweet = {
 
 
 const throttle = pThrottle({
-    limit: 110,
-    interval: 120000,
+    limit: 100,
+    interval: 130000,
     onDelay: () => {
         console.log(`Hit tweet get rate limit throttling`);
     },
