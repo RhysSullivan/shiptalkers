@@ -4,9 +4,9 @@ import { readFromCache, writeToCache } from "./cache";
 
 
 async function fetchTotalContributions(name: string) {
-    const cached = await readFromCache<number>(`${name}-github-total-contributions-all-time`);
+    const cached = await readFromCache<number>(`${name}-github-total-contributions-all-time-v2`);
     if (cached) {
-        return cached;
+        // return cached;
     }
     const url = `https://github.com/${name}?action=show&controller=profiles&tab=contributions&user_id=${name}`;
     const data = await fetch(url,
@@ -25,6 +25,7 @@ async function fetchTotalContributions(name: string) {
     const years = new Set(Array.from(yearLinks).map(link => link.id.replace('year-link-', '')));
 
     // TODO: CAN WE RUN IN PARALLEL W/ OUT HITTING RATE LIMIT?
+
     let total = 0;
     for await (const year of years) {
         const queryParams = new URLSearchParams({
@@ -35,14 +36,14 @@ async function fetchTotalContributions(name: string) {
         const content = await result.text();
         const doc2 = parse(content);
         const h2 = doc2.querySelector("h2");
-        const match = h2?.text.match(/\d+/)?.[0];
+        const match = h2?.innerText.trim().split(" ").at(0)?.replace(',', '')
         if (match) {
             total += parseInt(match);
         } else {
             console.error(`Failed to parse total contributions for ${name}`)
         }
     }
-    await writeToCache(`${name}-github-total-contributions-all-time`, total);
+    await writeToCache(`${name}-github-total-contributions-all-time-v2`, total);
     return total;
 }
 
