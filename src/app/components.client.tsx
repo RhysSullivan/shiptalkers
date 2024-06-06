@@ -88,8 +88,8 @@ export function Hero() {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
         const twitterUrl = e.target[1].value as string;
         // just get the names of both
-        const githubName = githubUrl.split("/").pop();
-        const twitterName = twitterUrl.split("/").pop();
+        const githubName = githubUrl.split("/").pop().trim();
+        const twitterName = twitterUrl.split("/").pop().trim();
         if (!githubName || !twitterName) return;
         void router.push(
           getPageUrl({ github: githubName, twitter: twitterName }),
