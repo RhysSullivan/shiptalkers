@@ -69,6 +69,7 @@
     "superjson": "1.13.3",
     "tailwind-merge": "^2.2.0",
     "tailwindcss-animate": "^1.0.7",
+    "throttled-queue": "^2.1.4",
     "tsx": "^4.11.0",
     "ws": "^8.17.0",
     "zod": "^3.22.4"

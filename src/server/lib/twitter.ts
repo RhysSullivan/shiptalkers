@@ -1,16 +1,19 @@
 import { env } from "../../env";
 import { readFromCache, writeToCache } from "./cache";
+import { throttledQueue } from "./throttle";
 import { ErrorResponse, SuccessResponse, Tweet, TwitterUser } from "./twitter.types";
-import { pThrottle } from "./throttle";
 
 
-const throttleProfile = pThrottle({
-    limit: 100,
-    interval: 130000,
-    onDelay: () => {
-        console.log(`Hit profile fetch rate limit throttling`);
+
+const throttleProfile = throttledQueue({
+    maxRequestsPerInterval: 100,
+    interval: 100000,
+    startDelay: 130000,
+    onThrottle(numRequestsInQueue) {
+        console.log(`Throttling profile fetch, ${numRequestsInQueue} in queue`);
     },
 });
+
 
 
 export async function fetchTwitterProfile(name: string) {
@@ -18,7 +21,7 @@ export async function fetchTwitterProfile(name: string) {
     if (cached) {
         return cached;
     }
-    const throttled = throttleProfile(async () => {
+    const userInfo = await throttleProfile(async () => {
         return await fetch(`https://api.socialdata.tools/twitter/user/${name}`, {
             method: "GET",
             headers: {
@@ -29,7 +32,7 @@ export async function fetchTwitterProfile(name: string) {
         })
     }
     );
-    const userInfo = await throttled() as Response;
+
     if (!userInfo.ok) {
         if (userInfo.status == 429) {
             throw new Error(`Rate limit exceeded fetching ${name} ${userInfo.status}`);
@@ -56,12 +59,13 @@ export type PartialTweet = {
 }
 
 
-const throttle = pThrottle({
-    limit: 100,
-    interval: 130000,
-    onDelay: () => {
-        console.log(`Hit tweet get rate limit throttling`);
+const throttle = throttledQueue({
+    onThrottle(numRequestsInQueue) {
+        console.log(`Throttling tweet fetch, ${numRequestsInQueue} in queue`);
     },
+    maxRequestsPerInterval: 100,
+    interval: 100000,
+    startDelay: 130000,
 });
 
 // sorted by ID in descending order
@@ -88,7 +92,7 @@ async function fetchFromSocialData(input: {
         type: "Latest",
     });
     const apiUrl = `https://api.socialdata.tools/twitter/search?${queryParams.toString()}`;
-    const throttled = throttle(async () => {
+    const res = await throttle(async () => {
         return await fetch(apiUrl, {
             method: "GET",
             headers: {
@@ -98,8 +102,6 @@ async function fetchFromSocialData(input: {
             cache: "force-cache",
         })
     });
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const res = await throttled() as Response;
     console.log(`Fetching tweets from ${apiUrl} with status ${res.status}`)
     const json = (await res.json()) as SuccessResponse | ErrorResponse;
     if ("status" in json) {
