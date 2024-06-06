@@ -5,13 +5,13 @@ import { ErrorResponse, SuccessResponse, Tweet, TwitterUser } from "./twitter.ty
 
 
 
-const throttleProfile = throttledQueue({
-    maxRequestsPerInterval: 100,
-    interval: 100000,
-    startDelay: 130000,
+const throttle = throttledQueue({
+    maxRequestsPerInterval: 350,
+    interval: 70000,
+    startDelay: 80000,
     evenlySpaced: true,
     onThrottle(numRequestsInQueue) {
-        console.log(`Throttling profile fetch, ${numRequestsInQueue} in queue`);
+        console.log(`Throttling fetch, ${numRequestsInQueue} in queue`);
     },
 });
 
@@ -30,7 +30,7 @@ export async function fetchTwitterProfile(name: string) {
     if (cached) {
         return cached;
     }
-    const userInfo = await throttleProfile(async () => {
+    const userInfo = await throttle(async () => {
         return await fetch(`https://api.socialdata.tools/twitter/user/${name}`, {
             method: "GET",
             headers: {
@@ -66,17 +66,6 @@ export type PartialTweet = {
     reply_count: number;
     view_count: number;
 }
-
-
-const throttle = throttledQueue({
-    onThrottle(numRequestsInQueue) {
-        console.log(`Throttling tweet fetch, ${numRequestsInQueue} in queue`);
-    },
-    evenlySpaced: true,
-    maxRequestsPerInterval: 100,
-    interval: 100000,
-    startDelay: 130000,
-});
 
 // sorted by ID in descending order
 async function fetchFromSocialData(input: {
