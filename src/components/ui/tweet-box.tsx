@@ -11,6 +11,8 @@ import { Textarea } from "./textarea";
 import { useQuery } from "@tanstack/react-query";
 import { ClipboardIcon, ClipboardCheckIcon } from "lucide-react";
 
+import { ClipboardItem } from "clipboard-polyfill";
+
 export function TweetBox(props: { src: string; text: string }) {
   const [copySuccess, setCopySuccess] = useState<boolean>(false);
   const { data } = useQuery(["copy-image"], async () => {
