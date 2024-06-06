@@ -38,7 +38,7 @@ function ReloadButton(props: { twitter: string; github: string }) {
         );
         setIsReloading(false);
         if (res.status === 200) {
-          void navigation.refresh();
+          window.location.reload();
         } else {
           console.log(res, res.status);
         }
