@@ -81,7 +81,17 @@ export const getUserDataStreamed = async (input: {
     console.log("Writing to db", restForLogging)
     await db.insert(users).values(rest).onDuplicateKeyUpdate({
       set: rest,
-    })
+    });
+    const queryParams = new URLSearchParams({
+      github: githubName,
+      twitter: twitterName,
+      token: process.env.INVALIDATE_TOKEN!,
+    });
+    await fetch(
+      process.env.NODE_ENV === "production"
+        ? "https://shiptalkers.dev/api/invalidate"
+        : "http://localhost:3000/api/invalidate",
+    )
   });
 };
 
