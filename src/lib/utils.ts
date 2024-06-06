@@ -1,6 +1,6 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { User } from "../server/db/schema";
+import { type User } from "../server/db/schema";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -19,13 +19,16 @@ export function getRatioText(input: {
   const { tweets, commits, displayName } = input;
 
   // edge cases
+  if (tweets === 0 && commits === 0) {
+    return `${displayName} is a mysterious creature`;
+  }
   if (tweets === 0) {
     return `${displayName} is locked into coding`;
-  } else if (commits === 0) {
+  }
+  if (commits === 0) {
     return `${displayName} is a Twitter addict`;
-  } else if (tweets === 0 && commits === 0) {
-    return `${displayName} is a mysterious creature`;
-  } else if (tweets === commits) {
+  }
+  if (tweets === commits) {
     return `${displayName}'s life is perfectly balanced, as all things should be`;
   }
 
