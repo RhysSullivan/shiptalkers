@@ -10,6 +10,7 @@ export async function POST(req: Request) {
     const twitter = parsed.get("twitter");
     const token = parsed.get("token");
     if (token !== process.env.INVALIDATE_TOKEN) {
+        console.log("Unauthorized", token, process.env.INVALIDATE_TOKEN)
         return new Response("Unauthorized", { status: 401 });
     }
     if (!github || !twitter) {
