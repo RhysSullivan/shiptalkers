@@ -39,16 +39,18 @@ function TopTable(props: { mode: "commits" | "tweets"; users: User[] }) {
             {props.users.filter(isVerifiedUser).map((user) => (
               <TableRow key={user.twitterId}>
                 <TableCell className="w-[300px]">
-                  <Link
-                    className="flex flex-row items-center gap-2 font-medium hover:underline"
-                    href={getPageUrl({
-                      github: user.githubName,
-                      twitter: user.twitterName,
-                    })}
-                  >
+                  <div className="flex flex-row items-center gap-2 font-medium">
                     <TwitterAvatar name={user.twitterName} className="size-8" />
-                    <span className="ml-2">{user.twitterDisplayName}</span>
-                  </Link>
+                    <Link
+                      href={getPageUrl({
+                        github: user.githubName,
+                        twitter: user.twitterName,
+                      })}
+                      className="ml-2 hover:underline"
+                    >
+                      {user.twitterDisplayName}
+                    </Link>
+                  </div>
                 </TableCell>
                 <TableCell className="text-right">
                   {props.mode === "tweets"

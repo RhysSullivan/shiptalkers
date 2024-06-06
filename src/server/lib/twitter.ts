@@ -18,7 +18,7 @@ export async function fetchTwitterProfile(name: string) {
         return cached;
     }
     const throttled = throttleProfile(async () => {
-        await fetch(`https://api.socialdata.tools/twitter/user/${name}`, {
+        return await fetch(`https://api.socialdata.tools/twitter/user/${name}`, {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${process.env.SOCIAL_DATA_API_KEY}`,
