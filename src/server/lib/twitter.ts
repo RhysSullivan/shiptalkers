@@ -59,6 +59,7 @@ async function fetchFromSocialData(input: {
         },
         cache: "force-cache",
     });
+    console.log(`Fetching tweets from ${apiUrl} with status ${res.status}`)
     const json = (await res.json()) as SuccessResponse | ErrorResponse;
     if ("status" in json) {
         throw new Error(json.message);
