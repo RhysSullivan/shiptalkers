@@ -90,7 +90,6 @@ export function Profile(props: {
     heatmapData,
     tweetsSent,
     twitterDisplayName,
-    twitterId,
     twitterFollowerCount,
   } = pageData.user;
 
@@ -103,6 +102,7 @@ export function Profile(props: {
           return;
         }
         setPageData(data);
+        setError(null);
       },
       onError(err) {
         console.error(err);
