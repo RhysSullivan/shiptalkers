@@ -126,8 +126,8 @@ importers:
         specifier: ^4.2.0
         version: 4.2.0(express-rate-limit@7.3.0(express@4.19.2))
       rate-limiter-flexible:
-        specifier: ^5.0.3
-        version: 5.0.3
+        specifier: ^2.4.1
+        version: 2.4.1
       react:
         specifier: 18.2.0
         version: 18.2.0
@@ -2861,8 +2861,8 @@ packages:
     peerDependencies:
       express-rate-limit: '>= 6'
 
-  rate-limiter-flexible@5.0.3:
-    resolution: {integrity: sha512-lWx2y8NBVlTOLPyqs+6y7dxfEpT6YFqKy3MzWbCy95sTTOhOuxufP2QvRyOHpfXpB9OUJPbVLybw3z3AVAS5fA==}
+  rate-limiter-flexible@2.4.1:
+    resolution: {integrity: sha512-dgH4T44TzKVO9CLArNto62hJOwlWJMLUjVVr/ii0uUzZXEXthDNr7/yefW5z/1vvHAfycc1tnuiYyNJ8CTRB3g==}
 
   raw-body@2.5.2:
     resolution: {integrity: sha512-8zGqypfENjCIqGhgXToC8aB2r7YrBX+AQAfIPs/Mlk+BtPTztOvTS01NRW/3Eh60J+a48lt8qsCzirQ6loCVfA==}
@@ -5986,7 +5986,7 @@ snapshots:
     dependencies:
       express-rate-limit: 7.3.0(express@4.19.2)
 
-  rate-limiter-flexible@5.0.3: {}
+  rate-limiter-flexible@2.4.1: {}
 
   raw-body@2.5.2:
     dependencies:

@@ -5,8 +5,8 @@ import { users } from "../../../server/db/schema";
 import { and, eq } from "drizzle-orm";
 import { deleteGithubContribtionsCache, deleteGithubMetadataCache } from "../../../server/lib/github";
 import { deleteTwitterProfileCache } from "../../../server/lib/twitter";
-import { rateLimiter } from "../../../server/lib/cache";
 import { NextRequest } from "next/server";
+import { readFromCache, writeToCache } from "../../../server/lib/cache";
 
 // queryParams: github, twitter
 export async function POST(req: NextRequest) {
@@ -19,13 +19,14 @@ export async function POST(req: NextRequest) {
         return new Response("Missing parameters", { status: 400 });
     }
     // get ip    
-    const ip = `${github}-${twitter}-rate-limit`
-    try {
-        await rateLimiter.consume(ip, 1)
-    } catch (error) {
-        console.error(`Rate limited ${github} ${twitter} ${ip} ${error}`)
-        return new Response("Rate limited", { status: 429 });
+    const key = `${github}-${twitter}-rate-limit-v2`
+    const existing = await readFromCache(key);
+    if (existing) {
+        return new Response("Rate limited", {
+            status: 429
+        })
     }
+    await writeToCache(key, key, 60)
     if (reset) {
         console.log(`Manually resetting ${github} ${twitter}`)
         // yes i know about Promise.all

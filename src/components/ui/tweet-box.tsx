@@ -49,7 +49,7 @@ function ReloadButton(props: { twitter: string; github: string }) {
           // clear after 5 seconds
           setTimeout(() => {
             setStatus(null);
-          }, 5000);
+          }, 60000);
         }
       }}
     >
