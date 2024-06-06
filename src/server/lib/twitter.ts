@@ -60,11 +60,11 @@ async function fetchFromSocialData(input: {
         cache: "force-cache",
     });
     const json = (await res.json()) as SuccessResponse | ErrorResponse;
-
     if ("status" in json) {
         throw new Error(json.message);
     }
-    const oldestTweet = (json.tweets ?? [])
+    json.tweets = json.tweets ?? [];
+    const oldestTweet = json.tweets
         .sort((a, b) => (BigInt(a.id_str) < BigInt(b.id_str) ? 1 : -1))
         .at(-1);
     console.log(

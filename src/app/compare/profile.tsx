@@ -210,20 +210,22 @@ export function Profile(props: {
           />
         </div>
       </div>
-      <div className="py-4">
-        <TweetBox
-          text={`${getRatioText({
-            commits: totalCommits,
-            displayName: `@${twitterName}`,
-            tweets: totalTweets,
-          })}\n\n${pageUrl}`}
-          src={
-            isDataLoading
-              ? "https://generated.vusercontent.net/placeholder.svg"
-              : ogImageUrl
-          }
-        />
-      </div>
+      {!isDataLoading && (
+        <div className="py-4">
+          <TweetBox
+            text={`${getRatioText({
+              commits: totalCommits,
+              displayName: `@${twitterName}`,
+              tweets: totalTweets,
+            })}\n\n${pageUrl}`}
+            src={
+              isDataLoading
+                ? "https://generated.vusercontent.net/placeholder.svg"
+                : ogImageUrl
+            }
+          />
+        </div>
+      )}
       {props.recentlyCompared}
     </div>
   );
