@@ -73,7 +73,8 @@ export const getUserDataStreamed = async (input: {
     );
 
     const { createdAt, updatedAt, ...rest } = asUser;
-    console.log("Writing to db", rest)
+    const { heatmapData, ...restForLogging } = rest;
+    console.log("Writing to db", restForLogging)
     await db.insert(users).values(rest).onDuplicateKeyUpdate({
       set: rest,
     })

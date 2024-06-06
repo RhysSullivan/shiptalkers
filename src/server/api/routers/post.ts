@@ -5,11 +5,10 @@ import { PageData, getUserDataStreamed } from "./get-data";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { User } from "../../db/schema";
 
-const ee = new EventEmitter().setMaxListeners(1000);
 
-const activeQueries = new Set<string>();
+const activeQueries = new Map<string, EventEmitter>();
 
-async function handleSubscribe(input: {
+function handleSubscribe(input: {
   github: string;
   twitter: string;
   emit: Observer<PageData, unknown>
@@ -17,12 +16,14 @@ async function handleSubscribe(input: {
 }
 ) {
   const { key } = input;
-  if (!activeQueries.has(key)) {
-    activeQueries.add(key);
+  let ee = activeQueries.get(key);
+  if (!ee) {
+    ee = new EventEmitter().setMaxListeners(0);
+    activeQueries.set(key, ee);
     void getUserDataStreamed({
       githubName: input.github, twitterName: input.twitter, emit:
         (chunk) => {
-          ee.emit('tweetsGathered', {
+          ee!.emit('tweetsGathered', {
             key,
             data: chunk,
             finished: false,
@@ -30,7 +31,7 @@ async function handleSubscribe(input: {
         },
       onComplete: (data) => {
         activeQueries.delete(key);
-        ee.emit('tweetsGathered', {
+        ee!.emit('tweetsGathered', {
           key,
           data,
           finished: true,
@@ -38,6 +39,7 @@ async function handleSubscribe(input: {
       }
     });
   }
+  return ee;
 }
 
 export const postRouter = createTRPCRouter({
@@ -58,7 +60,7 @@ export const postRouter = createTRPCRouter({
           user: input.data,
         });
       };
-      void handleSubscribe({ ...input, emit, key });
+      const ee = handleSubscribe({ ...input, emit, key });
       ee.on('tweetsGathered', listenToTweets);
       return () => {
         ee.off('tweetsGathered', listenToTweets);
