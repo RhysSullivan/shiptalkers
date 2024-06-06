@@ -3,7 +3,7 @@ import { Observer, observable } from '@trpc/server/observable';
 import { EventEmitter } from 'events';
 import { PageData, getUserDataStreamed } from "./get-data";
 import { createTRPCRouter, publicProcedure } from "../trpc";
-import { User } from "../../db/schema";
+import { HeatmaplessUser, User } from "../../db/schema";
 
 
 const activeQueries = new Map<string, EventEmitter>();
@@ -49,7 +49,7 @@ function handleSubscribe(input: {
 type ErrorOrUser = {
   error: string;
 } | {
-  data: User;
+  data: HeatmaplessUser;
 }
 
 type EmitData = {

@@ -53,6 +53,6 @@ export function getPageUrl(input: {
 }
 
 // Verified users are users who have their Twitter handle in their GitHub bio, or have the same Twitter and GitHub handle
-export function isVerifiedUser(user: User) {
+export function isVerifiedUser(user: Pick<User, "twitterInGithubBio" | "twitterName" | "githubName">): boolean {
   return user.twitterInGithubBio || user.twitterName === user.githubName;
 }

@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import { Github, LoaderIcon, Twitter } from "lucide-react";
-import type { User } from "../server/db/schema";
+import type { HeatmaplessUser, User } from "../server/db/schema";
 
 import { useQuery } from "@tanstack/react-query";
 import { ChangeEvent, useEffect, useState } from "react";
@@ -141,7 +141,7 @@ export function Hero() {
   );
 }
 
-export function ComparisonCard(props: { user: User }) {
+export function ComparisonCard(props: { user: HeatmaplessUser }) {
   const { user } = props;
   return (
     <a

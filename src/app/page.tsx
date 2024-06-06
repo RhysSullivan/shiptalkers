@@ -1,7 +1,7 @@
 import { Github, Twitter } from "lucide-react";
 import { Hero } from "./components.client";
 import { db } from "../server/db";
-import { User, users } from "../server/db/schema";
+import { HeatmaplessUser, User, users } from "../server/db/schema";
 import { desc } from "drizzle-orm";
 import { BrowseSection } from "./components.server";
 import {
@@ -19,7 +19,10 @@ import { getPageUrl, isVerifiedUser } from "../lib/utils";
 
 export const revalidate = 600; // 10 minutes
 
-function TopTable(props: { mode: "commits" | "tweets"; users: User[] }) {
+function TopTable(props: {
+  mode: "commits" | "tweets";
+  users: HeatmaplessUser[];
+}) {
   return (
     <div className="pt-4">
       <h2 className="text-center font-bold">

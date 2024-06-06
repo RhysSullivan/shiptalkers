@@ -1,7 +1,7 @@
 
 import type { HeatmapData } from "../../../lib/utils";
 import { db } from "../../db";
-import { TweetCommitData, User, users } from "../../db/schema";
+import { HeatmaplessUser, TweetCommitData, User, users } from "../../db/schema";
 import { fetchGithubPage } from "../../lib/github";
 import { PartialTweet, fetchTweetsFromUser, fetchTwitterProfile } from "../../lib/twitter";
 
@@ -13,17 +13,11 @@ export function toUserSchema(props: {
   githubName: string;
   twitterName: string;
   metadata: { followers: number; twitter_username: string | null };
+  totalCommits: number;
+  totalTweets: number;
   twitterPage: { name: string; id_str: string; followers_count: number; profile_image_url_https: string | null };
-  merged: TweetCommitData;
+  merged: TweetCommitData | null;
 }): User {
-  const totalCommits = props.merged.reduce(
-    (acc, data) => acc + data.commits,
-    0,
-  );
-  const totalTweets = props.merged.reduce(
-    (acc, data) => acc + data.tweets,
-    0,
-  );
   return {
     createdAt: new Date(),
     updatedAt: null,
@@ -31,11 +25,11 @@ export function toUserSchema(props: {
     twitterId: props.twitterPage.id_str,
     twitterFollowerCount: props.twitterPage.followers_count ?? 0,
     githubFollowerCount: props.metadata.followers ?? 0,
-    commitsMade: totalCommits ?? 0,
+    commitsMade: props.totalCommits,
     githubName: props.githubName,
     twitterInGithubBio: props.metadata.twitter_username?.toLowerCase() === props.twitterName.toLowerCase(),
     twitterName: props.twitterName,
-    tweetsSent: totalTweets ?? 0,
+    tweetsSent: props.totalTweets,
     heatmapData: props.merged,
     twitterAvatarUrl: props.twitterPage.profile_image_url_https,
   };
@@ -44,61 +38,50 @@ export function toUserSchema(props: {
 export const getUserDataStreamed = async (input: {
   githubName: string;
   twitterName: string;
-  emit: (streamed: User) => void;
-  onComplete: (streamed: User) => void;
+  emit: (streamed: HeatmaplessUser) => void;
+  onComplete: (streamed: HeatmaplessUser) => void;
 }) => {
   const { githubName, twitterName } = input;
-  const { heatmapData: githubData, metadata } = await fetchGithubPage(githubName);
+  const { totalContributions, metadata } = await fetchGithubPage(githubName);
   const twitterPage = await fetchTwitterProfile(twitterName);
   if (!twitterPage || !metadata) {
     throw new Error("Twitter page not found");
   }
-  const tweetsStop = githubData[0]!.day;
-  return fetchTweetsFromUser(twitterName, new Date(tweetsStop), (collection) => {
-    input.emit(
-      toUserSchema({
-        githubName,
-        twitterName,
-        merged: parseCollection(collection, githubData),
-        metadata,
-        twitterPage,
-      })
-    );
-  }).then(async (data) => {
-    const merged = parseCollection(data, githubData);
-    const asUser = toUserSchema({
-      githubName,
-      twitterName,
-      merged,
-      metadata,
-      twitterPage,
-    });
-    input.onComplete(
-      asUser
-    );
 
-    const { createdAt, updatedAt, ...rest } = asUser;
-    const { heatmapData, ...restForLogging } = rest;
-    console.log("Writing to db", restForLogging)
-    await db.insert(users).values(rest).onDuplicateKeyUpdate({
-      set: rest,
-    });
-    const queryParams = new URLSearchParams({
-      github: githubName,
-      twitter: twitterName,
-      token: process.env.INVALIDATE_TOKEN!,
-    });
-    const invalidateRes = await fetch(
-      process.env.NODE_ENV === "production"
-        ? "https://shiptalkers.dev/api/invalidate?" + queryParams.toString()
-        : "http://localhost:3000/api/invalidate?" + queryParams.toString(),
-    );
-    if (!invalidateRes.ok) {
-      console.error(`Failed to invalidate cache for ${githubName}`, await invalidateRes.text(), queryParams.toString());
-    } else {
-      console.log(`Invalidated cache ${githubName}`, queryParams.toString());
-    }
+  const asUser = toUserSchema({
+    githubName,
+    twitterName,
+    merged: null,
+    metadata,
+    totalTweets: twitterPage.statuses_count,
+    totalCommits: totalContributions,
+    twitterPage,
   });
+  input.onComplete(
+    asUser
+  );
+
+  const { createdAt, updatedAt, ...rest } = asUser;
+  const { heatmapData, ...restForLogging } = rest;
+  console.log("Writing to db", restForLogging)
+  await db.insert(users).values(rest).onDuplicateKeyUpdate({
+    set: restForLogging,
+  });
+  const queryParams = new URLSearchParams({
+    github: githubName,
+    twitter: twitterName,
+    token: process.env.INVALIDATE_TOKEN!,
+  });
+  const invalidateRes = await fetch(
+    process.env.NODE_ENV === "production"
+      ? "https://shiptalkers.dev/api/invalidate?" + queryParams.toString()
+      : "http://localhost:3000/api/invalidate?" + queryParams.toString(),
+  );
+  if (!invalidateRes.ok) {
+    console.error(`Failed to invalidate cache for ${githubName}`, await invalidateRes.text(), queryParams.toString(), invalidateRes.status);
+  } else {
+    console.log(`Invalidated cache ${githubName}`, queryParams.toString());
+  }
 };
 
 export function parseCollection(
@@ -174,5 +157,5 @@ export async function getCachedUserData(input: { githubName: string, twitterName
 
 export type PageData = {
   isDataLoading: boolean;
-  user: User;
+  user: Omit<User, "heatmapData">;
 };

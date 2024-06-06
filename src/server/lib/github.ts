@@ -1,11 +1,10 @@
 import { parse } from "node-html-parser";
-import type { HeatmapData } from "../../lib/utils";
 import { readFromCache, writeToCache } from "./cache";
 
 
 
-async function fetchGithubHeatmap(name: string): Promise<HeatmapData[]> {
-    const cached = await readFromCache<HeatmapData[]>(`${name}-heatmap-github`);
+async function fetchTotalContributions(name: string) {
+    const cached = await readFromCache<number>(`${name}-github-total-contributions-all-time`);
     if (cached) {
         return cached;
     }
@@ -16,51 +15,35 @@ async function fetchGithubHeatmap(name: string): Promise<HeatmapData[]> {
                 connection: "keep-alive",
                 "X-Requested-With": "XMLHttpRequest",
             },
-            next: {
-                revalidate: 60 * 10
-            }
         }
     );
-    console.log(data.status, data.statusText, url)
+
     const htmlContent = await data.text();
     const doc = parse(htmlContent);
-    const tbody = doc.querySelector("tbody");
-    const heatmapData: HeatmapData[] = [];
-    if (!tbody) {
-        console.error(`Tbody not found in the HTML content for ${name}`)
-        throw new Error("Tbody not found in the HTML content");
-    }
+    const yearLinks = doc.querySelectorAll("a[id*='year-link']");
 
-    // Get all the tr elements inside tbody
-    const trElements = tbody.querySelectorAll("tr");
+    const years = new Set(Array.from(yearLinks).map(link => link.id.replace('year-link-', '')));
 
-    // Iterate through each tr element
-    trElements.forEach((tr) => {
-        // Get all the td elements inside each tr
-        const tdElements = tr.querySelectorAll("td");
-
-        // Extract and log data from each td
-        tdElements.forEach((td) => {
-            const date = td.getAttribute("data-date");
-
-            // find in the td elements, the <tool-tip> with the property for=td.id
-
-            const toolTip = tr.querySelector(`[for=${td.id}]`);
-            // text can be {number} contributions... or "No contributions"
-            const text = toolTip?.text.trim().split(" ")[0];
-            if (!text || !date) {
-                return;
-            }
-            const count = !/\D/.test(text) ? parseInt(text) : 0;
-
-            heatmapData.push({
-                day: date,
-                value: count,
-            });
+    // TODO: CAN WE RUN IN PARALLEL W/ OUT HITTING RATE LIMIT?
+    let total = 0;
+    for await (const year of years) {
+        const queryParams = new URLSearchParams({
+            from: `${year}-01-01`,
+            to: `${year}-12-31`,
         });
-    });
-    await writeToCache(`${name}-heatmap-github`, heatmapData);
-    return heatmapData;
+        const result = await fetch(`https://github.com/users/${name}/contributions?${queryParams.toString()}`);
+        const content = await result.text();
+        const doc2 = parse(content);
+        const h2 = doc2.querySelector("h2");
+        const match = h2?.text.match(/\d+/)?.[0];
+        if (match) {
+            total += parseInt(match);
+        } else {
+            console.error(`Failed to parse total contributions for ${name}`)
+        }
+    }
+    await writeToCache(`${name}-github-total-contributions-all-time`, total);
+    return total;
 }
 
 
@@ -118,12 +101,12 @@ async function fetchGithubMetadata(name: string): Promise<GithubMetadata | undef
 }
 
 export async function fetchGithubPage(name: string) {
-    const [heatmapData, metadata] = await Promise.all([
-        fetchGithubHeatmap(name),
+    const [totalContributions, metadata] = await Promise.all([
+        fetchTotalContributions(name),
         fetchGithubMetadata(name),
     ]);
     return {
-        heatmapData,
+        totalContributions,
         metadata,
     };
 }

@@ -1,5 +1,5 @@
 import { type Metadata } from "next";
-import { Profile } from "./profile";
+import { Profile } from "./profile-no-heatmap";
 import {
   getCachedUserData,
   parseCollection,
@@ -97,24 +97,23 @@ export default async function Page(props: Props) {
     );
   }
   try {
-    const { heatmapData, metadata: githubMetadata } =
+    const { totalContributions, metadata: githubMetadata } =
       await fetchGithubPage(github);
-    if (!heatmapData || !githubMetadata) {
+    if (!githubMetadata) {
       return <div>GitHub profile not found</div>;
     }
     // some are partially loaded and we can hydrate with cached tweets for better UX
-    const [cachedTweets, cachedProfile] = await Promise.all([
-      getCachedTweets(twitter),
-      getCachedTwitterProfile(twitter),
-    ]);
+    const cachedProfile = await getCachedTwitterProfile(twitter);
     return (
       <Profile
         initialData={{
           isDataLoading: true,
           user: toUserSchema({
             githubName: github,
-            merged: parseCollection(cachedTweets ?? [], heatmapData),
+            merged: null,
             metadata: githubMetadata,
+            totalTweets: cachedProfile?.statuses_count ?? 0,
+            totalCommits: totalContributions,
             twitterPage: cachedProfile ?? {
               followers_count: 0,
               id_str: "0",

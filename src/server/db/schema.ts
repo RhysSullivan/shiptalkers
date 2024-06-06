@@ -30,6 +30,7 @@ const int11 = customType<{ data: number }>({
 });
 
 
+
 export type TweetCommitData = {
   day: string;
   commits: number;
@@ -61,10 +62,11 @@ export const users = mysqlTable("user", {
   updatedAt: timestamp("updated_at").default(
     sql`CURRENT_TIMESTAMP`
   ),
-  heatmapData: json("heatmapData").notNull().$type<TweetCommitData>(),
+  heatmapData: json("heatmapData").$type<TweetCommitData>(),
 }, (t) => ({
   pk: primaryKey(t.githubName, t.twitterName)
 }));
 
 
 export type User = typeof users.$inferSelect;
+export type HeatmaplessUser = Omit<User, "heatmapData">;
