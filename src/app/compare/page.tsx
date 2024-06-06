@@ -51,7 +51,6 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     github,
     displayName: user.twitterDisplayName,
     twitter,
-    twtrId: user.twitterId,
     commits: user.commitsMade.toString(),
     tweets: user.tweetsSent.toString(),
   });
