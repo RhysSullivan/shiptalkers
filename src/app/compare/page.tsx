@@ -123,6 +123,12 @@ export default async function Page(props: Props) {
       />
     );
   } catch (error) {
-    return <div>GitHub profile not found</div>;
+    console.error(`failed to load github for ${github}`, error);
+    return (
+      <div>
+        GitHub profile not found. if {"you're"} really sure it's correct, try
+        refreshing the page in like {(Math.random() * 120).toFixed()}seconds
+      </div>
+    );
   }
 }
