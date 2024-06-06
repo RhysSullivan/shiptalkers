@@ -2,7 +2,12 @@ import { env } from "../../env";
 import { readFromCache, writeToCache } from "./cache";
 import { ErrorResponse, SuccessResponse, Tweet, TwitterUser } from "./twitter.types";
 
+
 export async function fetchTwitterProfile(name: string) {
+    const cached = await readFromCache<TwitterUser>(`twitter-profile-${name}`);
+    if (cached) {
+        return cached;
+    }
     const userInfo = await fetch(`https://api.socialdata.tools/twitter/user/${name}`, {
         method: "GET",
         headers: {
@@ -14,7 +19,9 @@ export async function fetchTwitterProfile(name: string) {
     if (!userInfo.ok) {
         throw new Error(`Failed to fetch twitter profile for ${name}`);
     }
-    return userInfo.json() as Promise<TwitterUser | undefined>;
+    const data = userInfo.json();
+    await writeToCache(`twitter-profile-${name}`, data);
+    return data as Promise<TwitterUser | undefined>;
 }
 
 const SAFETY_STOP = env.NODE_ENV === "development" ? 10 : 3000;
