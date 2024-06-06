@@ -105,31 +105,33 @@ export default async function Page(props: Props) {
     // some are partially loaded and we can hydrate with cached tweets for better UX
     const cachedProfile = await getCachedTwitterProfile(twitter);
     return (
-      <Profile
-        initialData={{
-          isDataLoading: true,
-          user: toUserSchema({
-            githubName: github,
-            merged: null,
-            metadata: githubMetadata,
-            totalTweets: cachedProfile?.statuses_count ?? 0,
-            totalCommits: totalContributions,
-            twitterPage: cachedProfile ?? {
-              followers_count: 0,
-              id_str: "0",
-              name: twitter,
-              profile_image_url_https: null,
-            },
-            twitterName: twitter,
-          }),
-        }}
-        fetchTweets={true}
-        recentlyCompared={
-          <Suspense>
-            <BrowseSection filterTwitterNames={[twitter]} sort="recent" />
-          </Suspense>
-        }
-      />
+      <>
+        <Profile
+          initialData={{
+            isDataLoading: true,
+            user: toUserSchema({
+              githubName: github,
+              merged: null,
+              metadata: githubMetadata,
+              totalTweets: cachedProfile?.statuses_count ?? 0,
+              totalCommits: totalContributions ?? 0,
+              twitterPage: cachedProfile ?? {
+                followers_count: 0,
+                id_str: "0",
+                name: twitter,
+                profile_image_url_https: null,
+              },
+              twitterName: twitter,
+            }),
+          }}
+          fetchTweets={true}
+          recentlyCompared={
+            <Suspense>
+              <BrowseSection filterTwitterNames={[twitter]} sort="recent" />
+            </Suspense>
+          }
+        />
+      </>
     );
   } catch (error) {
     console.error(`failed to load github for ${github}`, error);

@@ -18,6 +18,11 @@ async function fetchTotalContributions(name: string) {
         }
     );
 
+    if (!data.ok) {
+        console.error(`Failed to fetch Github contributions for ${name} ${data.status} ${url} ${data.statusText}`);
+        return;
+    }
+
     const htmlContent = await data.text();
     const doc = parse(htmlContent);
     const yearLinks = doc.querySelectorAll("a[id*='year-link']");
@@ -33,10 +38,15 @@ async function fetchTotalContributions(name: string) {
             to: `${year}-12-31`,
         });
         const result = await fetch(`https://github.com/users/${name}/contributions?${queryParams.toString()}`);
+        if (!result.ok) {
+            console.error(`Failed to fetch Github contributions for ${name} ${result.status} ${url} ${result.statusText}`);
+            return;
+        }
         const content = await result.text();
         const doc2 = parse(content);
         const h2 = doc2.querySelector("h2");
         const match = h2?.innerText.trim().split(" ").at(0)?.replace(',', '')
+        console.log(h2?.innerText, match)
         if (match) {
             total += parseInt(match);
         } else {
