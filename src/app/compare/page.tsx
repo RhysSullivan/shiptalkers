@@ -81,7 +81,7 @@ export default async function Page(props: Props) {
     return (
       <Profile
         initialData={{ isDataLoading: false, user }}
-        fetchTweets={false}
+        fetchTweets={process.env.NODE_ENV === "development" ? true : false}
         recentlyCompared={
           <Suspense>
             <BrowseSection filterTwitterNames={[twitter]} sort="recent" />
@@ -98,7 +98,13 @@ export default async function Page(props: Props) {
   try {
     await fetchTwitterProfile(twitter);
   } catch (error) {
-    return <div>Twitter profile not found</div>;
+    return (
+      <div>
+        Twitter profile not found. If it's valid we may be being rate limited if
+        so wait {(Math.random() * 300).toFixed(0)}
+        seconds and try again.
+      </div>
+    );
   }
   const [{ heatmapData, metadata: githubMetadata }, twitterProfile] =
     await Promise.all([fetchGithubPage(github), fetchTwitterProfile(twitter)]);

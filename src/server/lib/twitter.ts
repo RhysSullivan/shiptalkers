@@ -37,7 +37,7 @@ export type PartialTweet = {
     reply_count: number;
     view_count: number;
 }
-import pThrottle from 'p-throttle';
+import { pThrottle } from "./throttle";
 
 
 const throttle = pThrottle({
@@ -82,7 +82,8 @@ async function fetchFromSocialData(input: {
             cache: "force-cache",
         })
     });
-    const res = await throttled();
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const res = await throttled() as Response;
     console.log(`Fetching tweets from ${apiUrl} with status ${res.status}`)
     const json = (await res.json()) as SuccessResponse | ErrorResponse;
     if ("status" in json) {
