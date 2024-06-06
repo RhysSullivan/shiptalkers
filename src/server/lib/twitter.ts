@@ -2,7 +2,12 @@ import { env } from "../../env";
 import { readFromCache, writeToCache } from "./cache";
 import { ErrorResponse, SuccessResponse, Tweet, TwitterUser } from "./twitter.types";
 
+
 export async function fetchTwitterProfile(name: string) {
+    const cached = await readFromCache<TwitterUser>(`twitter-profile-${name}`);
+    if (cached) {
+        return cached;
+    }
     const userInfo = await fetch(`https://api.socialdata.tools/twitter/user/${name}`, {
         method: "GET",
         headers: {
@@ -11,7 +16,12 @@ export async function fetchTwitterProfile(name: string) {
         },
         cache: "force-cache",
     })
-    return userInfo.json() as Promise<TwitterUser | undefined>;
+    if (!userInfo.ok) {
+        throw new Error(`Failed to fetch twitter profile for ${name}`);
+    }
+    const data = userInfo.json();
+    await writeToCache(`twitter-profile-${name}`, data);
+    return data as Promise<TwitterUser | undefined>;
 }
 
 const SAFETY_STOP = env.NODE_ENV === "development" ? 10 : 3000;
@@ -27,6 +37,17 @@ export type PartialTweet = {
     reply_count: number;
     view_count: number;
 }
+import pThrottle from 'p-throttle';
+
+
+const throttle = pThrottle({
+    limit: 110,
+    interval: 120000,
+    onDelay: () => {
+        console.log(`Hit rate limit throttling`);
+    },
+});
+
 // sorted by ID in descending order
 async function fetchFromSocialData(input: {
     username: string;
@@ -51,20 +72,27 @@ async function fetchFromSocialData(input: {
         type: "Latest",
     });
     const apiUrl = `https://api.socialdata.tools/twitter/search?${queryParams.toString()}`;
-    const res = await fetch(apiUrl, {
-        method: "GET",
-        headers: {
-            Authorization: `Bearer ${process.env.SOCIAL_DATA_API_KEY}`,
-            Accept: "application/json",
-        },
-        cache: "force-cache",
+    const throttled = throttle(async () => {
+        return await fetch(apiUrl, {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${process.env.SOCIAL_DATA_API_KEY}`,
+                Accept: "application/json",
+            },
+            cache: "force-cache",
+        })
     });
+    const res = await throttled();
+    console.log(`Fetching tweets from ${apiUrl} with status ${res.status}`)
     const json = (await res.json()) as SuccessResponse | ErrorResponse;
-
     if ("status" in json) {
         throw new Error(json.message);
     }
-    const oldestTweet = (json.tweets ?? [])
+    if (!('tweets' in json) || json.tweets === undefined) {
+        console.error('No tweets found in response', json);
+        throw new Error('No tweets found in response');
+    }
+    const oldestTweet = json.tweets
         .sort((a, b) => (BigInt(a.id_str) < BigInt(b.id_str) ? 1 : -1))
         .at(-1);
     console.log(

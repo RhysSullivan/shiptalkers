@@ -21,7 +21,7 @@ export const mysqlTable = mysqlTableCreator(
 
 const int11 = customType<{ data: number }>({
   dataType() {
-    return "int(11)";
+    return "int";
   },
 });
 
@@ -39,7 +39,7 @@ export const users = mysqlTable("user", {
   commitsMade: int11("commitsMade").notNull().default(0),
   twitterId: varchar("twitterId", {
     length: 255,
-  }).notNull(),
+  }),
   twitterDisplayName: varchar("twitterDisplayName", {
     length: 255,
   }).notNull(),

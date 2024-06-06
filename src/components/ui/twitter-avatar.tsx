@@ -18,7 +18,7 @@ export function TwitterAvatar(props: { className?: string; name: string }) {
     return (
       <a target="_blank" href={`https://vercel.lol/?utm=${props.name}`}>
         <img
-          src={`https://unavatar.io/twitter/rauchg`}
+          src={`https://unavatar.io/twitter/${props.name}`}
           alt="avatar"
           className={props.className
             ?.split(" ")

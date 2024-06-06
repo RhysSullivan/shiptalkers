@@ -3,20 +3,27 @@ import { users } from "../server/db/schema";
 import { desc } from "drizzle-orm";
 import { ComparisonCard } from "./components.client";
 import { isVerifiedUser } from "../lib/utils";
-export async function RecentlyComparedSection(props: {
+export async function BrowseSection(props: {
   filterTwitterNames?: string[];
+  sort: "popular" | "recent";
 }) {
   try {
     const recentComparisons = await db
       .select()
       .from(users)
-      .orderBy(desc(users.createdAt))
+      .orderBy(
+        props.sort === "popular"
+          ? desc(users.twitterFollowerCount)
+          : desc(users.createdAt),
+      )
       .limit(50)
       .execute()
       .then((x) => x.filter(isVerifiedUser));
     return (
       <section className="flex w-full max-w-6xl flex-col items-center justify-center gap-4 rounded-md px-4 py-6 text-center">
-        <h2 className="text-2xl font-bold">Recently Compared</h2>
+        <h2 className="text-2xl font-bold">
+          {props.sort === "popular" ? "Popular Tweeters" : "Recently Compared"}
+        </h2>
         <div className="grid w-full grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
           {recentComparisons
             .map((comparison) => {

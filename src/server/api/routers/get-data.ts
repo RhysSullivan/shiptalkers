@@ -23,7 +23,7 @@ export function toUserSchema(props: {
   return {
     createdAt: new Date(),
     updatedAt: null,
-    twitterDisplayName: props.twitterPage.name,
+    twitterDisplayName: props.twitterPage.name ?? props.twitterName,
     twitterId: props.twitterPage.id_str,
     twitterFollowerCount: props.twitterPage.followers_count ?? 0,
     githubFollowerCount: props.metadata.followers ?? 0,
@@ -73,7 +73,8 @@ export const getUserDataStreamed = async (input: {
     );
 
     const { createdAt, updatedAt, ...rest } = asUser;
-
+    const { heatmapData, ...restForLogging } = rest;
+    console.log("Writing to db", restForLogging)
     await db.insert(users).values(rest).onDuplicateKeyUpdate({
       set: rest,
     })

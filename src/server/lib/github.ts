@@ -1,9 +1,14 @@
 import { parse } from "node-html-parser";
 import type { HeatmapData } from "../../lib/utils";
+import { readFromCache, writeToCache } from "./cache";
 
 
 
-async function fetchGithubHeatmap(name: string) {
+async function fetchGithubHeatmap(name: string): Promise<HeatmapData[]> {
+    const cached = await readFromCache<HeatmapData[]>(`${name}-heatmap-github`);
+    if (cached) {
+        return cached;
+    }
     const data = await fetch(
         `https://github.com/${name}?action=show&controller=profiles&tab=contributions&user_id=${name}`,
         {
@@ -52,6 +57,7 @@ async function fetchGithubHeatmap(name: string) {
             });
         });
     });
+    await writeToCache(`${name}-heatmap-github`, heatmapData);
     return heatmapData;
 }
 
@@ -92,11 +98,16 @@ export type GithubMetadata = {
 };
 
 async function fetchGithubMetadata(name: string): Promise<GithubMetadata | undefined> {
+    const cached = await readFromCache<GithubMetadata>(`${name}-metadata-github`);
+    if (cached) {
+        return cached;
+    }
     const data = await fetch(`https://api.github.com/users/${name}`, {
         next: {
             revalidate: 60 * 10
         }
     });
+    await writeToCache(`${name}-metadata-github`, data.json());
     return data.json() as Promise<GithubMetadata | undefined>;
 }
 

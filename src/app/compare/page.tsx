@@ -6,7 +6,7 @@ import {
 } from "../../server/api/routers/get-data";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
-import { RecentlyComparedSection } from "../components.server";
+import { BrowseSection } from "../components.server";
 import { cookies } from "next/headers";
 import { fetchGithubPage } from "../../server/lib/github";
 import { fetchTwitterProfile } from "../../server/lib/twitter";
@@ -51,7 +51,6 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     github,
     displayName: user.twitterDisplayName,
     twitter,
-    twtrId: user.twitterId,
     commits: user.commitsMade.toString(),
     tweets: user.tweetsSent.toString(),
   });
@@ -65,7 +64,15 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 export const revalidate = 60; // 1 minute
 
 export default async function Page(props: Props) {
-  const { github, twitter } = parse(props);
+  let github: string;
+  let twitter: string;
+  try {
+    const p = parse(props);
+    github = p.github;
+    twitter = p.twitter;
+  } catch (error) {
+    return <div>Invalid URL {JSON.stringify(props.searchParams)}</div>;
+  }
   const user = await getCachedUserData({
     githubName: github,
     twitterName: twitter,
@@ -77,11 +84,21 @@ export default async function Page(props: Props) {
         fetchTweets={false}
         recentlyCompared={
           <Suspense>
-            <RecentlyComparedSection filterTwitterNames={[twitter]} />
+            <BrowseSection filterTwitterNames={[twitter]} sort="recent" />
           </Suspense>
         }
       />
     );
+  }
+  try {
+    await fetchGithubPage(github);
+  } catch (error) {
+    return <div>GitHub profile not found</div>;
+  }
+  try {
+    await fetchTwitterProfile(twitter);
+  } catch (error) {
+    return <div>Twitter profile not found</div>;
   }
   const [{ heatmapData, metadata: githubMetadata }, twitterProfile] =
     await Promise.all([fetchGithubPage(github), fetchTwitterProfile(twitter)]);
@@ -110,7 +127,7 @@ export default async function Page(props: Props) {
       fetchTweets={true}
       recentlyCompared={
         <Suspense>
-          <RecentlyComparedSection filterTwitterNames={[twitter]} />
+          <BrowseSection filterTwitterNames={[twitter]} sort="recent" />
         </Suspense>
       }
     />

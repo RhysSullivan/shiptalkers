@@ -3,7 +3,7 @@ import { Hero } from "./components.client";
 import { db } from "../server/db";
 import { User, users } from "../server/db/schema";
 import { desc } from "drizzle-orm";
-import { RecentlyComparedSection } from "./components.server";
+import { BrowseSection } from "./components.server";
 import {
   Table,
   TableBody,
@@ -99,7 +99,7 @@ export default async function Component() {
         <TopTable mode="tweets" users={topTweeters} />
         <TopTable mode="commits" users={topCommitters} />
       </div>
-      <RecentlyComparedSection />
+      <BrowseSection sort="popular" />
     </main>
   );
 }
