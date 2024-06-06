@@ -23,7 +23,7 @@ export function toUserSchema(props: {
   return {
     createdAt: new Date(),
     updatedAt: null,
-    twitterDisplayName: props.twitterPage.name,
+    twitterDisplayName: props.twitterPage.name ?? props.twitterName,
     twitterId: props.twitterPage.id_str,
     twitterFollowerCount: props.twitterPage.followers_count ?? 0,
     githubFollowerCount: props.metadata.followers ?? 0,
