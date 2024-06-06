@@ -101,7 +101,7 @@ export type GithubMetadata = {
 
 async function fetchGithubMetadata(name: string): Promise<GithubMetadata | undefined> {
     const cached = await readFromCache<GithubMetadata>(`${name}-metadata-github`);
-    if (cached) {
+    if (cached && !('json' in cached) && 'login' in cached) {
         return cached;
     }
     const data = await fetch(`https://api.github.com/users/${name}`, {
@@ -111,9 +111,10 @@ async function fetchGithubMetadata(name: string): Promise<GithubMetadata | undef
         console.error(`Failed to fetch Github metadata for ${name} ${data.status}`);
         return;
     } else {
-        await writeToCache(`${name}-metadata-github`, data.json());
+        const json = await data.json() as Promise<GithubMetadata>;
+        await writeToCache(`${name}-metadata-github`, json);
+        return json;
     }
-    return data.json() as Promise<GithubMetadata | undefined>;
 }
 
 export async function fetchGithubPage(name: string) {

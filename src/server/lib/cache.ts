@@ -25,3 +25,7 @@ export async function readFromCache<T>(key: string): Promise<T | null> {
     }
     return superjson.parse(value);
 }
+
+export async function deleteFromCache(key: string) {
+    return client.del(key);
+}
