@@ -25,13 +25,13 @@ export function toUserSchema(props: {
     updatedAt: null,
     twitterDisplayName: props.twitterPage.name,
     twitterId: props.twitterPage.id_str,
-    twitterFollowerCount: props.twitterPage.followers_count,
-    githubFollowerCount: props.metadata.followers,
-    commitsMade: totalCommits,
+    twitterFollowerCount: props.twitterPage.followers_count ?? 0,
+    githubFollowerCount: props.metadata.followers ?? 0,
+    commitsMade: totalCommits ?? 0,
     githubName: props.githubName,
     twitterInGithubBio: props.metadata.twitter_username?.toLowerCase() === props.twitterName.toLowerCase(),
     twitterName: props.twitterName,
-    tweetsSent: totalTweets,
+    tweetsSent: totalTweets ?? 0,
     heatmapData: props.merged,
   };
 }
