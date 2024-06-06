@@ -9,6 +9,7 @@ const throttleProfile = throttledQueue({
     maxRequestsPerInterval: 100,
     interval: 100000,
     startDelay: 130000,
+    evenlySpaced: true,
     onThrottle(numRequestsInQueue) {
         console.log(`Throttling profile fetch, ${numRequestsInQueue} in queue`);
     },
@@ -71,6 +72,7 @@ const throttle = throttledQueue({
     onThrottle(numRequestsInQueue) {
         console.log(`Throttling tweet fetch, ${numRequestsInQueue} in queue`);
     },
+    evenlySpaced: true,
     maxRequestsPerInterval: 100,
     interval: 100000,
     startDelay: 130000,
@@ -117,7 +119,7 @@ async function fetchFromSocialData(input: {
     }
     if (!('tweets' in json) || json.tweets === undefined) {
         console.error('No tweets found in response', json);
-        throw new Error('No tweets found in response');
+        throw new Error(`No tweets found in response ${res.status}`);
     }
     const oldestTweet = json.tweets
         .sort((a, b) => (BigInt(a.id_str) < BigInt(b.id_str) ? 1 : -1))

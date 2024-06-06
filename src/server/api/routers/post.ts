@@ -67,7 +67,8 @@ export const postRouter = createTRPCRouter({
           return;
         }
         if ('error' in input && input.error) {
-          emit.next(input.error);
+          emit.next(input.error.includes('429') ? `We're hitting rate limits at the moment, just hang tight and keep the page open. Thanks for your patience!`
+            : input.error);
           return;
         }
         if ('data' in input && input.data) {
