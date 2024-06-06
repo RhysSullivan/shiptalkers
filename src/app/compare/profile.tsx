@@ -47,8 +47,8 @@ function StreamingCTAs() {
           target="_blank"
         >
           follow me on Twitter
-        </Link>{" "}
-        and{" "}
+        </Link>
+        ,{" "}
         <Link
           href="https://github.com/RhysSullivan/shiptalkers"
           target="_blank"
@@ -56,7 +56,14 @@ function StreamingCTAs() {
         >
           star the project
         </Link>{" "}
-        on GitHub
+        on GitHub, and{" "}
+        <Link
+          href="https://www.youtube.com/watch?v=ljMqoUGnskA"
+          target="_blank"
+          className="text-blue-500 hover:underline"
+        >
+          touch grass
+        </Link>
       </span>
       <span>We're hitting rate limits so things may take a while</span>
       <span>

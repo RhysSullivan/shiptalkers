@@ -1,6 +1,6 @@
 import { db } from "../server/db";
 import { users } from "../server/db/schema";
-import { desc } from "drizzle-orm";
+import { desc, gt } from "drizzle-orm";
 import { ComparisonCard } from "./components.client";
 import { isVerifiedUser } from "../lib/utils";
 export async function BrowseSection(props: {
@@ -8,17 +8,23 @@ export async function BrowseSection(props: {
   sort: "popular" | "recent";
 }) {
   try {
-    const recentComparisons = await db
-      .select()
-      .from(users)
-      .orderBy(
-        props.sort === "popular"
-          ? desc(users.twitterFollowerCount)
-          : desc(users.createdAt),
-      )
-      .limit(50)
-      .execute()
-      .then((x) => x.filter(isVerifiedUser));
+    const recentComparisons =
+      props.sort === "popular"
+        ? await db
+            .select()
+            .from(users)
+            .where(gt(users.commitsMade, 500))
+            .orderBy(desc(users.twitterFollowerCount))
+            .limit(50)
+            .execute()
+            .then((x) => x.filter(isVerifiedUser))
+        : await db
+            .select()
+            .from(users)
+            .orderBy(desc(users.createdAt))
+            .limit(50)
+            .execute()
+            .then((x) => x.filter(isVerifiedUser));
     return (
       <section className="flex w-full max-w-6xl flex-col items-center justify-center gap-4 rounded-md px-4 py-6 text-center">
         <h2 className="text-2xl font-bold">
