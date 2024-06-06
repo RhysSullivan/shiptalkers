@@ -3,19 +3,31 @@ import { readFromCache, writeToCache } from "./cache";
 import { ErrorResponse, SuccessResponse, Tweet, TwitterUser } from "./twitter.types";
 
 
+const throttleProfile = pThrottle({
+    limit: 110,
+    interval: 120000,
+    onDelay: () => {
+        console.log(`Hit profile fetch rate limit throttling`);
+    },
+});
+
 export async function fetchTwitterProfile(name: string) {
     const cached = await readFromCache<TwitterUser>(`twitter-profile-${name}`);
     if (cached) {
         return cached;
     }
-    const userInfo = await fetch(`https://api.socialdata.tools/twitter/user/${name}`, {
-        method: "GET",
-        headers: {
-            Authorization: `Bearer ${process.env.SOCIAL_DATA_API_KEY}`,
-            Accept: "application/json",
-        },
-        cache: "force-cache",
-    })
+    const throttled = throttleProfile(async () => {
+        await fetch(`https://api.socialdata.tools/twitter/user/${name}`, {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${process.env.SOCIAL_DATA_API_KEY}`,
+                Accept: "application/json",
+            },
+            cache: "force-cache",
+        })
+    }
+    );
+    const userInfo = await throttled() as Response;
     if (!userInfo.ok) {
         throw new Error(`Failed to fetch twitter profile for ${name}`);
     }
@@ -44,7 +56,7 @@ const throttle = pThrottle({
     limit: 110,
     interval: 120000,
     onDelay: () => {
-        console.log(`Hit rate limit throttling`);
+        console.log(`Hit tweet get rate limit throttling`);
     },
 });
 

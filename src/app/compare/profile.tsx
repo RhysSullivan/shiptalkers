@@ -58,16 +58,19 @@ function StreamingCTAs() {
         </Link>{" "}
         on GitHub
       </span>
+      <span>We're hitting rate limits so things may take a while</span>
     </div>
   );
 }
 
 export function Profile(props: {
-  initialData: PageData;
+  initialData: Omit<PageData, "twitterPage">;
   recentlyCompared: React.ReactNode;
   fetchTweets: boolean;
 }) {
-  const [pageData, setPageData] = useState<PageData>(props.initialData);
+  const [pageData, setPageData] = useState<Omit<PageData, "twitterPage">>(
+    props.initialData,
+  );
   const {
     githubName,
     twitterName,

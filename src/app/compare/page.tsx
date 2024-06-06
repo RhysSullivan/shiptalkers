@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+import { type Metadata } from "next";
 import { Profile } from "./profile";
 import {
   getCachedUserData,
@@ -7,9 +7,7 @@ import {
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { BrowseSection } from "../components.server";
-import { cookies } from "next/headers";
 import { fetchGithubPage } from "../../server/lib/github";
-import { fetchTwitterProfile } from "../../server/lib/twitter";
 type Props = {
   searchParams:
     | {
@@ -91,51 +89,40 @@ export default async function Page(props: Props) {
     );
   }
   try {
-    await fetchGithubPage(github);
-  } catch (error) {
-    return <div>GitHub profile not found</div>;
-  }
-  try {
-    await fetchTwitterProfile(twitter);
-  } catch (error) {
+    const { heatmapData, metadata: githubMetadata } =
+      await fetchGithubPage(github);
+    if (!heatmapData || !githubMetadata) {
+      return <div>GitHub profile not found</div>;
+    }
     return (
-      <div>
-        Twitter profile not found. If it's valid we may be being rate limited if
-        so wait {(Math.random() * 300).toFixed(0)}
-        seconds and try again.
-      </div>
+      <Profile
+        initialData={{
+          isDataLoading: true,
+          user: toUserSchema({
+            githubName: github,
+            merged: heatmapData.map((x) => ({
+              day: x.day,
+              commits: x.value,
+              tweets: 0,
+            })),
+            metadata: githubMetadata,
+            twitterPage: {
+              followers_count: 0,
+              id_str: "0",
+              name: twitter,
+            },
+            twitterName: twitter,
+          }),
+        }}
+        fetchTweets={true}
+        recentlyCompared={
+          <Suspense>
+            <BrowseSection filterTwitterNames={[twitter]} sort="recent" />
+          </Suspense>
+        }
+      />
     );
-  }
-  const [{ heatmapData, metadata: githubMetadata }, twitterProfile] =
-    await Promise.all([fetchGithubPage(github), fetchTwitterProfile(twitter)]);
-  if (!twitterProfile) {
-    return <div>Twitter profile not found</div>;
-  }
-  if (!githubMetadata) {
+  } catch (error) {
     return <div>GitHub profile not found</div>;
   }
-  return (
-    <Profile
-      initialData={{
-        isDataLoading: true,
-        user: toUserSchema({
-          githubName: github,
-          merged: heatmapData.map((x) => ({
-            day: x.day,
-            commits: x.value,
-            tweets: 0,
-          })),
-          metadata: githubMetadata,
-          twitterPage: twitterProfile,
-          twitterName: twitter,
-        }),
-      }}
-      fetchTweets={true}
-      recentlyCompared={
-        <Suspense>
-          <BrowseSection filterTwitterNames={[twitter]} sort="recent" />
-        </Suspense>
-      }
-    />
-  );
 }
