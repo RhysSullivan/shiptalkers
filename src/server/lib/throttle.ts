@@ -72,6 +72,7 @@ export function pThrottle({ limit, interval, strict = false, onDelay }: Throttle
         return Math.max(0, nextExecutionTime - now);
     }
 
+
     const getDelay = strict ? strictDelay : windowedDelay;
 
     return function (func: (...args: any[]) => any): ThrottledFunction {
