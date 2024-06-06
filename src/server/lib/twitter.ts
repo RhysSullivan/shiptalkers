@@ -1,5 +1,5 @@
 import { env } from "../../env";
-import { readFromCache, writeToCache } from "./cache";
+import { deleteFromCache, readFromCache, writeToCache } from "./cache";
 import { throttledQueue } from "./throttle";
 import { ErrorResponse, SuccessResponse, Tweet, TwitterUser } from "./twitter.types";
 
@@ -50,6 +50,10 @@ export async function fetchTwitterProfile(name: string) {
     const data = await userInfo.json() as Promise<TwitterUser>;
     await writeToCache(`twitter-profile-${name}`, data);
     return data;
+}
+
+export async function deleteTwitterProfileCache(name: string) {
+    return await deleteFromCache(`twitter-profile-${name}`);
 }
 
 const SAFETY_STOP = env.NODE_ENV === "development" ? 10 : 3000;

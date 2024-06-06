@@ -1,12 +1,12 @@
 import { parse } from "node-html-parser";
-import { readFromCache, writeToCache } from "./cache";
+import { deleteFromCache, readFromCache, writeToCache } from "./cache";
 
 
 
 async function fetchTotalContributions(name: string) {
     const cached = await readFromCache<number>(`${name}-github-total-contributions-all-time-v2`);
     if (cached) {
-        // return cached;
+        return cached;
     }
     const url = `https://github.com/${name}?action=show&controller=profiles&tab=contributions&user_id=${name}`;
     const data = await fetch(url,
@@ -56,6 +56,9 @@ async function fetchTotalContributions(name: string) {
     return total;
 }
 
+export async function deleteGithubContribtionsCache(name: string) {
+    return await deleteFromCache(`${name}-github-total-contributions-all-time-v2`);
+}
 
 export type GithubMetadata = {
     login: string;
@@ -108,6 +111,10 @@ async function fetchGithubMetadata(name: string): Promise<GithubMetadata | undef
         await writeToCache(`${name}-metadata-github`, json);
         return json;
     }
+}
+
+export async function deleteGithubMetadataCache(name: string) {
+    return await deleteFromCache(`${name}-metadata-github`);
 }
 
 export async function fetchGithubPage(name: string) {
