@@ -14,11 +14,19 @@ const throttleProfile = throttledQueue({
     },
 });
 
+export async function getCachedTwitterProfile(name: string) {
+    const cached = await readFromCache<TwitterUser>(`twitter-profile-${name}`);
+    const isRealCached = cached && !('json' in cached) && 'name' in cached;
+    if (!isRealCached) {
+        return null;
+    }
+    return cached;
+}
 
 
 export async function fetchTwitterProfile(name: string) {
-    const cached = await readFromCache<TwitterUser>(`twitter-profile-${name}`);
-    if (cached && !('json' in cached) && 'name' in cached) {
+    const cached = await getCachedTwitterProfile(name);
+    if (cached) {
         return cached;
     }
     const userInfo = await throttleProfile(async () => {

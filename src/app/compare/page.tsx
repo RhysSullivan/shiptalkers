@@ -9,7 +9,10 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { BrowseSection } from "../components.server";
 import { fetchGithubPage } from "../../server/lib/github";
-import { getCachedTweets } from "../../server/lib/twitter";
+import {
+  getCachedTweets,
+  getCachedTwitterProfile,
+} from "../../server/lib/twitter";
 type Props = {
   searchParams:
     | {
@@ -97,16 +100,19 @@ export default async function Page(props: Props) {
       return <div>GitHub profile not found</div>;
     }
     // some are partially loaded and we can hydrate with cached tweets for better UX
-    const cachedTwitter = await getCachedTweets(twitter);
+    const [cachedTweets, cachedProfile] = await Promise.all([
+      getCachedTweets(twitter),
+      getCachedTwitterProfile(twitter),
+    ]);
     return (
       <Profile
         initialData={{
           isDataLoading: true,
           user: toUserSchema({
             githubName: github,
-            merged: parseCollection(cachedTwitter ?? [], heatmapData),
+            merged: parseCollection(cachedTweets ?? [], heatmapData),
             metadata: githubMetadata,
-            twitterPage: {
+            twitterPage: cachedProfile ?? {
               followers_count: 0,
               id_str: "0",
               name: twitter,
