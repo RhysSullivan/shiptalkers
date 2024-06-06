@@ -6,9 +6,10 @@ import { and, eq } from "drizzle-orm";
 import { deleteGithubContribtionsCache, deleteGithubMetadataCache } from "../../../server/lib/github";
 import { deleteTwitterProfileCache } from "../../../server/lib/twitter";
 import { rateLimiter } from "../../../server/lib/cache";
+import { NextRequest } from "next/server";
 
 // queryParams: github, twitter
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
 
     const parsed = new URL(req.url).searchParams;
     const github = parsed.get("github");
@@ -17,14 +18,14 @@ export async function POST(req: Request) {
     if (!github || !twitter) {
         return new Response("Missing parameters", { status: 400 });
     }
-    // get ip
-    const ip = req.headers.get('x-forwarded-for') ?? '127.0.0.1'
+    // get ip    
+    const ip = `${github}-${twitter}-rate-limit`
     try {
         await rateLimiter.consume(ip, 1)
     } catch (error) {
+        console.error(`Rate limited ${github} ${twitter} ${ip}`)
         return new Response("Rate limited", { status: 429 });
     }
-
     if (reset) {
         console.log(`Manually resetting ${github} ${twitter}`)
         // yes i know about Promise.all

@@ -38,7 +38,9 @@ function ReloadButton(props: { twitter: string; github: string }) {
           console.log(res, res.status);
         }
         if (res.status === 429) {
-          setStatus("Rate limited, try again later (like 5 minutes)");
+          setStatus(
+            "Refreshing this profile is being rate limited, try again in 60 second",
+          );
           // clear after 5 seconds
           setTimeout(() => {
             setStatus(null);

@@ -36,7 +36,7 @@ import { RateLimiterRedis } from "rate-limiter-flexible";
 export const rateLimiter = new RateLimiterRedis({
     storeClient: client,
     keyPrefix: 'middleware',
-    points: 15, // 10 requests
-    duration: 30, // per 1 second by IP
+    points: 1, // 10 requests
+    duration: 60, // per 1 second by IP
 });
 
