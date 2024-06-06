@@ -5,7 +5,7 @@ export function TwitterAvatar(props: { className?: string; name: string }) {
   if (props.name === "rauchg") {
     return (
       <img
-        src={`https://unavatar.io/twitter/rauchg`}
+        src={`https://unavatar.io/twitter/${props.name}`}
         alt="avatar"
         className={props.className
           ?.split(" ")
