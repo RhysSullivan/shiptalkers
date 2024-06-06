@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import { TRPCReactProvider } from "../trpc/react";
 import { PHProvider, PostHogPageView } from "../components/ui/posthog";
 import Link from "next/link";
+import { Suspense } from "react";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -70,7 +71,9 @@ export default function RootLayout({
       >
         <TRPCReactProvider>
           <PHProvider>
-            <PostHogPageView />
+            <Suspense>
+              <PostHogPageView />
+            </Suspense>
             <nav className="z-50 bg-white px-4 py-2 shadow-lg dark:bg-gray-900">
               <div className="w-full text-center">
                 We're experiencing an insane load at the moment, if your profile
