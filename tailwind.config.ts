@@ -1,15 +1,15 @@
-import type { Config } from "tailwindcss"
-import colors from 'tailwindcss/colors';
+import type { Config } from "tailwindcss";
+import colors from "tailwindcss/colors";
 
 const config: Config = {
   darkMode: ["class"],
   content: [
-    './pages/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-    './app/**/*.{ts,tsx}',
-    './src/**/*.{ts,tsx}',
+    "./pages/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./app/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
     // Path to Tremor module
-    './node_modules/@tremor/**/*.{js,ts,jsx,tsx}',
+    "./node_modules/@tremor/**/*.{js,ts,jsx,tsx}",
   ],
   prefix: "",
   theme: {
@@ -86,9 +86,9 @@ const config: Config = {
           },
         },
         // dark mode
-        'dark-tremor': {
+        "dark-tremor": {
           brand: {
-            faint: '#0B1229',
+            faint: "#0B1229",
             muted: colors.blue[950],
             subtle: colors.blue[800],
             DEFAULT: colors.blue[500],
@@ -96,7 +96,7 @@ const config: Config = {
             inverted: colors.blue[950],
           },
           background: {
-            muted: '#131A2B',
+            muted: "#131A2B",
             subtle: colors.gray[800],
             DEFAULT: colors.gray[900],
             emphasis: colors.gray[300],
@@ -120,29 +120,29 @@ const config: Config = {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
-        'tremor-small': '0.375rem',
-        'tremor-default': '0.5rem',
-        'tremor-full': '9999px',
+        "tremor-small": "0.375rem",
+        "tremor-default": "0.5rem",
+        "tremor-full": "9999px",
       },
       boxShadow: {
         // light
-        'tremor-input': '0 1px 2px 0 rgb(0 0 0 / 0.05)',
-        'tremor-card':
-          '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
-        'tremor-dropdown':
-          '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+        "tremor-input": "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+        "tremor-card":
+          "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
+        "tremor-dropdown":
+          "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
         // dark
-        'dark-tremor-input': '0 1px 2px 0 rgb(0 0 0 / 0.05)',
-        'dark-tremor-card':
-          '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
-        'dark-tremor-dropdown':
-          '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+        "dark-tremor-input": "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+        "dark-tremor-card":
+          "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
+        "dark-tremor-dropdown":
+          "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
       },
       fontSize: {
-        'tremor-label': ['0.75rem', { lineHeight: '1rem' }],
-        'tremor-default': ['0.875rem', { lineHeight: '1.25rem' }],
-        'tremor-title': ['1.125rem', { lineHeight: '1.75rem' }],
-        'tremor-metric': ['1.875rem', { lineHeight: '2.25rem' }],
+        "tremor-label": ["0.75rem", { lineHeight: "1rem" }],
+        "tremor-default": ["0.875rem", { lineHeight: "1.25rem" }],
+        "tremor-title": ["1.125rem", { lineHeight: "1.75rem" }],
+        "tremor-metric": ["1.875rem", { lineHeight: "2.25rem" }],
       },
       keyframes: {
         "accordion-down": {
@@ -165,12 +165,11 @@ const config: Config = {
             "background-position": "0% 0%",
           },
         },
-
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        'spin-slow': 'spin 3s linear infinite',
+        "spin-slow": "spin 3s linear infinite",
       },
     },
   },
@@ -178,17 +177,17 @@ const config: Config = {
     {
       pattern:
         /^(bg-(?:slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-(?:50|100|200|300|400|500|600|700|800|900|950))$/,
-      variants: ['hover', 'ui-selected'],
+      variants: ["hover", "ui-selected"],
     },
     {
       pattern:
         /^(text-(?:slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-(?:50|100|200|300|400|500|600|700|800|900|950))$/,
-      variants: ['hover', 'ui-selected'],
+      variants: ["hover", "ui-selected"],
     },
     {
       pattern:
         /^(border-(?:slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-(?:50|100|200|300|400|500|600|700|800|900|950))$/,
-      variants: ['hover', 'ui-selected'],
+      variants: ["hover", "ui-selected"],
     },
     {
       pattern:
@@ -202,7 +201,7 @@ const config: Config = {
       pattern:
         /^(fill-(?:slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-(?:50|100|200|300|400|500|600|700|800|900|950))$/,
     },
-    ...['[#1DA1F2]', '[#26a641]'].flatMap((customColor) => [
+    ...["[#1DA1F2]", "[#26a641]"].flatMap((customColor) => [
       `bg-${customColor}`,
       `border-${customColor}`,
       `hover:bg-${customColor}`,
@@ -217,7 +216,12 @@ const config: Config = {
       `ui-selected:text-${customColor}`,
     ]),
   ],
-  plugins: [require("tailwindcss-animate"), require('@headlessui/tailwindcss'), require('@tailwindcss/forms')],
-} satisfies Config
+  plugins: [
+    require("tailwindcss-animate"),
+    require("@headlessui/tailwindcss"),
+    require("@tailwindcss/line-clamp"),
+    require("@tailwindcss/forms"),
+  ],
+} satisfies Config;
 
-export default config
+export default config;

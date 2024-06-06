@@ -96,10 +96,10 @@ export function Hero() {
         );
       }}
     >
-      <div className="flex w-full max-w-sm items-center space-x-2">
+      <div className="flex w-full max-w-sm items-center gap-x-2">
         <Github size={24} />
         <Input
-          className="min-w-[300px] max-w-[300px]"
+          className="w-full min-w-[300px] rounded-lg bg-white/70 backdrop-blur-sm backdrop-saturate-200"
           required
           name="github-url"
           placeholder="GitHub Profile Name"
@@ -108,10 +108,10 @@ export function Hero() {
         />
       </div>
       <div className="flex w-full max-w-sm flex-col items-center space-x-2">
-        <div className="flex w-full max-w-sm items-center space-x-2">
+        <div className="flex w-full max-w-sm items-center gap-x-2">
           <Twitter size={24} />
           <Input
-            className="min-w-[300px] max-w-[300px]"
+            className="w-full min-w-[300px] rounded-lg bg-white/70 backdrop-blur-sm backdrop-saturate-200"
             name="twitter-url"
             required
             defaultValue={profileData?.twitter_username ?? ""}
@@ -124,14 +124,17 @@ export function Hero() {
         </div>
         <div className="h-[15px] w-full">
           {profileData?.twitter_username && (
-            <span className="mx-auto w-full  text-sm text-gray-500">
+            <span className="mx-auto w-full text-sm text-gray-500">
               *Autofilled with twitter from GitHub bio
             </span>
           )}
         </div>
       </div>
 
-      <Button className="mt-4" type="submit">
+      <Button
+        className="mt-4 rounded-lg hover:bg-neutral-700 active:translate-y-0.5 active:bg-neutral-500"
+        type="submit"
+      >
         Submit
       </Button>
     </form>
@@ -142,31 +145,41 @@ export function ComparisonCard(props: { user: User }) {
   const { user } = props;
   return (
     <a
-      className="flex flex-row items-center  justify-between rounded-md border-2 px-4 py-2 drop-shadow-sm transition-all hover:scale-105 hover:border-blue-500 hover:shadow-lg"
+      className="flex flex-row items-center justify-between rounded-md border-2 bg-white p-4 drop-shadow-sm transition-all hover:scale-105 hover:border-blue-500 hover:shadow-lg"
       href={getPageUrl({
         github: user.githubName,
         twitter: user.twitterName,
       })}
     >
-      <div className="flex flex-row items-start justify-center gap-4 ">
-        <TwitterAvatar name={user.twitterName} className="size-24" />
-        <div className="flex h-full flex-col  items-start justify-start text-start">
-          <h3 className="text-lg font-bold">{user.twitterDisplayName}</h3>
-          <span className="text-sm text-gray-500">@{user.twitterName}</span>
-          <span className="text-sm text-gray-500">
-            {user.twitterFollowerCount.toLocaleString()} followers
-          </span>
-
-          <span className="text-sm text-gray-500">
-            {user.tweetsSent.toLocaleString()} tweets
-          </span>
-          <span className="text-sm text-gray-500">
-            {user.commitsMade.toLocaleString()} commits
-          </span>
+      <div className="flex flex-row items-start justify-center gap-4">
+        <TwitterAvatar name={user.twitterName} className="size-24 min-w-24" />
+        <div className="flex h-full flex-col justify-start gap-2 text-start">
+          <h3 className="line-clamp-2 h-full max-w-56 text-wrap text-lg font-bold leading-5">
+            {user.twitterDisplayName}
+          </h3>
+          <div className="flex flex-row items-end justify-between gap-4">
+            <div className="flex h-full flex-col items-start justify-start text-start">
+              <span className="text-sm text-gray-500">@{user.twitterName}</span>
+              <span className="text-sm text-gray-500">
+                {user.twitterFollowerCount.toLocaleString()} followers
+              </span>
+              <span className="text-sm text-gray-500">
+                {user.tweetsSent.toLocaleString()} tweets
+              </span>
+              <span className="text-sm text-gray-500">
+                {user.commitsMade.toLocaleString()} commits
+              </span>
+            </div>
+            <div className="-mb-4 flex h-full flex-col items-center justify-end pl-4">
+              <GitTweetBars
+                user={user}
+                barHeight={60}
+                iconSize={24}
+                barWidth={20}
+              />
+            </div>
+          </div>
         </div>
-      </div>
-      <div className="flex h-full flex-col items-center justify-end pl-4">
-        <GitTweetBars user={user} barHeight={60} iconSize={24} barWidth={20} />
       </div>
     </a>
   );

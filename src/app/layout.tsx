@@ -73,30 +73,32 @@ export default function RootLayout({
         <TRPCReactProvider cookies={cookies().toString()}>
           <PHProvider>
             <PostHogPageView />
-            <nav className="flex items-center justify-between bg-white py-2 shadow-lg md:p-2  dark:bg-gray-900">
-              <a href="/">
-                <h1 className="text-2xl font-bold">Shiptalkers</h1>
-              </a>
-              <div className="flex items-center space-x-4">
-                <Link
-                  className="hidden h-9 items-center justify-center rounded-md bg-gray-50 px-4 py-2 text-sm font-medium text-gray-900 shadow transition-colors hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-700 disabled:pointer-events-none disabled:opacity-50 sm:inline-flex"
-                  href="https://github.com/RhysSullivan/shiptalkers"
-                  target="_blank"
-                  prefetch={false}
-                >
-                  <GithubIcon className="mr-2 h-4 w-4" />
-                  Star on GitHub
-                </Link>
+            <nav className="z-50 bg-white px-4 py-2 shadow-lg dark:bg-gray-900">
+              <div className="mx-auto flex max-w-screen-xl items-center justify-between">
+                <a href="/">
+                  <h1 className="text-2xl font-bold">Shiptalkers</h1>
+                </a>
+                <div className="flex items-center space-x-4">
+                  <Link
+                    className="hidden h-9 items-center justify-center rounded-md bg-gray-50 px-4 py-2 text-sm font-medium text-gray-900 shadow transition-colors hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-700 disabled:pointer-events-none disabled:opacity-50 sm:inline-flex"
+                    href="https://github.com/RhysSullivan/shiptalkers"
+                    target="_blank"
+                    prefetch={false}
+                  >
+                    <GithubIcon className="mr-2 h-4 w-4" />
+                    Star on GitHub
+                  </Link>
 
-                <Link
-                  href="https://twitter.com/intent/follow?screen_name=RhysSullivan"
-                  className="inline-flex h-9 items-center justify-center rounded-md bg-blue-500 px-4 py-2 text-sm font-medium text-gray-50 shadow transition-colors hover:bg-blue-600 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-700 disabled:pointer-events-none disabled:opacity-50"
-                  prefetch={false}
-                  target="_blank"
-                >
-                  <TwitterIcon className="mr-2 h-4 w-4" />
-                  Follow me on Twitter
-                </Link>
+                  <Link
+                    href="https://twitter.com/intent/follow?screen_name=RhysSullivan"
+                    className="inline-flex h-9 items-center justify-center rounded-md bg-blue-500 px-4 py-2 text-sm font-medium text-gray-50 shadow transition-colors hover:bg-blue-600 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-700 disabled:pointer-events-none disabled:opacity-50"
+                    prefetch={false}
+                    target="_blank"
+                  >
+                    <TwitterIcon className="mr-2 h-4 w-4" />
+                    Follow me on Twitter
+                  </Link>
+                </div>
               </div>
             </nav>
             {children}
