@@ -25,8 +25,13 @@ function ReloadButton(props: { twitter: string; github: string }) {
       className="flex flex-row gap-2"
       onClick={async () => {
         setIsReloading(true);
+        const urlSearchParams = new URLSearchParams({
+          github: props.github,
+          twitter: props.twitter,
+          reset: "true",
+        });
         const res = await fetch(
-          "/api/invalidate-public?github=rhyssullivan&twitter=rhyssullivan&reset=true",
+          `/api/invalidate-public?${urlSearchParams.toString()}`,
           {
             method: "POST",
           },
