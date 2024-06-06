@@ -9,8 +9,8 @@ async function fetchGithubHeatmap(name: string): Promise<HeatmapData[]> {
     if (cached) {
         return cached;
     }
-    const data = await fetch(
-        `https://github.com/${name}?action=show&controller=profiles&tab=contributions&user_id=${name}`,
+    const url = `https://github.com/${name}?action=show&controller=profiles&tab=contributions&user_id=${name}`;
+    const data = await fetch(url,
         {
             headers: {
                 connection: "keep-alive",
@@ -21,11 +21,13 @@ async function fetchGithubHeatmap(name: string): Promise<HeatmapData[]> {
             }
         }
     );
+    console.log(data.status, data.statusText, url)
     const htmlContent = await data.text();
     const doc = parse(htmlContent);
     const tbody = doc.querySelector("tbody");
     const heatmapData: HeatmapData[] = [];
     if (!tbody) {
+        console.error(`Tbody not found in the HTML content for ${name}`)
         throw new Error("Tbody not found in the HTML content");
     }
 
@@ -107,7 +109,12 @@ async function fetchGithubMetadata(name: string): Promise<GithubMetadata | undef
             revalidate: 60 * 10
         }
     });
-    await writeToCache(`${name}-metadata-github`, data.json());
+    if (!data.ok) {
+        console.error(`Failed to fetch Github metadata for ${name} ${data.status}`);
+        return;
+    } else {
+        await writeToCache(`${name}-metadata-github`, data.json());
+    }
     return data.json() as Promise<GithubMetadata | undefined>;
 }
 
