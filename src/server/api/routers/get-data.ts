@@ -54,7 +54,7 @@ export const getUserDataStreamed = async (input: {
     merged: null,
     metadata,
     totalTweets: twitterPage.statuses_count,
-    totalCommits: totalContributions,
+    totalCommits: totalContributions ?? 0,
     twitterPage,
   });
   input.onComplete(
