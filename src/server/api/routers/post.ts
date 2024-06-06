@@ -5,7 +5,7 @@ import { PageData, getUserDataStreamed } from "./get-data";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { User } from "../../db/schema";
 
-const ee = new EventEmitter();
+const ee = new EventEmitter().setMaxListeners(1000);
 
 const activeQueries = new Set<string>();
 
