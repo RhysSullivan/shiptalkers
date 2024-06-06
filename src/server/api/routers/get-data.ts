@@ -76,7 +76,9 @@ export const getUserDataStreamed = async (input: {
     process.env.NODE_ENV === "production"
       ? "https://shiptalkers.dev/api/invalidate?" + queryParams.toString()
       : "http://localhost:3000/api/invalidate?" + queryParams.toString(),
-  );
+    {
+      method: "POST",
+    });
   if (!invalidateRes.ok) {
     console.error(`Failed to invalidate cache for ${githubName}`, await invalidateRes.text(), queryParams.toString(), invalidateRes.status);
   } else {
