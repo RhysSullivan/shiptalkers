@@ -217,6 +217,8 @@ export function Profile(props: {
       {!isDataLoading && (
         <div className="py-4">
           <TweetBox
+            github={githubName}
+            twitter={twitterName}
             text={`${getRatioText({
               commits: totalCommits,
               displayName: `@${twitterName}`,

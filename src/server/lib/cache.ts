@@ -1,5 +1,6 @@
 import { RedisClientType, createClient } from 'redis';
 import { env } from '../../env';
+
 const client = createClient({
     url: env.REDIS_URL,
     socket: {
@@ -29,3 +30,13 @@ export async function readFromCache<T>(key: string): Promise<T | null> {
 export async function deleteFromCache(key: string) {
     return client.del(key);
 }
+
+import { RateLimiterRedis } from "rate-limiter-flexible";
+
+export const rateLimiter = new RateLimiterRedis({
+    storeClient: client,
+    keyPrefix: 'middleware',
+    points: 15, // 10 requests
+    duration: 30, // per 1 second by IP
+});
+

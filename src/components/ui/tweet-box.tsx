@@ -9,11 +9,58 @@ import { Button } from "./button";
 import { LinkButton } from "./link-button";
 import { Textarea } from "./textarea";
 import { useQuery } from "@tanstack/react-query";
-import { ClipboardIcon, ClipboardCheckIcon } from "lucide-react";
+import { ClipboardIcon, ClipboardCheckIcon, LoaderIcon } from "lucide-react";
 
 import { ClipboardItem } from "clipboard-polyfill";
+import { useRouter } from "next/navigation";
 
-export function TweetBox(props: { src: string; text: string }) {
+function ReloadButton(props: { twitter: string; github: string }) {
+  const [isReloading, setIsReloading] = useState<boolean>(false);
+  const [status, setStatus] = useState<string | null>(null);
+  const navigation = useRouter();
+  return (
+    <Button
+      variant={"secondary"}
+      disabled={isReloading || status !== null}
+      className="flex flex-row gap-2"
+      onClick={async () => {
+        setIsReloading(true);
+        const res = await fetch(
+          "/api/invalidate-public?github=rhyssullivan&twitter=rhyssullivan&reset=true",
+          {
+            method: "POST",
+          },
+        );
+        setIsReloading(false);
+        if (res.status === 200) {
+          void navigation.refresh();
+        } else {
+          console.log(res, res.status);
+        }
+        if (res.status === 429) {
+          setStatus("Rate limited, try again later (like 5 minutes)");
+          // clear after 5 seconds
+          setTimeout(() => {
+            setStatus(null);
+          }, 5000);
+        }
+      }}
+    >
+      {isReloading && (
+        <LoaderIcon size={24} className="spin-slow animate-spin" />
+      )}
+      {status && <span>{status}</span>}
+      Reload
+    </Button>
+  );
+}
+
+export function TweetBox(props: {
+  src: string;
+  text: string;
+  twitter: string;
+  github: string;
+}) {
   const [copySuccess, setCopySuccess] = useState<boolean>(false);
   const { data } = useQuery(["copy-image"], async () => {
     const response = await fetch(props.src);
@@ -60,6 +107,7 @@ export function TweetBox(props: { src: string; text: string }) {
         />
       </div>
       <div className="mt-4 flex w-full items-center justify-end space-x-2">
+        <ReloadButton twitter={props.twitter} github={props.github} />
         <Button
           onClick={copyToClipboard}
           variant={"secondary"}
