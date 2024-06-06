@@ -6,7 +6,7 @@ import {
 } from "../../server/api/routers/get-data";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
-import { RecentlyComparedSection } from "../components.server";
+import { BrowseSection } from "../components.server";
 import { cookies } from "next/headers";
 import { fetchGithubPage } from "../../server/lib/github";
 import { fetchTwitterProfile } from "../../server/lib/twitter";
@@ -84,7 +84,7 @@ export default async function Page(props: Props) {
         fetchTweets={false}
         recentlyCompared={
           <Suspense>
-            <RecentlyComparedSection filterTwitterNames={[twitter]} />
+            <BrowseSection filterTwitterNames={[twitter]} sort="recent" />
           </Suspense>
         }
       />
@@ -127,7 +127,7 @@ export default async function Page(props: Props) {
       fetchTweets={true}
       recentlyCompared={
         <Suspense>
-          <RecentlyComparedSection filterTwitterNames={[twitter]} />
+          <BrowseSection filterTwitterNames={[twitter]} sort="recent" />
         </Suspense>
       }
     />
