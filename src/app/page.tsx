@@ -13,8 +13,6 @@ import {
   TableRow,
 } from "../components/ui/table";
 import { TwitterAvatar } from "../components/ui/twitter-avatar";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import { ScrollArea } from "../components/ui/scroll-area";
 import Link from "next/link";
 import { getPageUrl, isVerifiedUser } from "../lib/utils";
