@@ -139,7 +139,7 @@ async function fetchFromSocialData(input: {
     input.callback(
         array
     );
-    if (input.runs && (input.runs % 5 === 0)) {
+    if (input.runs) {
         console.log('Setting partial cache')
         void setCachedTweets(input.username, array);
     }
@@ -171,7 +171,7 @@ async function fetchFromSocialData(input: {
     return;
 }
 
-function getCachedTweets(name: string) {
+export function getCachedTweets(name: string) {
     return readFromCache<PartialTweet[]>(name);
 }
 

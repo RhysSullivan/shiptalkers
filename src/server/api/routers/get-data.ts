@@ -5,6 +5,10 @@ import { TweetCommitData, User, users } from "../../db/schema";
 import { fetchGithubPage } from "../../lib/github";
 import { PartialTweet, fetchTweetsFromUser, fetchTwitterProfile } from "../../lib/twitter";
 
+export const errors = ["Github page not found", "Twitter page not found", "Unknown error"] as const;
+export const errorSet = new Set(errors);
+export type Errors = typeof errors[number];
+
 export function toUserSchema(props: {
   githubName: string;
   twitterName: string;
@@ -81,7 +85,7 @@ export const getUserDataStreamed = async (input: {
   });
 };
 
-function parseCollection(
+export function parseCollection(
   tweets: PartialTweet[],
   githubData: HeatmapData[],
 ): TweetCommitData {

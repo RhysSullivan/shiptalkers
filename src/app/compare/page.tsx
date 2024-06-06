@@ -2,12 +2,14 @@ import { type Metadata } from "next";
 import { Profile } from "./profile";
 import {
   getCachedUserData,
+  parseCollection,
   toUserSchema,
 } from "../../server/api/routers/get-data";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { BrowseSection } from "../components.server";
 import { fetchGithubPage } from "../../server/lib/github";
+import { getCachedTweets } from "../../server/lib/twitter";
 type Props = {
   searchParams:
     | {
@@ -94,17 +96,15 @@ export default async function Page(props: Props) {
     if (!heatmapData || !githubMetadata) {
       return <div>GitHub profile not found</div>;
     }
+    // some are partially loaded and we can hydrate with cached tweets for better UX
+    const cachedTwitter = await getCachedTweets(twitter);
     return (
       <Profile
         initialData={{
           isDataLoading: true,
           user: toUserSchema({
             githubName: github,
-            merged: heatmapData.map((x) => ({
-              day: x.day,
-              commits: x.value,
-              tweets: 0,
-            })),
+            merged: parseCollection(cachedTwitter ?? [], heatmapData),
             metadata: githubMetadata,
             twitterPage: {
               followers_count: 0,
