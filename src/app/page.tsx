@@ -75,13 +75,13 @@ export default async function Component() {
     .select()
     .from(users)
     .orderBy(desc(users.tweetsSent))
-    .limit(50)
+    .limit(200)
     .execute();
   const topCommitters = await db
     .select()
     .from(users)
     .orderBy(desc(users.commitsMade))
-    .limit(50)
+    .limit(200)
     .execute();
 
   return (
