@@ -118,6 +118,9 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   if (user.twitterAvatarUrl) {
     ogUrl.set("avatar", user.twitterAvatarUrl);
   }
+  if (user.updatedAt) {
+    ogUrl.set("etag", user.updatedAt.getTime().toString());
+  }
   const ogImageUrl = `https://shiptalkers.dev/api/og/compare?${ogUrl.toString()}`;
   return {
     openGraph: {
