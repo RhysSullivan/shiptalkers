@@ -75,6 +75,8 @@ async function getPageDataInternal(props: Props) {
 
 // unstable cache and react cache don't seem to deduplicate properly
 import Dataloader from "dataloader";
+import { revalidatePath } from "next/cache";
+import { getPageUrl } from "../../lib/utils";
 const dataloader = new Dataloader(
   // @ts-expect-error - this is a hack to make the types work
   async (props: Props[]) => {
@@ -138,6 +140,9 @@ export default async function Page(props: Props) {
       await db.insert(users).values(rest).onDuplicateKeyUpdate({
         set: restForLogging,
       });
+      revalidatePath(
+        getPageUrl({ github: user.githubName, twitter: user.twitterName }),
+      );
     }
     return (
       <>
