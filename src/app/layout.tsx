@@ -74,18 +74,6 @@ export default function RootLayout({
               <PostHogPageView />
             </Suspense>
             <nav className="z-50 bg-white px-4 py-2 shadow-lg dark:bg-gray-900">
-              <div className="w-full text-center">
-                We're experiencing an insane load at the moment, if your profile
-                is having issues loading please open an issue on{" "}
-                <a
-                  href="
-                  https://github.com/RhysSullivan/shiptalkers/issues"
-                  target="_blank"
-                  className="text-blue-500 hover:underline"
-                >
-                  GitHub
-                </a>
-              </div>
               <div className="mx-auto flex max-w-screen-xl items-center justify-between">
                 <a href="/">
                   <h1 className="text-2xl font-bold">Shiptalkers</h1>

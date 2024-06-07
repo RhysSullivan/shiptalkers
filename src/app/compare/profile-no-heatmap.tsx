@@ -6,9 +6,7 @@ import {
   VerifiedIcon,
 } from "lucide-react";
 import { RatioPie } from "./pie";
-import { useState } from "react";
 import type { PageData } from "../../server/api/routers/get-data";
-import { api } from "../../trpc/react";
 import { getPageUrl, getRatioText, isVerifiedUser } from "../../lib/utils";
 import { SocialData } from "../../components/ui/socialdata";
 import { TwitterAvatar } from "../../components/ui/twitter-avatar";
@@ -74,10 +72,7 @@ export function Profile(props: {
   recentlyCompared: React.ReactNode;
   fetchTweets: boolean;
 }) {
-  const [pageData, setPageData] = useState<Omit<PageData, "twitterPage">>(
-    props.initialData,
-  );
-  const [error, setError] = useState<string | null>(null);
+  const { initialData: pageData } = props;
   const {
     githubName,
     twitterName,
@@ -87,26 +82,6 @@ export function Profile(props: {
     twitterDisplayName,
     twitterFollowerCount,
   } = pageData.user;
-
-  api.post.data.useSubscription(
-    { github: githubName, twitter: twitterName },
-    {
-      onData(data) {
-        if (typeof data === "string") {
-          setError(data);
-          return;
-        }
-        setPageData(data);
-        setError(null);
-      },
-      onError(err) {
-        console.error(err);
-      },
-      enabled: props.fetchTweets,
-    },
-  );
-
-  const isDataLoading = pageData?.isDataLoading ?? true;
 
   const totalCommits = commitsMade;
   const totalTweets = tweetsSent;
@@ -127,7 +102,7 @@ export function Profile(props: {
     twitter: twitterName,
   })}`;
   return (
-    <div className="mx-auto flex w-full max-w-screen-xl flex-grow flex-col items-center justify-center py-8">
+    <div className="mx-auto flex w-full max-w-screen-xl flex-grow flex-col items-center  py-8">
       <div className="flex w-full flex-row items-center justify-between gap-4 md:mx-auto">
         <div className="flex flex-col items-start justify-start gap-2 px-2">
           <TwitterAvatar user={pageData.user} className="size-20 md:size-32" />
@@ -202,8 +177,6 @@ export function Profile(props: {
           </div>
         </div>
       </div>
-      {isDataLoading && <StreamingCTAs />}
-      {error && <div className="text-red-500">{error}</div>}
       <div className="flex w-full flex-row gap-2 py-4 text-start font-semibold">
         <a
           href="https://socialdata.tools/?ref=shiptalkers.dev"
@@ -214,24 +187,19 @@ export function Profile(props: {
         </a>
       </div>
 
-      {!isDataLoading && (
-        <div className="py-4">
-          <TweetBox
-            github={githubName}
-            twitter={twitterName}
-            text={`${getRatioText({
-              commits: totalCommits,
-              displayName: `@${twitterName}`,
-              tweets: totalTweets,
-            })}\n\n${pageUrl}`}
-            src={
-              isDataLoading
-                ? "https://generated.vusercontent.net/placeholder.svg"
-                : ogImageUrl
-            }
-          />
-        </div>
-      )}
+      <div className="py-4">
+        <TweetBox
+          github={githubName}
+          twitter={twitterName}
+          text={`${getRatioText({
+            commits: totalCommits,
+            displayName: `@${twitterName}`,
+            tweets: totalTweets,
+          })}\n\n${pageUrl}`}
+          src={ogImageUrl}
+        />
+      </div>
+
       <span>
         We've given up on showing heatmaps of contribution counts and instead
         are just doing total all time tweets & commits

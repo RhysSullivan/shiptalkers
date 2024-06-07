@@ -4,17 +4,11 @@
   "private": true,
   "scripts": {
     "with-env": "dotenv -e .env --",
-    "build": "run-s build:*",
     "db:push": "pnpm with-env drizzle-kit push:mysql",
     "db:studio": "pnpm with-env drizzle-kit studio",
-    "dev:wss": "pnpm with-env cross-env PORT=3001 tsx watch src/server/wssDevServer.ts --tsconfig tsconfig.server.json ",
-    "build:next": "pnpm with-env cross-env NODE_ENV=production next build",
-    "build:wss": "pnpm with-env tsc --project tsconfig.server.json",
-    "dev:next": "pnpm with-env next dev --turbo",
-    "start:wss": "pnpm with-env cross-env NODE_ENV=production node dist/server/prodServer.js",
-    "start:next": "pnpm with-env cross-env NODE_ENV=production next start",
-    "local:start": "run-p start:*",
-    "dev": "run-p dev:*",
+    "dev": "pnpm with-env next dev --turbo",
+    "build": "pnpm with-env cross-env NODE_ENV=production next build",
+    "start": "pnpm with-env cross-env NODE_ENV=production next start",    
     "lint": "next lint"
   },
   "engines": {
@@ -53,6 +47,7 @@
     "clipboard-polyfill": "^4.1.0",
     "clsx": "^2.0.0",
     "d3": "^7.9.0",
+    "dataloader": "^2.2.2",
     "drizzle-orm": "^0.28.5",
     "express-rate-limit": "^7.3.0",
     "lucide-react": "^0.302.0",

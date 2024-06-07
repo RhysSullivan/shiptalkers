@@ -4,7 +4,6 @@ import { throttledQueue } from "./throttle";
 import { ErrorResponse, SuccessResponse, Tweet, TwitterUser } from "./twitter.types";
 
 
-
 const throttle = throttledQueue({
     maxRequestsPerInterval: 350,
     interval: 70000,
@@ -28,16 +27,14 @@ export async function fetchTwitterProfile(name: string) {
     if (cached) {
         return cached;
     }
-    const userInfo = await throttle(async () => {
-        return await fetch(`https://api.socialdata.tools/twitter/user/${name}`, {
+    const userInfo =
+        await fetch(`https://api.socialdata.tools/twitter/user/${name}`, {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${process.env.SOCIAL_DATA_API_KEY}`,
                 Accept: "application/json",
             },
         })
-    }
-    );
 
     if (!userInfo.ok) {
         if (userInfo.status == 429) {

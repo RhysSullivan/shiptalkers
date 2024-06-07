@@ -4,7 +4,7 @@ import { ImageResponse } from "next/og";
 import * as d3 from "d3";
 import { GitTweetBars } from "../../../../components/ui/git-tweet-bars";
 import { getPageUrl, getRatioText } from "../../../../lib/utils";
-
+export const runtime = "edge";
 // Data for the pie chart
 const data = [
   { label: "tweets", value: 30 },

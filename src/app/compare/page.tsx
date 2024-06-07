@@ -2,17 +2,15 @@ import { type Metadata } from "next";
 import { Profile } from "./profile-no-heatmap";
 import {
   getCachedUserData,
-  parseCollection,
   toUserSchema,
 } from "../../server/api/routers/get-data";
-import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { BrowseSection } from "../components.server";
 import { fetchGithubPage } from "../../server/lib/github";
-import {
-  getCachedTweets,
-  getCachedTwitterProfile,
-} from "../../server/lib/twitter";
+import { fetchTwitterProfile } from "../../server/lib/twitter";
+import { db } from "../../server/db";
+import { users } from "../../server/db/schema";
+
 type Props = {
   searchParams:
     | {
@@ -35,26 +33,66 @@ function parse(props: Props) {
         twitter: props.searchParams.twitter.toLowerCase(),
       };
 }
-export const revalidate = 60 * 60; // 1 hour
 
-export async function generateMetadata(props: Props): Promise<Metadata> {
+async function getPageDataInternal(props: Props) {
   const { github, twitter } = parse(props);
-  if (github == twitter && !("name" in props.searchParams)) {
-    redirect(`/compare?name=${github}`);
-  }
   const user = await getCachedUserData({
     githubName: github,
     twitterName: twitter,
   });
+  if (user) {
+    return {
+      status: "cached",
+      user,
+    } as const;
+  }
+  const [{ totalContributions, metadata: githubMetadata }, twitterProfile] =
+    await Promise.all([fetchGithubPage(github), fetchTwitterProfile(twitter)]);
+  if (!githubMetadata) {
+    return {
+      status: "Github profile not found",
+    } as const;
+  }
+  if (!twitterProfile) {
+    return {
+      status: "Twitter profile not found",
+    } as const;
+  }
+  const asUser = toUserSchema({
+    githubName: github,
+    twitterName: twitter,
+    merged: null,
+    metadata: githubMetadata,
+    totalTweets: twitterProfile.statuses_count,
+    totalCommits: totalContributions ?? 0,
+    twitterPage: twitterProfile,
+  });
+  return {
+    status: "fetched",
+    user: asUser,
+  } as const;
+}
 
-  if (!user) {
+// unstable cache and react cache don't seem to deduplicate properly
+import Dataloader from "dataloader";
+const dataloader = new Dataloader(
+  // @ts-expect-error - this is a hack to make the types work
+  async (props: Props[]) => {
+    return Promise.all(props.map(getPageDataInternal));
+  },
+  { cacheKeyFn: (props) => JSON.stringify(props) },
+);
+
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const { user, status } = await dataloader.load(props);
+  if (status !== "fetched" && status !== "cached") {
     return {};
   }
 
   const ogUrl = new URLSearchParams({
-    github,
+    github: user.githubName,
     displayName: user.twitterDisplayName,
-    twitter,
+    twitter: user.twitterName,
     commits: user.commitsMade.toString(),
     tweets: user.tweetsSent.toString(),
   });
@@ -65,6 +103,8 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   return {
     openGraph: {
       images: [{ url: ogImageUrl }],
+      title: `${user.twitterDisplayName} Tweets VS Commits - Shiptalkers.dev`,
+      description: `${user.twitterDisplayName} has made ${user.commitsMade} commits and sent ${user.tweetsSent} tweets`,
     },
   };
 }
@@ -79,52 +119,30 @@ export default async function Page(props: Props) {
   } catch (error) {
     return <div>Invalid URL {JSON.stringify(props.searchParams)}</div>;
   }
-  const user = await getCachedUserData({
-    githubName: github,
-    twitterName: twitter,
-  });
-  if (user) {
-    return (
-      <Profile
-        initialData={{ isDataLoading: false, user }}
-        fetchTweets={process.env.NODE_ENV === "development" ? true : false}
-        recentlyCompared={
-          <Suspense>
-            <BrowseSection filterTwitterNames={[twitter]} sort="recent" />
-          </Suspense>
-        }
-      />
-    );
-  }
+
   try {
-    const { totalContributions, metadata: githubMetadata } =
-      await fetchGithubPage(github);
-    if (!githubMetadata) {
-      return <div>GitHub profile not found</div>;
+    const { user, status } = await dataloader.load(props);
+    if (status !== "fetched" && status !== "cached") {
+      return <div>{status}</div>;
     }
-    // some are partially loaded and we can hydrate with cached tweets for better UX
-    const cachedProfile = await getCachedTwitterProfile(twitter);
+    if (status === "fetched") {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { createdAt, updatedAt, ...rest } = user;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { heatmapData, ...restForLogging } = rest;
+      console.log("Writing to db", restForLogging);
+      await db.insert(users).values(rest).onDuplicateKeyUpdate({
+        set: restForLogging,
+      });
+    }
     return (
       <>
         <Profile
           initialData={{
-            isDataLoading: true,
-            user: toUserSchema({
-              githubName: github,
-              merged: null,
-              metadata: githubMetadata,
-              totalTweets: cachedProfile?.statuses_count ?? 0,
-              totalCommits: totalContributions ?? 0,
-              twitterPage: cachedProfile ?? {
-                followers_count: 0,
-                id_str: "0",
-                name: twitter,
-                profile_image_url_https: null,
-              },
-              twitterName: twitter,
-            }),
+            isDataLoading: false,
+            user: user,
           }}
-          fetchTweets={true}
+          fetchTweets={false}
           recentlyCompared={
             <Suspense>
               <BrowseSection filterTwitterNames={[twitter]} sort="recent" />
