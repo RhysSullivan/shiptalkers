@@ -114,7 +114,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     },
   };
 }
-
+export const maxDuration = 60;
 export default async function Page(props: Props) {
   let github: string;
   let twitter: string;
