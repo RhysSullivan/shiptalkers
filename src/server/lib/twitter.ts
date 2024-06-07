@@ -36,7 +36,6 @@ export async function fetchTwitterProfile(name: string) {
                 Authorization: `Bearer ${process.env.SOCIAL_DATA_API_KEY}`,
                 Accept: "application/json",
             },
-            cache: "force-cache",
         })
     }
     );
@@ -101,7 +100,6 @@ async function fetchFromSocialData(input: {
                 Authorization: `Bearer ${process.env.SOCIAL_DATA_API_KEY}`,
                 Accept: "application/json",
             },
-            cache: "force-cache",
         })
     });
     console.log(`Fetching tweets from ${apiUrl} with status ${res.status}`)

@@ -100,9 +100,7 @@ async function fetchGithubMetadata(name: string): Promise<GithubMetadata | undef
     if (cached && !('json' in cached) && 'login' in cached) {
         return cached;
     }
-    const data = await fetch(`https://api.github.com/users/${name}`, {
-        cache: "force-cache",
-    });
+    const data = await fetch(`https://api.github.com/users/${name}`);
     if (!data.ok) {
         console.error(`Failed to fetch Github metadata for ${name} ${data.status}`);
         return;
