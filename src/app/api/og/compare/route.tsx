@@ -152,7 +152,7 @@ export async function GET(req: Request) {
         <img
           src={
             twitterAvatarUrl?.replace("_normal", "") ??
-            `https://unavatar.io/twitter/${twitter}`
+            `https://unavatar.io/x/${twitter}`
           }
           width="220"
           height="220"
