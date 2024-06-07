@@ -44,6 +44,7 @@ export default function Loading() {
           </div>
         </div>
       </div>
+      <span>We're loading in the data now, this can take up to a minute</span>
       <div className="flex w-full flex-row gap-2 py-4 text-start font-semibold">
         <a
           href="https://socialdata.tools/?ref=shiptalkers.dev"
