@@ -50,12 +50,17 @@ async function getPageDataInternal(props: Props) {
     await Promise.all([fetchGithubPage(github), fetchTwitterProfile(twitter)]);
   if (!githubMetadata) {
     return {
-      status: "Github profile not found",
+      status: `GitHub profile not found. Go to https://github.com/${github} to make sure it exists and is set to public`,
+    } as const;
+  }
+  if (totalContributions === undefined) {
+    return {
+      status: `GitHub contributions not found. Go to https://github.com/${github} to make sure it exists and is set to public`,
     } as const;
   }
   if (!twitterProfile) {
     return {
-      status: "Twitter profile not found",
+      status: `Twitter profile not found. Go to https://twitter.com/${twitter} to make sure it exists`,
     } as const;
   }
   const asUser = toUserSchema({

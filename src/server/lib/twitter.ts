@@ -40,7 +40,9 @@ export async function fetchTwitterProfile(name: string) {
         if (userInfo.status == 429) {
             throw new Error(`Rate limit exceeded fetching ${name} ${userInfo.status}`);
         }
-        throw new Error(`Failed to fetch twitter profile for ${name} ${userInfo.status}`);
+        if (userInfo.status == 404) {
+            return null;
+        }
     }
     const data = await userInfo.json() as Promise<TwitterUser>;
     await writeToCache(`twitter-profile-${name}`, data);
