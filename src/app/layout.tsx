@@ -80,13 +80,13 @@ export default function RootLayout({
                 </a>
                 <div className="flex items-center space-x-4">
                   <Link
-                    className="hidden h-9 items-center justify-center rounded-md bg-gray-50 px-4 py-2 text-sm font-medium text-gray-900 shadow transition-colors hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-700 disabled:pointer-events-none disabled:opacity-50 sm:inline-flex"
+                    className="inline-flex h-9 items-center justify-center rounded-md bg-gray-50 px-4 py-2 text-sm font-medium text-gray-900 shadow transition-colors hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-700 disabled:pointer-events-none disabled:opacity-50"
                     href="https://github.com/RhysSullivan/shiptalkers"
                     target="_blank"
                     prefetch={false}
                   >
-                    <GithubIcon className="mr-2 h-4 w-4" />
-                    Star on GitHub
+                    <GithubIcon className="h-4 w-4 md:mr-2" />
+                    <span className="hidden md:block">Star on GitHub</span>
                   </Link>
 
                   <Link
@@ -95,8 +95,10 @@ export default function RootLayout({
                     prefetch={false}
                     target="_blank"
                   >
-                    <TwitterIcon className="mr-2 h-4 w-4" />
-                    Follow me on Twitter
+                    <TwitterIcon className="h-4 w-4 md:mr-2" />
+                    <span className="hidden md:block">
+                      Follow me on Twitter
+                    </span>
                   </Link>
                 </div>
               </div>
