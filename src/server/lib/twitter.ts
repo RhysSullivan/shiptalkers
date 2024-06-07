@@ -8,7 +8,6 @@ import { ErrorResponse, SuccessResponse, Tweet, TwitterUser } from "./twitter.ty
 const throttle = throttledQueue({
     maxRequestsPerInterval: 350,
     interval: 70000,
-    evenlySpaced: true,
     onThrottle(numRequestsInQueue) {
         console.log(`Throttling fetch, ${numRequestsInQueue} in queue`);
     },
