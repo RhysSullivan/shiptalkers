@@ -86,7 +86,15 @@ const dataloader = new Dataloader(
 );
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
-  const { github, twitter } = parse(props);
+  let github: string;
+  let twitter: string;
+  try {
+    const d = parse(props);
+    github = d.github;
+    twitter = d.twitter;
+  } catch (error) {
+    return {};
+  }
   const user = await getCachedUserData({
     githubName: github,
     twitterName: twitter,
