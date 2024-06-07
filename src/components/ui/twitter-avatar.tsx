@@ -22,7 +22,7 @@ export function TwitterAvatar(props: {
   const { twitterName, twitterAvatarUrl } = props.user;
   const src =
     twitterAvatarUrl?.replace("_normal", "") ??
-    `https://unavatar.io/twitter/${twitterName}`;
+    `https://unavatar.io/x/${twitterName}`;
   if (vercelTwitterPeople.includes(twitterName)) {
     return (
       <a target="_blank" href={`https://vercel.lol/?utm=${twitterName}`}>
