@@ -96,6 +96,9 @@ export function Profile(props: {
   if (pageData.user.twitterAvatarUrl) {
     ogUrl.set("avatar", pageData.user.twitterAvatarUrl);
   }
+  if (pageData.user.updatedAt) {
+    ogUrl.set("etag", pageData.user.updatedAt.getTime().toString());
+  }
   const ogImageUrl = `/api/og/compare?${ogUrl.toString()}`;
   const pageUrl = `https://shiptalkers.dev${getPageUrl({
     github: githubName,

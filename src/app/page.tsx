@@ -16,6 +16,7 @@ import { TwitterAvatar } from "../components/ui/twitter-avatar";
 import { ScrollArea } from "../components/ui/scroll-area";
 import Link from "next/link";
 import { getPageUrl, isVerifiedUser } from "../lib/utils";
+import { Tweet } from "react-tweet";
 
 export const revalidate = 600; // 10 minutes
 
@@ -103,6 +104,12 @@ export default async function Component() {
       <div className="flex flex-col justify-center gap-4 px-2 md:flex-row md:gap-16">
         <TopTable mode="tweets" users={topTweeters} />
         <TopTable mode="commits" users={topCommitters} />
+      </div>
+      <div className="flex  flex-col items-center pt-10">
+        <span className="text-center text-lg font-semibold">
+          Support the launch!
+        </span>
+        <Tweet id={"1798512543574708731"} />
       </div>
       <BrowseSection sort="popular" />
     </main>
