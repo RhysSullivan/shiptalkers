@@ -69,23 +69,38 @@ export function TweetBox(props: {
   github: string;
 }) {
   const [copySuccess, setCopySuccess] = useState<boolean>(false);
-  const { data } = useQuery(["copy-image"], async () => {
-    const response = await fetch(props.src);
-    const blob = await response.blob();
-    return blob;
-  });
   const queryParams = new URLSearchParams({
     text: props.text,
   });
 
   const copyToClipboard = async () => {
     try {
-      if (!data) {
-        return; // TODO: Handle error
-      }
-      const item = new ClipboardItem({ "image/png": data });
-      await navigator.clipboard.write([item]);
-      // todo handle error
+      // Create pseudo-element to load image in
+      const img: HTMLImageElement = await new Promise((resolve) => {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => resolve(img);
+        img.src = props.src;
+      });
+
+      // Render to unmounted canvas and rip image from that
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      canvas.width = img.width;
+      canvas.height = img.height;
+      if (!ctx) throw new Error("Could not get canvas context.");
+      ctx.drawImage(img, 0, 0);
+
+      const imageData: Blob = await new Promise((resolve) => {
+        canvas.toBlob((a) => a && resolve(a));
+      });
+
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          [imageData.type]: imageData,
+        }),
+      ]);
+
       setCopySuccess(true);
       setTimeout(() => {
         setCopySuccess(false);
