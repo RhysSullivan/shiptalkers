@@ -12,6 +12,7 @@ import { eq, and, gt, sql, desc, asc, or, not } from "drizzle-orm";
 import { GitTweetBars } from "../../components/ui/git-tweet-bars";
 import { TwitterAvatar } from "../../components/ui/twitter-avatar";
 import { cn } from "../../lib/utils";
+import { MatchCard } from "../components.client";
 
 function Bio(props: { user: HeatmaplessUser; direction: "left" | "right" }) {
   const { user, direction } = props;
@@ -42,6 +43,17 @@ function Bio(props: { user: HeatmaplessUser; direction: "left" | "right" }) {
               prefetch={false}
             >
               Twitter
+            </Link>
+          </div>
+          <div className="flex items-center gap-2">
+            <GithubIcon className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+            <Link
+              href={`https://github.com/${user.githubName}`}
+              className="text-gray-600 hover:underline dark:text-gray-400"
+              target="_blank"
+              prefetch={false}
+            >
+              GitHub
             </Link>
           </div>
           <div className="flex items-center gap-2">
@@ -106,16 +118,16 @@ export default async function Component(props: Props) {
     .orderBy(
       sql`ABS(${users.tweetsSent} - ${searchingUser.commitsMade}) + ABS(${users.commitsMade} - ${searchingUser.tweetsSent})`,
     )
-    .limit(10)) as (HeatmaplessUser & {
+    .limit(16)) as (HeatmaplessUser & {
     matchPercent: string;
   })[];
 
-  const foundUser = foundUsers[0];
-  if (!foundUser) {
+  const bestMatch = foundUsers.shift();
+
+  if (!bestMatch) {
     console.error("No match found");
     return null;
   }
-  console.log(typeof foundUser.matchPercent);
 
   return (
     <div className="mx-auto flex w-full max-w-screen-xl flex-grow flex-col items-center ">
@@ -123,10 +135,10 @@ export default async function Component(props: Props) {
         The best cofounder for {searchingUser.twitterDisplayName} is...{" "}
       </h1>
       <div className="flex flex-row gap-8">
-        <TwitterAvatar user={foundUser} className="size-32" />
+        <TwitterAvatar user={bestMatch} className="size-32" />
         <div>
           <span className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-            {foundUser.twitterDisplayName}
+            {bestMatch.twitterDisplayName}
           </span>
           <div className="flex flex-row items-end gap-8">
             <div className="flex flex-col items-start gap-2">
@@ -134,7 +146,7 @@ export default async function Component(props: Props) {
                 <div className="flex items-center gap-2">
                   <TwitterIcon className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                   <Link
-                    href={`https://twitter.com/${foundUser.twitterName}`}
+                    href={`https://twitter.com/${bestMatch.twitterName}`}
                     className="text-gray-600 hover:underline dark:text-gray-400"
                     target="_blank"
                     prefetch={false}
@@ -144,7 +156,7 @@ export default async function Component(props: Props) {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-gray-600 dark:text-gray-400">
-                    {foundUser.twitterFollowerCount.toLocaleString()} followers
+                    {bestMatch.twitterFollowerCount.toLocaleString()} followers
                   </span>
                 </div>
               </div>
@@ -152,7 +164,7 @@ export default async function Component(props: Props) {
                 <div className="flex items-center gap-2">
                   <GithubIcon className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                   <Link
-                    href={`https://github.com/${foundUser.githubName}`}
+                    href={`https://github.com/${bestMatch.githubName}`}
                     className="text-gray-600 hover:underline dark:text-gray-400"
                     target="_blank"
                     prefetch={false}
@@ -162,7 +174,7 @@ export default async function Component(props: Props) {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-gray-600 dark:text-gray-400">
-                    {foundUser.twitterFollowerCount.toLocaleString()} followers
+                    {bestMatch.twitterFollowerCount.toLocaleString()} followers
                   </span>
                 </div>
               </div>
@@ -174,9 +186,14 @@ export default async function Component(props: Props) {
       <div className="grid grid-cols-1 items-center justify-center gap-8 pt-16 md:grid-cols-3 md:gap-32">
         <Bio user={searchingUser} direction="right" />
         <span className="text-center text-2xl font-semibold text-gray-900 dark:text-gray-100">
-          It's a {parseFloat(Number(foundUser.matchPercent).toFixed(2))}% match!{" "}
+          It's a {parseFloat(Number(bestMatch.matchPercent).toFixed(2))}% match!{" "}
         </span>
-        <Bio user={foundUser} direction="left" />
+        <Bio user={bestMatch} direction="left" />
+      </div>
+      <div className="grid grid-cols-1 gap-4 pb-48 pt-32 md:grid-cols-3 ">
+        {foundUsers.map((user) => (
+          <MatchCard key={user.twitterId} user={user} />
+        ))}
       </div>
     </div>
   );

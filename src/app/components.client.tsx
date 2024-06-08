@@ -184,3 +184,46 @@ export function ComparisonCard(props: { user: HeatmaplessUser }) {
     </a>
   );
 }
+
+export function MatchCard(props: {
+  user: HeatmaplessUser & {
+    matchPercent: string;
+  };
+}) {
+  const { user } = props;
+  return (
+    <a
+      className="flex flex-row items-center justify-between rounded-md border-2 bg-white p-4 drop-shadow-sm transition-all hover:scale-105 hover:border-blue-500 hover:shadow-lg"
+      href={getPageUrl({
+        github: user.githubName,
+        twitter: user.twitterName,
+      })}
+    >
+      <div className="flex flex-row items-center justify-center gap-4">
+        <TwitterAvatar user={user} className="size-24 min-w-24" />
+        <div className="flex h-full flex-col justify-start gap-2 text-start">
+          <h3 className="line-clamp-2 h-full max-w-56 text-wrap text-lg font-bold leading-5">
+            {user.twitterDisplayName}
+          </h3>
+          <div className="flex flex-row items-end justify-between gap-4">
+            <div className="flex h-full flex-col items-start justify-start text-start">
+              <span className="text-sm text-gray-500">@{user.twitterName}</span>
+              <span className="text-sm text-gray-500">
+                {user.twitterFollowerCount.toLocaleString()} followers
+              </span>
+              <span className="text-sm text-gray-500">
+                {user.tweetsSent.toLocaleString()} tweets
+              </span>
+              <span className="text-sm text-gray-500">
+                {user.commitsMade.toLocaleString()} commits
+              </span>
+            </div>
+          </div>
+        </div>
+        <div className="flex h-full flex-col items-center justify-center text-lg font-semibold">
+          {parseFloat(Number(user.matchPercent).toFixed(2))}% match
+        </div>
+      </div>
+    </a>
+  );
+}
