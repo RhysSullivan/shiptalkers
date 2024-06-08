@@ -8,10 +8,8 @@ import { useState } from "react";
 import { Button } from "./button";
 import { LinkButton } from "./link-button";
 import { Textarea } from "./textarea";
-import { useQuery } from "@tanstack/react-query";
 import { ClipboardIcon, ClipboardCheckIcon, LoaderIcon } from "lucide-react";
 
-import { ClipboardItem } from "clipboard-polyfill";
 import { useRouter } from "next/navigation";
 
 function ReloadButton(props: { twitter: string; github: string }) {

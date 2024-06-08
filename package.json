@@ -44,7 +44,6 @@
     "@visx/responsive": "^3.10.2",
     "@visx/scale": "^3.5.0",
     "class-variance-authority": "^0.7.0",
-    "clipboard-polyfill": "^4.1.0",
     "clsx": "^2.0.0",
     "d3": "^7.9.0",
     "dataloader": "^2.2.2",
