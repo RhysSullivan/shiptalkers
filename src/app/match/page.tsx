@@ -10,6 +10,7 @@ import { getUser } from "../../server/db/users";
 import { Hero, MatchCard } from "./hero";
 import { getMatchSuggestions } from "./utils";
 import { ViewAnotherMatchCardSuggestion } from "../components.client";
+import { Home } from "./home";
 
 type AAAA = {
   searchParams:
@@ -42,6 +43,9 @@ function parse2ElectricBoogaloo(props: SpecificCompareProps) {
 }
 
 export default async function Component(props: SpecificCompareProps) {
+  if (!props.searchParams || Object.keys(props.searchParams).length === 0) {
+    return <Home />;
+  }
   const { github, twitter } = parse(props);
   const compareTo = parse2ElectricBoogaloo(props);
   if (!compareTo) {
