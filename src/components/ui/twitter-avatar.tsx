@@ -12,7 +12,7 @@ const vercelTwitterPeople = [
   "tomlienard",
   "delba_oliveira",
   "jaredpalmer",
-  "timneutkens"
+  "timneutkens",
 ];
 
 export function TwitterAvatar(props: {
@@ -29,10 +29,12 @@ export function TwitterAvatar(props: {
         <img
           src={src}
           alt="avatar"
-          className={props.className
-            ?.split(" ")
-            .filter((c) => !c.includes("rounded"))
-            .join(" ")}
+          className={
+            props.className
+              ?.split(" ")
+              .filter((c) => !c.includes("rounded"))
+              .join(" ") + " shrink-0"
+          }
           style={{
             clipPath:
               "polygon(50% 0%, 0% 100%, 100% 100%)" /* adjust percentages as needed */,
@@ -45,7 +47,7 @@ export function TwitterAvatar(props: {
     <img
       src={src}
       alt="avatar"
-      className={cn("rounded-full", props.className)}
+      className={cn("shrink-0 rounded-full", props.className)}
     />
   );
 }

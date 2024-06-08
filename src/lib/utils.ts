@@ -55,6 +55,19 @@ export function getPageUrl(input: {
   return `/compare?github=${lwrGh}&twitter=${lwrTw}`
 }
 
+export function getMatchPageUrl(input: {
+  github: string;
+  twitter: string;
+  toGithub: string;
+  toTwitter: string;
+}) {
+  const lwrGh = input.github.toLowerCase();
+  const lwrTw = input.twitter.toLowerCase();
+  const lwrToGh = input.toGithub.toLowerCase();
+  const lwrToTw = input.toTwitter.toLowerCase();
+  return `/match?github=${lwrToGh}&twitter=${lwrToTw}&toGithub=${lwrGh}&toTwitter=${lwrTw}`
+}
+
 // Verified users are users who have their Twitter handle in their GitHub bio, or have the same Twitter and GitHub handle
 export function isVerifiedUser(user: Pick<User, "twitterInGithubBio" | "twitterName" | "githubName">): boolean {
   return user.twitterInGithubBio || user.twitterName === user.githubName;
