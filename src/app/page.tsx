@@ -1,8 +1,8 @@
 import { Github, Twitter } from "lucide-react";
 import { Hero } from "./components.client";
 import { db } from "../server/db";
-import { HeatmaplessUser, User, users } from "../server/db/schema";
-import { desc } from "drizzle-orm";
+import { HeatmaplessUser, users } from "../server/db/schema";
+import { desc, gt } from "drizzle-orm";
 import { BrowseSection } from "./components.server";
 import {
   Table,
@@ -74,6 +74,7 @@ export default async function Component() {
   const topTweeters = await db
     .select()
     .from(users)
+    .where(gt(users.commitsMade, 1000))
     .orderBy(desc(users.tweetsSent))
     .limit(200)
     .execute();

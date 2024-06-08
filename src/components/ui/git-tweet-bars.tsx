@@ -5,6 +5,7 @@ export function GitTweetBars(props: {
   barHeight: number;
   barWidth?: number;
   iconSize?: number;
+  smallestBarLast?: boolean;
 }) {
   const { user } = props;
   const { barHeight, iconSize = 48, barWidth = 100 } = props;
@@ -17,11 +18,14 @@ export function GitTweetBars(props: {
     <div
       style={{
         display: "flex",
-        flexDirection: "row",
         height: `${barHeight}px`,
         gap: "20px",
         justifyContent: "flex-end",
         alignItems: "flex-end",
+        flexDirection:
+          props.smallestBarLast && commitBarHeight < tweetBarHeight
+            ? "row"
+            : "row-reverse",
       }}
     >
       <div
