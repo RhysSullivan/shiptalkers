@@ -219,7 +219,6 @@ const config: Config = {
   plugins: [
     require("tailwindcss-animate"),
     require("@headlessui/tailwindcss"),
-    require("@tailwindcss/line-clamp"),
     require("@tailwindcss/forms"),
   ],
 } satisfies Config;
