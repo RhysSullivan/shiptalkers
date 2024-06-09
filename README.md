@@ -7,7 +7,7 @@
   - `Grinder` - 3:1 commits to tweets
   - `` - 2:1 commits to tweets
   - `Perfectly Balanced` - 1:1 commits to tweets
-  - `Shiposter` - 1:2 commits to tweets
+  - `Shitposter` - 1:2 commits to tweets
   - `Indie Hacker` - 1:3 commits to tweets
   - `Reply Guy` - 1:4 commits to tweets
   - `Influencer` - 1:5 commits to tweets
