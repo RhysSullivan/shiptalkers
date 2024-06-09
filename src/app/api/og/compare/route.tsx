@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import { ImageResponse } from "next/og";
 import { GitTweetBars } from "../../../../components/ui/git-tweet-bars";
-import { getPageUrl, getRatioText } from "../../../../lib/utils";
+import { getCategory, getPageUrl, getRatioText } from "../../../../lib/utils";
 export const runtime = "edge";
 
 export async function GET(req: Request) {
@@ -19,7 +19,7 @@ export async function GET(req: Request) {
   const commits = Number(commitsS);
   const tweets = Number(tweetsS);
   const txt = getRatioText({ tweets, commits, displayName });
-
+  const tagLine = getCategory({ tweets, commits, displayName });
   const UserMetadata = () => (
     <div
       style={{
@@ -28,7 +28,25 @@ export async function GET(req: Request) {
         fontSize: "25px",
       }}
     >
-      <h1>{displayName}</h1>
+      <h1
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "flex-start",
+        gap: "10px",
+      }}>
+        {displayName}
+        <span
+          style={{
+            fontSize: "30px",
+            fontWeight: "bolder",
+            color: "blue",
+          }}
+        >
+          [{tagLine}]
+        </span>
+      </h1>
       <div
         style={{
           display: "flex",
