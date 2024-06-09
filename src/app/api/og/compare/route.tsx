@@ -11,15 +11,29 @@ export async function GET(req: Request) {
   const twitter = parsed.get("twitter");
   const commitsS = parsed.get("commits");
   const tweetsS = parsed.get("tweets");
+  const followers = parsed.get("followers");
   const twitterAvatarUrl = parsed.get("avatar");
   const displayName = parsed.get("displayName");
-  if (!github || !twitter || !commitsS || !tweetsS || !displayName) {
+  if (
+    !github ||
+    !twitter ||
+    !commitsS ||
+    !tweetsS ||
+    !displayName ||
+    !followers
+  ) {
+    console.log("Missing parameters");
     return new Response("Missing parameters", { status: 400 });
   }
   const commits = Number(commitsS);
   const tweets = Number(tweetsS);
   const txt = getRatioText({ tweets, commits, displayName });
-  const tagLine = getCategory({ tweets, commits, displayName });
+  const tagLine = getCategory({
+    tweets,
+    commits,
+    displayName,
+    twitterFollowerCount: Number(followers),
+  });
   const UserMetadata = () => (
     <div
       style={{
@@ -29,13 +43,14 @@ export async function GET(req: Request) {
       }}
     >
       <h1
-      style={{
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "flex-start",
-        gap: "10px",
-      }}>
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "flex-start",
+          gap: "10px",
+        }}
+      >
         {displayName}
         <span
           style={{
@@ -57,8 +72,7 @@ export async function GET(req: Request) {
           fontSize: "24px",
           paddingBottom: "15px",
           fontWeight: "bold",
-        }}
-      >
+        }}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="48"

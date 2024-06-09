@@ -59,11 +59,12 @@ export function isVerifiedUser(user: Pick<User, "twitterInGithubBio" | "twitterN
   return user.twitterInGithubBio || user.twitterName === user.githubName;
 }
 export function getCategory(input: {
-  tweets: number;
-  commits: number;
-  displayName: string;
+  tweets: number,
+  commits: number,
+  displayName: string,
+  twitterFollowerCount?: number,
 }): string {
-  const { tweets, commits } = input;
+  const { tweets, commits, twitterFollowerCount } = input;
   const ratio = (commits / tweets);
   switch (true) {
     case (ratio >= 5):
@@ -77,6 +78,7 @@ export function getCategory(input: {
     case (ratio >= 0.5 && ratio < 1):
       return "Shiposter";
     case (ratio >= 0.333 && ratio < 0.5):
+      if (twitterFollowerCount && twitterFollowerCount > 100000) return "Founder";
       return "Indie Hacker";
     case (ratio >= 0.25 && ratio < 0.333):
       return "Reply Guy";

@@ -92,6 +92,7 @@ export function Profile(props: {
     twitter: twitterName,
     commits: totalCommits.toString(),
     tweets: totalTweets.toString(),
+    followers:Math.max(twitterFollowerCount, githubFollowerCount).toString()
   });
   if (pageData.user.twitterAvatarUrl) {
     ogUrl.set("avatar", pageData.user.twitterAvatarUrl);

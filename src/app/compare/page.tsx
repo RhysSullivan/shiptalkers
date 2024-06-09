@@ -34,7 +34,7 @@ function parse(props: Props) {
       };
 }
 
-async function getPageDataInternal(props: Props) {
+export async function getPageDataInternal(props: Props) {
   const { github, twitter } = parse(props);
   const user = await getCachedUserData({
     githubName: github,
@@ -114,6 +114,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     twitter: user.twitterName,
     commits: user.commitsMade.toString(),
     tweets: user.tweetsSent.toString(),
+    followers:Math.max(user.twitterFollowerCount, user.githubFollowerCount).toString()
   });
   if (user.twitterAvatarUrl) {
     ogUrl.set("avatar", user.twitterAvatarUrl);

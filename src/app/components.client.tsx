@@ -147,6 +147,7 @@ export function ComparisonCard(props: { user: HeatmaplessUser }) {
     tweets: user.tweetsSent,
     commits: user.commitsMade,
     displayName: user.twitterDisplayName,
+    twitterFollowerCount: user.twitterFollowerCount,
   });
   return (
     <a
