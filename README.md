@@ -14,7 +14,7 @@ ShipTalkers is an open-source project by [Rhys Sullivan](https://github.com/Rhys
 - Have a leaderboard sorted from the highest to lowest commit ratios.
 - For holidays, callout tweeting, coding, or living.
 
-# TODO:
+## TODO:
 - [ ] After comparing, give them a special name i.e. "Indie Hacker," "Reply Guy," etc.
  - Special name ideas:
  - [ ] Special name for 5:0 commits to tweets
@@ -51,9 +51,8 @@ ShipTalkers is an open-source project by [Rhys Sullivan](https://github.com/Rhys
         pnpm dev
     ```
 
-- You will see the live app served at ``localhost:3000``    
-
-    ![alt text](image.png)
+- You will see the live app served at ``localhost:3000``
+  
 ## Contributing
 We welcome contributions from the community! If you have any ideas, bug reports, or feature requests, please open an issue or submit a pull request. Before creating a pull request make sure you read through the current open PRs so as not to create a duplicate of an already existent one.
 
