@@ -30,6 +30,30 @@ ShipTalkers is an open-source project by [Rhys Sullivan](https://github.com/Rhys
 - [ ] Have a leaderboard, sorted from most to least commit ratios
 - [ ] For holidays, callout tweeting, coding, or living
 
+## Getting Started (Development Setup)
+- Clone the repository by clicking on the code button and choose any option from the dropdown.
+
+    - Option 1: Copy this url and paste it in your terminal https://github.com/RhysSullivan/shiptalkers.git
+
+    - Option 2: Click the Open with Github Desktop Option which will open up the GUI client if it's installed on your machine
+
+    - Option 3: Download the project as zip and unzip it upon completing the download
+
+- Copy and paste this command in your terminal; to install the necessary modules
+
+    ```
+        pnpm install
+    ```
+
+- Run this commad to serve the project on your localhost 
+
+    ```
+        pnpm dev
+    ```
+
+- You will see the live app served at ``localhost:3000``    
+
+    ![alt text](image.png)
 ## Contributing
 We welcome contributions from the community! If you have any ideas, bug reports, or feature requests, please open an issue or submit a pull request. Before creating a pull request make sure you read through the current open PRs so as not to create a duplicate of an already existent one.
 
