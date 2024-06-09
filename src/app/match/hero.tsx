@@ -66,10 +66,12 @@ function Bio(props: { user: HeatmaplessUser; direction: "left" | "right" }) {
     >
       <div className={cn("flex flex-row gap-8")}>
         {direction === "left" && <Stats user={user} className="items-end" />}
-        <TwitterAvatar
-          user={user}
-          className="size-20 flex-shrink-0 md:size-32"
-        />
+        <div className="shrink-0">
+          <TwitterAvatar
+            user={user}
+            className="size-20 flex-shrink-0 md:size-32"
+          />
+        </div>
         {direction === "right" && <Stats user={user} />}
       </div>
       <div className="hidden md:block">
@@ -94,17 +96,63 @@ function Bio(props: { user: HeatmaplessUser; direction: "left" | "right" }) {
   );
 }
 
+function CompatibilityText(props: {
+  leftUser: HeatmaplessUser;
+  matchedUser: MatchedUser;
+}) {
+  const { leftUser, matchedUser } = props;
+  const totalTweets = leftUser.tweetsSent + matchedUser.tweetsSent;
+  const totalCommits = leftUser.commitsMade + matchedUser.commitsMade;
+  const total = totalTweets + totalCommits;
+  const percentTweets = (totalTweets / total) * 100;
+  const percentCommits = (totalCommits / total) * 100;
+  const isSignificantlyDifferent =
+    Math.abs(percentTweets - percentCommits) > 20;
+  let text: string;
+  if (!isSignificantlyDifferent) {
+    const tweeter =
+      leftUser.tweetsSent > matchedUser.tweetsSent ? leftUser : matchedUser;
+    const committer =
+      leftUser.commitsMade > matchedUser.commitsMade ? leftUser : matchedUser;
+    text = `${committer.twitterDisplayName} is building it and ${tweeter.twitterDisplayName} is promoting it`;
+  } else if (percentTweets > percentCommits) {
+    text = `Together they would spend ${percentTweets.toFixed(
+      2,
+    )}% of their time tweeting and ${percentCommits.toFixed(
+      2,
+    )}% of their time coding, everyone would know about their product but it would never be shipped`;
+  } else {
+    text = `Together they would spend ${percentTweets.toFixed(
+      2,
+    )}% of their time tweeting and ${percentCommits.toFixed(
+      2,
+    )}% of their time coding, they would build the best product ever, that no one knows about`;
+  }
+  return (
+    <span className="text-center  text-gray-600 dark:text-gray-400">
+      {text}
+    </span>
+  );
+}
+
 export function MatchCard(props: {
   leftUser: HeatmaplessUser;
   matchedUser: MatchedUser;
 }) {
   const { leftUser, matchedUser } = props;
+
   return (
     <div className="grid grid-cols-1 items-center justify-center gap-8 pt-16 md:grid-cols-3 md:gap-32">
       <Bio user={leftUser} direction="right" />
-      <span className="text-center text-2xl font-semibold text-gray-900 dark:text-gray-100">
-        It's a {parseFloat(Number(matchedUser.matchPercent).toFixed(2))}% match!{" "}
-      </span>
+      <div className="flex flex-col items-center gap-4">
+        <span className="text-center  text-2xl font-semibold text-gray-900 dark:text-gray-100">
+          {leftUser.twitterDisplayName} and {matchedUser.twitterDisplayName} are
+          {Number(matchedUser.matchPercent) < 80 ? " only " : " "}
+          {parseFloat(Number(matchedUser.matchPercent).toFixed(2))}% compatible
+          to build a product together
+        </span>
+        <CompatibilityText leftUser={leftUser} matchedUser={matchedUser} />
+      </div>
       <Bio user={matchedUser} direction="left" />
     </div>
   );

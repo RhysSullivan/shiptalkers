@@ -130,7 +130,6 @@ export function Hero() {
           )}
         </div>
       </div>
-
       <Button
         className="mt-4 rounded-lg hover:bg-neutral-700 active:translate-y-0.5 active:bg-neutral-500"
         type="submit"

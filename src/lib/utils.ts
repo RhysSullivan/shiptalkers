@@ -58,14 +58,20 @@ export function getPageUrl(input: {
 export function getMatchPageUrl(input: {
   github: string;
   twitter: string;
-  toGithub: string;
-  toTwitter: string;
+  toGithub?: string;
+  toTwitter?: string;
 }) {
   const lwrGh = input.github.toLowerCase();
-  const lwrTw = input.twitter.toLowerCase();
-  const lwrToGh = input.toGithub.toLowerCase();
-  const lwrToTw = input.toTwitter.toLowerCase();
-  return `/match?github=${lwrToGh}&twitter=${lwrToTw}&toGithub=${lwrGh}&toTwitter=${lwrTw}`
+  const lwrTw = input.twitter.toLowerCase();;
+  const query = new URLSearchParams({
+    github: lwrGh,
+    twitter: lwrTw,
+  });
+  if (input.toGithub && input.toTwitter && input.toGithub.length > 0 && input.toTwitter.length > 0) {
+    query.set("toGithub", input.toGithub);
+    query.set("toTwitter", input.toTwitter);
+  }
+  return `/match?${query.toString()}`
 }
 
 // Verified users are users who have their Twitter handle in their GitHub bio, or have the same Twitter and GitHub handle

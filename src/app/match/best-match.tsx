@@ -8,7 +8,7 @@ import { db } from "../../server/db";
 import { users } from "../../server/db/schema";
 import { eq, and, sql, or, not } from "drizzle-orm";
 import { ViewAnotherMatchCardSuggestion } from "../components.client";
-import { getMatchSuggestions, type MatchedUser } from "./utils";
+import { getMatchSuggestionBasedOnRelative, type MatchedUser } from "./utils";
 import { Hero } from "./hero";
 import { getUser } from "../../server/db/users";
 
@@ -19,7 +19,7 @@ export async function BestMatch(props: { github: string; twitter: string }) {
     return null;
   }
 
-  const suggestions = await getMatchSuggestions({ forUser: searchingUser });
+  const suggestions = await getMatchSuggestionBasedOnRelative(searchingUser);
   const bestMatch = suggestions.shift();
 
   if (!bestMatch) {

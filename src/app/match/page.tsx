@@ -4,11 +4,11 @@
  * @see https://v0.dev/t/0FjhmAlN5Xv
  * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
  */
-import { getMatchPercent, parse, type Props } from "../utils";
+import { getMatchPercentRelative, parse, type Props } from "../utils";
 import { BestMatch } from "./best-match";
 import { getUser } from "../../server/db/users";
 import { Hero, MatchCard } from "./hero";
-import { getMatchSuggestions } from "./utils";
+import { getMatchSuggestionsBasedOnTotal } from "./utils";
 import { ViewAnotherMatchCardSuggestion } from "../components.client";
 import { Home } from "./home";
 
@@ -62,14 +62,14 @@ export default async function Component(props: SpecificCompareProps) {
     return null;
   }
 
-  const suggestions = await getMatchSuggestions({ forUser: userA });
+  const suggestions = await getMatchSuggestionsBasedOnTotal({ forUser: userA });
   return (
     <div className="mx-auto flex w-full max-w-screen-xl flex-grow flex-col items-center ">
       <MatchCard
         leftUser={userA}
         matchedUser={{
           ...userB,
-          matchPercent: getMatchPercent(userA, userB).toString(),
+          matchPercent: getMatchPercentRelative(userA, userB).toString(),
         }}
       />
       <div className="grid grid-cols-1 gap-4 pb-48 pt-32 md:grid-cols-3 ">
