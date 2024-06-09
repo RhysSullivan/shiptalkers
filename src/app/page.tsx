@@ -33,6 +33,7 @@ function TopTable(props: {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>#</TableHead>
               <TableHead>User</TableHead>
               <TableHead className="text-center">
                 {props.mode === "tweets" ? "Tweets Sent" : "Commits Made"}
@@ -40,8 +41,21 @@ function TopTable(props: {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {props.users.filter(isVerifiedUser).map((user) => (
+            {props.users.filter(isVerifiedUser).map((user, index) => (
               <TableRow key={user.twitterId}>
+                <TableCell
+                  className={`text-center font-bold select-none ${
+                    index < 3 ? "text-3xl" : "text-md"
+                  }`}
+                >
+                  {index + 1 <= 3 ? (
+                    <>
+                      {index + 1 === 1 ? '🥇' : index + 1 === 2 ? '🥈' : '🥉'}
+                    </>
+                  ) : (
+                    index + 1
+                  )}
+                </TableCell>
                 <TableCell className="w-[300px]">
                   <div className="flex flex-row items-center gap-2 font-medium">
                     <TwitterAvatar user={user} className="size-8" />
