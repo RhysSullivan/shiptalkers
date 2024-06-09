@@ -74,31 +74,19 @@ export default function RootLayout({
               <PostHogPageView />
             </Suspense>
             <nav className="z-50 bg-white px-4 py-2 shadow-lg dark:bg-gray-900">
-              <div className="w-full text-center">
-                We're experiencing an insane load at the moment, if your profile
-                is having issues loading please open an issue on{" "}
-                <a
-                  href="
-                  https://github.com/RhysSullivan/shiptalkers/issues"
-                  target="_blank"
-                  className="text-blue-500 hover:underline"
-                >
-                  GitHub
-                </a>
-              </div>
               <div className="mx-auto flex max-w-screen-xl items-center justify-between">
                 <a href="/">
                   <h1 className="text-2xl font-bold">Shiptalkers</h1>
                 </a>
                 <div className="flex items-center space-x-4">
                   <Link
-                    className="hidden h-9 items-center justify-center rounded-md bg-gray-50 px-4 py-2 text-sm font-medium text-gray-900 shadow transition-colors hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-700 disabled:pointer-events-none disabled:opacity-50 sm:inline-flex"
+                    className="inline-flex h-9 items-center justify-center rounded-md bg-gray-50 px-4 py-2 text-sm font-medium text-gray-900 shadow transition-colors hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-700 disabled:pointer-events-none disabled:opacity-50"
                     href="https://github.com/RhysSullivan/shiptalkers"
                     target="_blank"
                     prefetch={false}
                   >
-                    <GithubIcon className="mr-2 h-4 w-4" />
-                    Star on GitHub
+                    <GithubIcon className="h-4 w-4 md:mr-2" />
+                    <span className="hidden md:block">Star on GitHub</span>
                   </Link>
 
                   <Link
@@ -107,8 +95,10 @@ export default function RootLayout({
                     prefetch={false}
                     target="_blank"
                   >
-                    <TwitterIcon className="mr-2 h-4 w-4" />
-                    Follow me on Twitter
+                    <TwitterIcon className="h-4 w-4 md:mr-2" />
+                    <span className="hidden md:block">
+                      Follow me on Twitter
+                    </span>
                   </Link>
                 </div>
               </div>

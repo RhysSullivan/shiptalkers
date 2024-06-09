@@ -1,64 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 import { ImageResponse } from "next/og";
-
-import * as d3 from "d3";
 import { GitTweetBars } from "../../../../components/ui/git-tweet-bars";
 import { getPageUrl, getRatioText } from "../../../../lib/utils";
-
-// Data for the pie chart
-const data = [
-  { label: "tweets", value: 30 },
-  { label: "commits", value: 50 },
-];
-
-const colors = ["#1DA1F2", "#26a641"];
-
-// Interface for data item
-interface DataItem {
-  label: string;
-  value: number;
-}
-
-// Interface for props
-interface PieChartProps {
-  data: DataItem[];
-}
-
-// Functional component for the pie chart
-const PieChart: React.FC<PieChartProps> = ({ data }) => {
-  // Set dimensions for the SVG
-  const width = 350;
-  const height = 350;
-
-  // @ts-expect-error asd
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  const pie = d3.pie().value((d) => d.value);
-
-  // @ts-expect-error asd
-  const arcs = pie(data);
-
-  // Define arc generator
-  const arcGenerator: d3.Arc<unknown, d3.DefaultArcObject> = d3
-    .arc()
-    .innerRadius(0)
-    .outerRadius(Math.min(width, height) / 2 - 1);
-
-  // Generate JSX for the pie chart
-  return (
-    <svg width={width} height={height}>
-      <g transform={`translate(${width / 2},${height / 2})`}>
-        {arcs.map((arc, index) => (
-          <path
-            key={index}
-            fill={colors[index]}
-            // @ts-expect-error asd
-            d={arcGenerator(arc) ?? ""}
-          />
-        ))}
-      </g>
-    </svg>
-  );
-};
+export const runtime = "edge";
 
 export async function GET(req: Request) {
   // get github, twitter, commits, tweets

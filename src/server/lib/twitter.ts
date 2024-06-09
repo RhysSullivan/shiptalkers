@@ -4,11 +4,9 @@ import { throttledQueue } from "./throttle";
 import { ErrorResponse, SuccessResponse, Tweet, TwitterUser } from "./twitter.types";
 
 
-
 const throttle = throttledQueue({
     maxRequestsPerInterval: 350,
     interval: 70000,
-    evenlySpaced: true,
     onThrottle(numRequestsInQueue) {
         console.log(`Throttling fetch, ${numRequestsInQueue} in queue`);
     },
@@ -29,22 +27,22 @@ export async function fetchTwitterProfile(name: string) {
     if (cached) {
         return cached;
     }
-    const userInfo = await throttle(async () => {
-        return await fetch(`https://api.socialdata.tools/twitter/user/${name}`, {
+    const userInfo =
+        await fetch(`https://api.socialdata.tools/twitter/user/${name}`, {
             method: "GET",
             headers: {
                 Authorization: `Bearer ${process.env.SOCIAL_DATA_API_KEY}`,
                 Accept: "application/json",
             },
         })
-    }
-    );
 
     if (!userInfo.ok) {
         if (userInfo.status == 429) {
             throw new Error(`Rate limit exceeded fetching ${name} ${userInfo.status}`);
         }
-        throw new Error(`Failed to fetch twitter profile for ${name} ${userInfo.status}`);
+        if (userInfo.status == 404) {
+            return null;
+        }
     }
     const data = await userInfo.json() as Promise<TwitterUser>;
     await writeToCache(`twitter-profile-${name}`, data);
