@@ -64,7 +64,6 @@ export function getCategory(input: {
   displayName: string;
 }): string {
   const { tweets, commits } = input;
-  console.log(tweets,commits);
   const ratio = (commits / tweets);
   switch (true) {
     case (ratio >= 5):

@@ -39,9 +39,9 @@ export async function GET(req: Request) {
         {displayName}
         <span
           style={{
-            fontSize: "30px",
+            fontSize: "35px",
             fontWeight: "bolder",
-            color: "blue",
+            color: "#60a5fa",
           }}
         >
           [{tagLine}]
