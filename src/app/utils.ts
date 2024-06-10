@@ -22,20 +22,30 @@ export function parse(props: Props) {
             twitter: props.searchParams.twitter.toLowerCase(),
         };
 }
-
-
-// match percent is the inverse of what users spend time on
-// i.e if userA tweets 70% more than they commit, and userB commits 70% more than they tweet, they are a 100% match
+// 100 - ((ABS(${users.tweetsSent} - ${forUser.commitsMade}) + ABS(${users.commitsMade} - ${forUser.tweetsSent})) / (${forUser.tweetsSent} + ${forUser.commitsMade})) * 100
 export function getMatchPercentRelative(userA: HeatmaplessUser, userB: HeatmaplessUser) {
     const totalA = userA.tweetsSent + userA.commitsMade;
     const totalB = userB.tweetsSent + userB.commitsMade;
-    const percentA = userA.tweetsSent / totalA;
-    const percentB = userB.commitsMade / totalB;
-    const percentDiff = Math.abs(percentA - percentB);
-    return Math.round((1 - percentDiff) * 100);
+
+    const commitPercentA = userA.commitsMade / totalA;
+    const commitPercentB = userB.commitsMade / totalB;
+
+
+    const tweetPercentA = userA.tweetsSent / totalA;
+    const tweetPercentB = userB.tweetsSent / totalB;
+
+    const tD = Math.abs(tweetPercentA - tweetPercentB);
+    const cD = Math.abs(commitPercentA - commitPercentB);
+    const totalD = tD + cD;
+    const sim = 1 - totalD;
+    return 100 - Math.abs(sim * 100)
 }
 
-// sql`100 - ((ABS(${users.tweetsSent} - ${forUser.commitsMade}) + ABS(${users.commitsMade} - ${forUser.tweetsSent})) / (${forUser.tweetsSent} + ${forUser.commitsMade})) * 100`,
 export function getMatchPercentTotal(userA: HeatmaplessUser, userB: HeatmaplessUser) {
-    return 100 - ((Math.abs(userB.tweetsSent - userA.commitsMade) + Math.abs(userB.commitsMade - userA.tweetsSent)) / (userA.tweetsSent + userA.commitsMade)) * 100;
+    return 100; Math.round(
+        100 -
+        ((Math.abs(userB.tweetsSent - userA.commitsMade) + Math.abs(userB.commitsMade - userA.tweetsSent)) /
+            (userA.tweetsSent + userA.commitsMade)) *
+        100
+    );
 }

@@ -60,16 +60,28 @@ export function getMatchPageUrl(input: {
   twitter: string;
   toGithub?: string;
   toTwitter?: string;
+  relative?: boolean;
 }) {
   const lwrGh = input.github.toLowerCase();
   const lwrTw = input.twitter.toLowerCase();;
-  const query = new URLSearchParams({
-    github: lwrGh,
-    twitter: lwrTw,
-  });
+  const query = new URLSearchParams();
+  if (lwrGh === lwrTw) {
+    query.set("name", lwrGh);
+  }
+  else {
+    query.set("github", lwrGh);
+    query.set("twitter", lwrTw);
+  }
   if (input.toGithub && input.toTwitter && input.toGithub.length > 0 && input.toTwitter.length > 0) {
-    query.set("toGithub", input.toGithub);
-    query.set("toTwitter", input.toTwitter);
+    if (input.toGithub.toLowerCase() === input.toTwitter.toLowerCase()) {
+      query.set("toName", input.toGithub);
+    } else {
+      query.set("toGithub", input.toGithub);
+      query.set("toTwitter", input.toTwitter);
+    }
+  }
+  if (input.relative) {
+    query.set("rel", "true");
   }
   return `/match?${query.toString()}`
 }

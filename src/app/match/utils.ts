@@ -6,11 +6,9 @@ export type MatchedUser = HeatmaplessUser & {
     matchPercent: string;
 };
 
-export async function getMatchSuggestionsBasedOnTotal(props: {
-    forUser: HeatmaplessUser;
-}) {
-    const { forUser } = props;
-
+export async function getMatchSuggestionsBasedOnTotal(
+    forUser: HeatmaplessUser
+) {
     const foundUsers = await db
         // @ts-expect-error idk drizzle
         .select({

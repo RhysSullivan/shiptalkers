@@ -8,18 +8,28 @@ import { db } from "../../server/db";
 import { users } from "../../server/db/schema";
 import { eq, and, sql, or, not } from "drizzle-orm";
 import { ViewAnotherMatchCardSuggestion } from "../components.client";
-import { getMatchSuggestionBasedOnRelative, type MatchedUser } from "./utils";
+import {
+  getMatchSuggestionBasedOnRelative,
+  getMatchSuggestionsBasedOnTotal,
+  type MatchedUser,
+} from "./utils";
 import { Hero } from "./hero";
 import { getUser } from "../../server/db/users";
 
-export async function BestMatch(props: { github: string; twitter: string }) {
+export async function BestMatch(props: {
+  github: string;
+  twitter: string;
+  relative: boolean;
+}) {
   const searchingUser = await getUser(props);
   if (!searchingUser) {
     console.error("User not found");
     return null;
   }
 
-  const suggestions = await getMatchSuggestionBasedOnRelative(searchingUser);
+  const suggestions = props.relative
+    ? await getMatchSuggestionBasedOnRelative(searchingUser)
+    : await getMatchSuggestionsBasedOnTotal(searchingUser);
   const bestMatch = suggestions.shift();
 
   if (!bestMatch) {

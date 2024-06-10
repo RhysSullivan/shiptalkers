@@ -5,6 +5,7 @@ import type { MatchedUser } from "./utils";
 import Link from "next/link";
 import { cn, getPageUrl } from "../../lib/utils";
 import { GitTweetBars } from "../../components/ui/git-tweet-bars";
+import { getMatchPercentRelative, getMatchPercentTotal } from "../utils";
 
 function Stats(props: { user: HeatmaplessUser; className?: string }) {
   const { user } = props;
@@ -55,8 +56,15 @@ function Stats(props: { user: HeatmaplessUser; className?: string }) {
   );
 }
 
-function Bio(props: { user: HeatmaplessUser; direction: "left" | "right" }) {
-  const { user, direction } = props;
+function Bio(props: {
+  user: HeatmaplessUser;
+  direction: "left" | "right";
+  otherUser: HeatmaplessUser;
+}) {
+  const { user, direction, otherUser } = props;
+  const total = user.tweetsSent + user.commitsMade;
+  const percentTweets = (user.tweetsSent / total) * 100;
+  const percentCommits = (user.commitsMade / total) * 100;
   return (
     <div
       className={cn(
@@ -64,15 +72,26 @@ function Bio(props: { user: HeatmaplessUser; direction: "left" | "right" }) {
         direction === "left" ? "flex-row-reverse" : "flex-row",
       )}
     >
-      <div className={cn("flex flex-row gap-8")}>
-        {direction === "left" && <Stats user={user} className="items-end" />}
-        <div className="shrink-0">
-          <TwitterAvatar
-            user={user}
-            className="size-20 flex-shrink-0 md:size-32"
-          />
+      <div className="flex flex-col">
+        <div className={cn("flex flex-row gap-8")}>
+          {direction === "left" && <Stats user={user} className="items-end" />}
+          <div className="shrink-0">
+            <TwitterAvatar
+              user={user}
+              className="size-20 flex-shrink-0 md:size-32"
+            />
+          </div>
+          {direction === "right" && <Stats user={user} />}
         </div>
-        {direction === "right" && <Stats user={user} />}
+        <span
+          className={cn(
+            "py-2  text-gray-600 ",
+            direction === "right" ? "text-start" : "text-end",
+          )}
+        >
+          {user.twitterDisplayName} spends {percentTweets.toFixed()}% of their
+          time tweeting and {percentCommits.toFixed()}% of their time coding
+        </span>
       </div>
       <div className="hidden md:block">
         <GitTweetBars
@@ -80,12 +99,14 @@ function Bio(props: { user: HeatmaplessUser; direction: "left" | "right" }) {
           barHeight={300}
           iconSize={24}
           barWidth={20}
+          otherUser={otherUser}
           smallestBarLast={direction === "right"}
         />
       </div>
       <div className="md:hidden">
         <GitTweetBars
           user={user}
+          otherUser={otherUser}
           barHeight={100}
           iconSize={24}
           barWidth={20}
@@ -98,62 +119,43 @@ function Bio(props: { user: HeatmaplessUser; direction: "left" | "right" }) {
 
 function CompatibilityText(props: {
   leftUser: HeatmaplessUser;
-  matchedUser: MatchedUser;
+  matchedUser: HeatmaplessUser;
 }) {
   const { leftUser, matchedUser } = props;
-  const totalTweets = leftUser.tweetsSent + matchedUser.tweetsSent;
-  const totalCommits = leftUser.commitsMade + matchedUser.commitsMade;
-  const total = totalTweets + totalCommits;
-  const percentTweets = (totalTweets / total) * 100;
-  const percentCommits = (totalCommits / total) * 100;
-  const isSignificantlyDifferent =
-    Math.abs(percentTweets - percentCommits) > 20;
-  let text: string;
-  if (!isSignificantlyDifferent) {
-    const tweeter =
-      leftUser.tweetsSent > matchedUser.tweetsSent ? leftUser : matchedUser;
-    const committer =
-      leftUser.commitsMade > matchedUser.commitsMade ? leftUser : matchedUser;
-    text = `${committer.twitterDisplayName} is building it and ${tweeter.twitterDisplayName} is promoting it`;
-  } else if (percentTweets > percentCommits) {
-    text = `Together they would spend ${percentTweets.toFixed(
-      2,
-    )}% of their time tweeting and ${percentCommits.toFixed(
-      2,
-    )}% of their time coding, everyone would know about their product but it would never be shipped`;
-  } else {
-    text = `Together they would spend ${percentTweets.toFixed(
-      2,
-    )}% of their time tweeting and ${percentCommits.toFixed(
-      2,
-    )}% of their time coding, they would build the best product ever, that no one knows about`;
-  }
-  return (
-    <span className="text-center  text-gray-600 dark:text-gray-400">
-      {text}
-    </span>
-  );
+  const totalA = leftUser.tweetsSent + leftUser.commitsMade;
+  const totalB = matchedUser.tweetsSent + matchedUser.commitsMade;
+  const percentTweetsA = (leftUser.tweetsSent / totalA) * 100;
+  const percentTweetsB = (matchedUser.tweetsSent / totalB) * 100;
+  const diffTweets = Math.abs(percentTweetsA - percentTweetsB);
+
+  const percentCommitsA = (leftUser.commitsMade / totalA) * 100;
+  const percentCommitsB = (matchedUser.commitsMade / totalB) * 100;
+  const diffCommits = Math.abs(percentCommitsA - percentCommitsB);
+  return (diffTweets + diffCommits) / 2;
 }
 
 export function MatchCard(props: {
   leftUser: HeatmaplessUser;
-  matchedUser: MatchedUser;
+  matchedUser: HeatmaplessUser;
 }) {
   const { leftUser, matchedUser } = props;
-
+  const matchPercent = getMatchPercentRelative(
+    leftUser,
+    matchedUser,
+  ).toString();
   return (
-    <div className="grid grid-cols-1 items-center justify-center gap-8 pt-16 md:grid-cols-3 md:gap-32">
-      <Bio user={leftUser} direction="right" />
+    <div className="grid grid-cols-1 items-center justify-center gap-8 pt-16 lg:grid-cols-3 lg:gap-32">
+      <Bio user={leftUser} direction="right" otherUser={matchedUser} />
       <div className="flex flex-col items-center gap-4">
         <span className="text-center  text-2xl font-semibold text-gray-900 dark:text-gray-100">
           {leftUser.twitterDisplayName} and {matchedUser.twitterDisplayName} are
-          {Number(matchedUser.matchPercent) < 80 ? " only " : " "}
-          {parseFloat(Number(matchedUser.matchPercent).toFixed(2))}% compatible
-          to build a product together
+          {Number(matchPercent) < 80 ? " only " : " "}
+          {parseFloat(Number(matchPercent).toFixed())}% compatible to build a
+          product together
         </span>
         <CompatibilityText leftUser={leftUser} matchedUser={matchedUser} />
       </div>
-      <Bio user={matchedUser} direction="left" />
+      <Bio user={matchedUser} direction="left" otherUser={leftUser} />
     </div>
   );
 }

@@ -1,5 +1,5 @@
 "use client";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import { Github, LoaderIcon, Twitter } from "lucide-react";
@@ -228,6 +228,17 @@ export function ViewAnotherMatchCardSuggestion(props: {
           {parseFloat(Number(suggestedUser.matchPercent).toFixed(2))}% match
         </div>
       </div>
+    </a>
+  );
+}
+
+// if we're on /match, return to /match
+// otherwise, return to /
+export function DynamicHomeUrl() {
+  const pathname = usePathname();
+  return (
+    <a href={pathname.includes("/match") ? "/match" : "/"}>
+      <h1 className="text-2xl font-bold">Shiptalkers</h1>
     </a>
   );
 }
