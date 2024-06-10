@@ -25,29 +25,32 @@ export function parse(props: Props) {
 
 export function getMatchPercentRelative(userA: HeatmaplessUser, userB: HeatmaplessUser) {
     const totalA = userA.tweetsSent + userA.commitsMade;
+    const commitPercentA = Number(((userA.commitsMade / totalA) * 100).toFixed());
+    const tweetPercentA = Number(((userA.tweetsSent / totalA) * 100).toFixed());
+
     const totalB = userB.tweetsSent + userB.commitsMade;
+    const commitPercentB = Number(((userB.commitsMade / totalB) * 100).toFixed());
+    const tweetPercentB = Number(((userB.tweetsSent / totalB) * 100).toFixed());
 
-    const commitPercentA = userA.commitsMade / totalA;
-    const commitPercentB = userB.commitsMade / totalB;
-
-
-    const tweetPercentA = userA.tweetsSent / totalA;
-    const tweetPercentB = userB.tweetsSent / totalB;
 
     const tweetsToCommits = Math.abs(tweetPercentA - commitPercentB);
     const commitsToTweets = Math.abs(commitPercentA - tweetPercentB);
+
     const tweetsToTweets = Math.abs(tweetPercentA - tweetPercentB);
     const commitsToCommits = Math.abs(commitPercentA - commitPercentB);
 
-    if ((tweetsToTweets + commitsToCommits) > (tweetsToCommits + commitsToTweets)) {
-        return 100 - (tweetsToCommits + commitsToTweets) * 100;
+
+
+
+    if (Math.abs(tweetsToTweets + commitsToCommits) > Math.abs(tweetsToCommits + commitsToTweets)) {
+        return 100 - (tweetsToCommits + commitsToTweets);
     }
 
     const tD = Math.abs(tweetPercentA - tweetPercentB);
     const cD = Math.abs(commitPercentA - commitPercentB);
     const totalD = tD + cD;
-    const sim = 1 - totalD;
-    return 100 - Math.abs(sim * 100)
+    const sim = 100 - totalD;
+    return 100 - sim
 }
 
 export function getMatchPercentTotal(userA: HeatmaplessUser, userB: HeatmaplessUser) {

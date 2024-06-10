@@ -37,6 +37,8 @@ const fetchGitHubProfile = async (
 
 function UsernameInput(props: {
   githubUrl: string;
+  defaultGithubUrl?: string;
+  defaultTwitterUrl?: string;
   setGithubUrl: (value: string) => void;
   header: React.ReactNode;
   required?: boolean;
@@ -95,7 +97,9 @@ function UsernameInput(props: {
             className="w-full min-w-[300px] rounded-lg bg-white/70 backdrop-blur-sm backdrop-saturate-200"
             name="twitter-url"
             required={props.required}
-            defaultValue={profileData?.twitter_username ?? ""}
+            defaultValue={
+              props.defaultTwitterUrl ?? profileData?.twitter_username ?? ""
+            }
             placeholder="Twitter Profile Name"
           />
           {/* spinner if loading, slow speed */}
@@ -117,10 +121,19 @@ function UsernameInput(props: {
   );
 }
 
-export function FindAMatch() {
+export function FindAMatch(props?: {
+  defaultUserAGithub?: string;
+  defaultUserBGithub?: string;
+  defaultUserATwitter?: string;
+  defaultUserBTwitter?: string;
+}) {
   const router = useRouter();
-  const [userAGithub, setUserAGithub] = useState<string>("");
-  const [userBGithub, setUserBGithub] = useState<string>("");
+  const [userAGithub, setUserAGithub] = useState<string>(
+    props?.defaultUserAGithub ?? "",
+  );
+  const [userBGithub, setUserBGithub] = useState<string>(
+    props?.defaultUserBGithub ?? "",
+  );
   return (
     <form
       className="flex flex-col items-center"
@@ -160,6 +173,7 @@ export function FindAMatch() {
           }
           githubUrl={userAGithub}
           setGithubUrl={setUserAGithub}
+          defaultTwitterUrl={props?.defaultUserATwitter}
           required
         />
         <div className="ml-8">
@@ -173,6 +187,8 @@ export function FindAMatch() {
               </div>
             }
             githubUrl={userBGithub}
+            defaultGithubUrl={props?.defaultUserBGithub}
+            defaultTwitterUrl={props?.defaultUserBTwitter}
             setGithubUrl={setUserBGithub}
           />
         </div>

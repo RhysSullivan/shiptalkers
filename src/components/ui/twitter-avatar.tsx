@@ -1,3 +1,5 @@
+"use client";
+import { useState } from "react";
 /* eslint-disable @next/next/no-img-element */
 import { cn } from "../../lib/utils";
 import { User } from "../../server/db/schema";
@@ -20,15 +22,21 @@ export function TwitterAvatar(props: {
   user: Pick<User, "twitterName" | "twitterAvatarUrl">;
 }) {
   const { twitterName, twitterAvatarUrl } = props.user;
-  const src =
+  const [url, setURL] = useState(
     twitterAvatarUrl?.replace("_normal", "") ??
-    `https://unavatar.io/x/${twitterName}`;
+      `https://unavatar.io/x/${twitterName}`,
+  );
+  const src = url;
   if (vercelTwitterPeople.includes(twitterName)) {
     return (
       <a target="_blank" href={`https://vercel.lol/?utm=${twitterName}`}>
         <img
           src={src}
-          alt="avatar"
+          alt={`avatar for ${twitterName}`}
+          onError={() => {
+            if (url.includes("unavatar.io")) return;
+            setURL(`https://unavatar.io/x/${twitterName}`);
+          }}
           className={
             props.className
               ?.split(" ")
@@ -44,10 +52,18 @@ export function TwitterAvatar(props: {
     );
   }
   return (
-    <img
-      src={src}
-      alt="avatar"
+    <object
+      type="image/png"
+      data={src}
+      aria-label={`avatar for ${twitterName}`}
       className={cn("shrink-0 rounded-full", props.className)}
-    />
+    >
+      <img
+        src={`https://unavatar.io/x/${twitterName}`}
+        alt={`avatar for ${twitterName}`}
+        width="150"
+        height="150"
+      />
+    </object>
   );
 }

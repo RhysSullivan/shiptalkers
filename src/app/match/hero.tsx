@@ -72,12 +72,17 @@ function Bio(props: {
   return (
     <div
       className={cn(
-        "flex items-center justify-between gap-4",
+        "flex w-full max-w-[400px] items-center justify-between gap-4",
         direction === "left" ? "flex-row-reverse" : "flex-row",
       )}
     >
-      <div className="flex flex-col">
-        <div className={cn("flex flex-row gap-8")}>
+      <div className="flex max-w-[400px]  flex-col">
+        <div
+          className={cn(
+            "flex flex-row gap-8",
+            direction === "left" ? "justify-end" : "justify-start",
+          )}
+        >
           {direction === "left" && <Stats user={user} className="items-end" />}
           <div className="shrink-0">
             <TwitterAvatar
@@ -87,9 +92,10 @@ function Bio(props: {
           </div>
           {direction === "right" && <Stats user={user} />}
         </div>
+
         <span
           className={cn(
-            "py-2  text-gray-600 ",
+            " py-2  text-gray-600  ",
             direction === "right" ? "text-start" : "text-end",
           )}
         >
@@ -141,20 +147,18 @@ export function MatchCard(props: {
     : getMatchPercentTotal(leftUser, matchedUser).toString();
   return (
     <div className="flex flex-col gap-4">
-      <div className="grid grid-cols-1 items-center justify-center gap-8 pt-16 lg:grid-cols-3 lg:gap-32">
+      <div className="flex flex-col items-center justify-center gap-8 pt-16 xl:flex-row  ">
         <Bio
           user={leftUser}
           direction="right"
           otherUser={matchedUser}
           relative={props.relative}
         />
-        <div className="flex flex-col items-center gap-4">
+        <div className="flex w-[450px] flex-col items-center gap-4">
           <span className="text-center  text-2xl font-semibold text-gray-900 dark:text-gray-100">
             {leftUser.twitterDisplayName} and {matchedUser.twitterDisplayName}{" "}
-            are
-            {Number(matchPercent) < 80 ? " only " : " "}
-            {parseFloat(Number(matchPercent).toFixed())}% compatible to build a
-            product together
+            are {parseFloat(Number(matchPercent).toFixed())}% compatible as
+            cofounders
           </span>
           <CompatibilityText leftUser={leftUser} matchedUser={matchedUser} />
         </div>
@@ -170,15 +174,11 @@ export function MatchCard(props: {
   );
 }
 
-export function Hero(props: {
-  leftUser: HeatmaplessUser;
-  relative: boolean;
-  matchedUser: MatchedUser;
-}) {
-  const { leftUser, matchedUser } = props;
+export function BestMatch(props: { matchedUser: HeatmaplessUser }) {
+  const { matchedUser } = props;
   return (
     <>
-      <div className="flex flex-row gap-8">
+      <div className="flex flex-row justify-end gap-8">
         <TwitterAvatar user={matchedUser} className="size-32 shrink-0" />
         <div>
           <span className="text-xl font-semibold text-gray-900 dark:text-gray-100">
@@ -227,11 +227,6 @@ export function Hero(props: {
           </div>
         </div>
       </div>
-      <MatchCard
-        leftUser={leftUser}
-        matchedUser={matchedUser}
-        relative={props.relative}
-      />
     </>
   );
 }

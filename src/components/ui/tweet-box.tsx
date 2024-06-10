@@ -3,7 +3,7 @@
  * @see https://v0.dev/t/HTV1Riwb0VD
  * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
  */
-
+"use client";
 import { useState } from "react";
 import { Button } from "./button";
 import { LinkButton } from "./link-button";

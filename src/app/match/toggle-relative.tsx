@@ -32,7 +32,7 @@ export function ToggleRelative(props: { relative: boolean }) {
       <Label htmlFor="relative">Relative</Label>
       <Switch
         id="relative"
-        defaultChecked={props.relative}
+        checked={props.relative}
         onCheckedChange={() => {
           const params = new URLSearchParams(searchParams);
           params.set("rel", String(!props.relative));

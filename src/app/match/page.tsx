@@ -5,15 +5,16 @@
  * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
  */
 import { getMatchPercentRelative, parse, type Props } from "../utils";
-import { BestMatch } from "./best-match";
 import { getUser } from "../../server/db/users";
-import { Hero, MatchCard } from "./hero";
+import { BestMatch, MatchCard } from "./hero";
 import {
   getMatchSuggestionBasedOnRelative,
   getMatchSuggestionsBasedOnTotal,
 } from "./utils";
 import { ViewAnotherMatchCardSuggestion } from "../components.client";
 import { Home } from "./home";
+import { FindAMatch } from "./input";
+import { TweetBox } from "../../components/ui/tweet-box";
 
 type AAAA = {
   searchParams:
@@ -61,23 +62,42 @@ export default async function Component(
   const relative = props.searchParams.rel
     ? props.searchParams.rel === "true"
     : false;
-  if (!compareTo) {
-    return <BestMatch github={github} twitter={twitter} relative={relative} />;
-  }
-  const [userA, userB] = await Promise.all([
+
+  const [userA, specificUser] = await Promise.all([
     getUser({ github, twitter }),
-    getUser({
-      github: compareTo.toGithub,
-      twitter: compareTo.toTwitter,
-    }),
+    compareTo &&
+      getUser({
+        github: compareTo.toGithub,
+        twitter: compareTo.toTwitter,
+      }),
   ]);
-  if (!userA || !userB) {
+  if (!userA) {
     return null;
   }
   const suggestions = await getMatchSuggestionsBasedOnTotal(userA);
+  const userB = specificUser ?? suggestions[0];
+  if (!userB) {
+    return null;
+  }
+
   return (
-    <div className="mx-auto flex w-full max-w-screen-xl flex-grow flex-col items-center ">
+    <div className="mx-auto flex w-full max-w-screen-xl flex-grow flex-col items-center gap-4">
+      {userB && !compareTo && (
+        <>
+          <h1 className="max-w-2xl py-4 text-center text-2xl font-semibold text-gray-900 dark:text-gray-100">
+            The best cofounder for {userB.twitterDisplayName} is...
+          </h1>
+          <BestMatch matchedUser={userB} />
+        </>
+      )}
       <MatchCard leftUser={userA} matchedUser={userB} relative={relative} />
+      <TweetBox github="" src="" text="" twitter="" />
+      <FindAMatch
+        defaultUserAGithub={userA.githubName}
+        defaultUserATwitter={userA.twitterName}
+        defaultUserBGithub={userB.githubName}
+        defaultUserBTwitter={userB.twitterName}
+      />
       <div className="grid grid-cols-1 gap-4 pb-48 pt-32 md:grid-cols-3 ">
         {suggestions.map((user) => (
           <ViewAnotherMatchCardSuggestion
