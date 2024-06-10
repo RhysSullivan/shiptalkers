@@ -6,6 +6,9 @@ import Link from "next/link";
 import { cn, getPageUrl } from "../../lib/utils";
 import { GitTweetBars } from "../../components/ui/git-tweet-bars";
 import { getMatchPercentRelative, getMatchPercentTotal } from "../utils";
+import { Switch } from "../../components/ui/switch";
+import { Label } from "../../components/ui/label";
+import { ToggleRelative } from "./toggle-relative";
 
 function Stats(props: { user: HeatmaplessUser; className?: string }) {
   const { user } = props;
@@ -60,6 +63,7 @@ function Bio(props: {
   user: HeatmaplessUser;
   direction: "left" | "right";
   otherUser: HeatmaplessUser;
+  relative: boolean;
 }) {
   const { user, direction, otherUser } = props;
   const total = user.tweetsSent + user.commitsMade;
@@ -98,6 +102,7 @@ function Bio(props: {
           user={user}
           barHeight={300}
           iconSize={24}
+          relative={props.relative}
           barWidth={20}
           otherUser={otherUser}
           smallestBarLast={direction === "right"}
@@ -107,6 +112,7 @@ function Bio(props: {
         <GitTweetBars
           user={user}
           otherUser={otherUser}
+          relative={props.relative}
           barHeight={100}
           iconSize={24}
           barWidth={20}
@@ -121,47 +127,52 @@ function CompatibilityText(props: {
   leftUser: HeatmaplessUser;
   matchedUser: HeatmaplessUser;
 }) {
-  const { leftUser, matchedUser } = props;
-  const totalA = leftUser.tweetsSent + leftUser.commitsMade;
-  const totalB = matchedUser.tweetsSent + matchedUser.commitsMade;
-  const percentTweetsA = (leftUser.tweetsSent / totalA) * 100;
-  const percentTweetsB = (matchedUser.tweetsSent / totalB) * 100;
-  const diffTweets = Math.abs(percentTweetsA - percentTweetsB);
-
-  const percentCommitsA = (leftUser.commitsMade / totalA) * 100;
-  const percentCommitsB = (matchedUser.commitsMade / totalB) * 100;
-  const diffCommits = Math.abs(percentCommitsA - percentCommitsB);
-  return (diffTweets + diffCommits) / 2;
+  return "";
 }
 
 export function MatchCard(props: {
   leftUser: HeatmaplessUser;
   matchedUser: HeatmaplessUser;
+  relative: boolean;
 }) {
   const { leftUser, matchedUser } = props;
-  const matchPercent = getMatchPercentRelative(
-    leftUser,
-    matchedUser,
-  ).toString();
+  const matchPercent = props.relative
+    ? getMatchPercentRelative(leftUser, matchedUser).toString()
+    : getMatchPercentTotal(leftUser, matchedUser).toString();
   return (
-    <div className="grid grid-cols-1 items-center justify-center gap-8 pt-16 lg:grid-cols-3 lg:gap-32">
-      <Bio user={leftUser} direction="right" otherUser={matchedUser} />
-      <div className="flex flex-col items-center gap-4">
-        <span className="text-center  text-2xl font-semibold text-gray-900 dark:text-gray-100">
-          {leftUser.twitterDisplayName} and {matchedUser.twitterDisplayName} are
-          {Number(matchPercent) < 80 ? " only " : " "}
-          {parseFloat(Number(matchPercent).toFixed())}% compatible to build a
-          product together
-        </span>
-        <CompatibilityText leftUser={leftUser} matchedUser={matchedUser} />
+    <div className="flex flex-col gap-4">
+      <div className="grid grid-cols-1 items-center justify-center gap-8 pt-16 lg:grid-cols-3 lg:gap-32">
+        <Bio
+          user={leftUser}
+          direction="right"
+          otherUser={matchedUser}
+          relative={props.relative}
+        />
+        <div className="flex flex-col items-center gap-4">
+          <span className="text-center  text-2xl font-semibold text-gray-900 dark:text-gray-100">
+            {leftUser.twitterDisplayName} and {matchedUser.twitterDisplayName}{" "}
+            are
+            {Number(matchPercent) < 80 ? " only " : " "}
+            {parseFloat(Number(matchPercent).toFixed())}% compatible to build a
+            product together
+          </span>
+          <CompatibilityText leftUser={leftUser} matchedUser={matchedUser} />
+        </div>
+        <Bio
+          user={matchedUser}
+          direction="left"
+          otherUser={leftUser}
+          relative={props.relative}
+        />
       </div>
-      <Bio user={matchedUser} direction="left" otherUser={leftUser} />
+      <ToggleRelative relative={props.relative} />
     </div>
   );
 }
 
 export function Hero(props: {
   leftUser: HeatmaplessUser;
+  relative: boolean;
   matchedUser: MatchedUser;
 }) {
   const { leftUser, matchedUser } = props;
@@ -216,7 +227,11 @@ export function Hero(props: {
           </div>
         </div>
       </div>
-      <MatchCard leftUser={leftUser} matchedUser={matchedUser} />
+      <MatchCard
+        leftUser={leftUser}
+        matchedUser={matchedUser}
+        relative={props.relative}
+      />
     </>
   );
 }

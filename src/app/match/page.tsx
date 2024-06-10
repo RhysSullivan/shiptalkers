@@ -8,7 +8,10 @@ import { getMatchPercentRelative, parse, type Props } from "../utils";
 import { BestMatch } from "./best-match";
 import { getUser } from "../../server/db/users";
 import { Hero, MatchCard } from "./hero";
-import { getMatchSuggestionsBasedOnTotal } from "./utils";
+import {
+  getMatchSuggestionBasedOnRelative,
+  getMatchSuggestionsBasedOnTotal,
+} from "./utils";
 import { ViewAnotherMatchCardSuggestion } from "../components.client";
 import { Home } from "./home";
 
@@ -45,7 +48,7 @@ function parse2ElectricBoogaloo(props: SpecificCompareProps) {
 export default async function Component(
   props: SpecificCompareProps & {
     searchParams: {
-      rel?: boolean;
+      rel?: string;
     };
   },
 ) {
@@ -54,7 +57,10 @@ export default async function Component(
   }
   const { github, twitter } = parse(props);
   const compareTo = parse2ElectricBoogaloo(props);
-  const relative = !!props.searchParams.rel;
+
+  const relative = props.searchParams.rel
+    ? props.searchParams.rel === "true"
+    : false;
   if (!compareTo) {
     return <BestMatch github={github} twitter={twitter} relative={relative} />;
   }
@@ -68,11 +74,10 @@ export default async function Component(
   if (!userA || !userB) {
     return null;
   }
-
   const suggestions = await getMatchSuggestionsBasedOnTotal(userA);
   return (
     <div className="mx-auto flex w-full max-w-screen-xl flex-grow flex-col items-center ">
-      <MatchCard leftUser={userA} matchedUser={userB} />
+      <MatchCard leftUser={userA} matchedUser={userB} relative={relative} />
       <div className="grid grid-cols-1 gap-4 pb-48 pt-32 md:grid-cols-3 ">
         {suggestions.map((user) => (
           <ViewAnotherMatchCardSuggestion

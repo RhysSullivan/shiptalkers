@@ -4,15 +4,8 @@
  * @see https://v0.dev/t/0FjhmAlN5Xv
  * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
  */
-import { db } from "../../server/db";
-import { users } from "../../server/db/schema";
-import { eq, and, sql, or, not } from "drizzle-orm";
 import { ViewAnotherMatchCardSuggestion } from "../components.client";
-import {
-  getMatchSuggestionBasedOnRelative,
-  getMatchSuggestionsBasedOnTotal,
-  type MatchedUser,
-} from "./utils";
+import { getMatchSuggestionsBasedOnTotal } from "./utils";
 import { Hero } from "./hero";
 import { getUser } from "../../server/db/users";
 
@@ -27,9 +20,7 @@ export async function BestMatch(props: {
     return null;
   }
 
-  const suggestions = props.relative
-    ? await getMatchSuggestionBasedOnRelative(searchingUser)
-    : await getMatchSuggestionsBasedOnTotal(searchingUser);
+  const suggestions = await getMatchSuggestionsBasedOnTotal(searchingUser);
   const bestMatch = suggestions.shift();
 
   if (!bestMatch) {
@@ -42,7 +33,11 @@ export async function BestMatch(props: {
       <h1 className="max-w-2xl py-4 text-center text-2xl font-semibold text-gray-900 dark:text-gray-100">
         The best cofounder for {searchingUser.twitterDisplayName} is...
       </h1>
-      <Hero leftUser={searchingUser} matchedUser={bestMatch} />
+      <Hero
+        leftUser={searchingUser}
+        matchedUser={bestMatch}
+        relative={props.relative}
+      />
       <div className="grid grid-cols-1 gap-4 pb-48 pt-32 md:grid-cols-3 ">
         {suggestions.map((user) => (
           <ViewAnotherMatchCardSuggestion

@@ -1,22 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 "use client";
 import { useRouter } from "next/navigation";
-import { Github, HelpCircleIcon, LoaderIcon, Twitter } from "lucide-react";
+import { Github, LoaderIcon, Twitter } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { ChangeEvent, useEffect, useState } from "react";
 import { GithubMetadata } from "../../server/lib/github";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import { getMatchPageUrl } from "../../lib/utils";
-import { Label } from "../../components/ui/label";
-import { Switch } from "../../components/ui/switch";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "../../components/ui/tooltip";
-
 // Debounce function
 // eslint-disable-next-line @typescript-eslint/ban-types
 const debounce = (func: Function, delay: number) => {
@@ -136,15 +127,13 @@ export function FindAMatch() {
       onSubmit={(e) => {
         e.preventDefault();
         // @ts-expect-error asd
-        const relativeMatch = !!e.target[2].checked as boolean;
+        const firstGithub = e.target[0].value as string;
         // @ts-expect-error asd
-        const firstGithub = e.target[3].value as string;
+        const firstTwitter = e.target[1].value as string;
         // @ts-expect-error asd
-        const firstTwitter = e.target[4].value as string;
+        const maybeSecondGithub = e.target[2].value as string;
         // @ts-expect-error asd
-        const maybeSecondGithub = e.target[5].value as string;
-        // @ts-expect-error asd
-        const maybeSecondTwitter = e.target[6].value as string;
+        const maybeSecondTwitter = e.target[3].value as string;
 
         const firstGithubName = firstGithub.split("/").pop()!.trim();
         const firstTwitterName = firstTwitter.split("/").pop()!.trim();
@@ -157,27 +146,10 @@ export function FindAMatch() {
             twitter: firstTwitterName,
             toGithub: secondGithubName,
             toTwitter: secondTwitterName,
-            relative: relativeMatch,
           }),
         );
       }}
     >
-      <div className="flex items-center gap-4">
-        <TooltipProvider>
-          <Tooltip delayDuration={100}>
-            <TooltipTrigger>
-              <HelpCircleIcon size={20} />
-            </TooltipTrigger>
-            <TooltipContent className="max-w-[260px]">
-              Use this if you want to compare based on percentage of tweets and
-              commits, rather than total. Useful for comparing users with
-              different activity levels.
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-        <Label htmlFor="relative">Relative Match</Label>
-        <Switch id="relative" />
-      </div>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <UsernameInput
           header={
@@ -188,7 +160,7 @@ export function FindAMatch() {
           }
           githubUrl={userAGithub}
           setGithubUrl={setUserAGithub}
-          // required
+          required
         />
         <div className="ml-8">
           <UsernameInput

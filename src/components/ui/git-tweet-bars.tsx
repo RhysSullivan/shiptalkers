@@ -7,6 +7,7 @@ export function GitTweetBars(props: {
   otherUser?: Pick<User, "tweetsSent" | "commitsMade">;
   iconSize?: number;
   smallestBarLast?: boolean;
+  relative?: boolean;
 }) {
   const { user } = props;
   const { iconSize = 48, barWidth = 100 } = props;
@@ -17,7 +18,9 @@ export function GitTweetBars(props: {
   const total = tweets + commits;
   const otherTotal = otherTweets + otherCommits;
   const maxTotal = Math.max(total, otherTotal);
-  barHeight = barHeight * (total / maxTotal);
+  if (!props.relative) {
+    barHeight = barHeight * (total / maxTotal);
+  }
   const tweetBarHeight = total > 0 ? barHeight * (tweets / total) : 0;
   const commitBarHeight = total > 0 ? barHeight * (commits / total) : 0;
   return (

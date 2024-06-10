@@ -22,7 +22,7 @@ export function parse(props: Props) {
             twitter: props.searchParams.twitter.toLowerCase(),
         };
 }
-// 100 - ((ABS(${users.tweetsSent} - ${forUser.commitsMade}) + ABS(${users.commitsMade} - ${forUser.tweetsSent})) / (${forUser.tweetsSent} + ${forUser.commitsMade})) * 100
+
 export function getMatchPercentRelative(userA: HeatmaplessUser, userB: HeatmaplessUser) {
     const totalA = userA.tweetsSent + userA.commitsMade;
     const totalB = userB.tweetsSent + userB.commitsMade;
@@ -34,6 +34,15 @@ export function getMatchPercentRelative(userA: HeatmaplessUser, userB: Heatmaple
     const tweetPercentA = userA.tweetsSent / totalA;
     const tweetPercentB = userB.tweetsSent / totalB;
 
+    const tweetsToCommits = Math.abs(tweetPercentA - commitPercentB);
+    const commitsToTweets = Math.abs(commitPercentA - tweetPercentB);
+    const tweetsToTweets = Math.abs(tweetPercentA - tweetPercentB);
+    const commitsToCommits = Math.abs(commitPercentA - commitPercentB);
+
+    if ((tweetsToTweets + commitsToCommits) > (tweetsToCommits + commitsToTweets)) {
+        return 100 - (tweetsToCommits + commitsToTweets) * 100;
+    }
+
     const tD = Math.abs(tweetPercentA - tweetPercentB);
     const cD = Math.abs(commitPercentA - commitPercentB);
     const totalD = tD + cD;
@@ -42,7 +51,7 @@ export function getMatchPercentRelative(userA: HeatmaplessUser, userB: Heatmaple
 }
 
 export function getMatchPercentTotal(userA: HeatmaplessUser, userB: HeatmaplessUser) {
-    return 100; Math.round(
+    return Math.round(
         100 -
         ((Math.abs(userB.tweetsSent - userA.commitsMade) + Math.abs(userB.commitsMade - userA.tweetsSent)) /
             (userA.tweetsSent + userA.commitsMade)) *

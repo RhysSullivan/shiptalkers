@@ -39,13 +39,11 @@ Math.round((1 - percentDiff) * 100)
 */
 export async function getMatchSuggestionBasedOnRelative(forUser: HeatmaplessUser) {
     const totalA = forUser.tweetsSent + forUser.commitsMade;
-    const percentA = forUser.tweetsSent / totalA;
+    const commitPercentA = forUser.commitsMade / totalA;
+    const tweetPercentA = forUser.tweetsSent / totalA;
     const foundUsers = await db
-        // @ts-expect-error idk drizzle
-        .select({
-            total: sql`(1 - ABS((${users.commitsMade} / (${users.commitsMade} + ${users.tweetsSent})) - ${percentA})) * 100`,
-            ...users,
-        })
+        .select(
+    )
         .from(users)
         .where(
             and(
@@ -55,10 +53,11 @@ export async function getMatchSuggestionBasedOnRelative(forUser: HeatmaplessUser
         )
         // sort by total, and then difference in followers
         .orderBy(
-            desc(sql`(1 - ABS((${users.commitsMade} / (${users.commitsMade} + ${users.tweetsSent})) - ${percentA})) * 100`),
-            // sql`ABS(${ users.twitterFollowerCount } - ${ forUser.twitterFollowerCount })`,
-            // sql`ABS(${ users.githubFollowerCount } - ${ forUser.githubFollowerCount })`,
+            sql`100 - ((1 - (ABS((${users.commitsMade} / ${users.tweetsSent} + ${users.commitsMade}) 
+            - ${commitPercentA}) + ABS((${users.tweetsSent} / ${users.tweetsSent} + ${users.commitsMade}) - ${tweetPercentA}))) * 100)`,
+            sql`ABS(${users.twitterFollowerCount} - ${forUser.twitterFollowerCount})`,
+            sql`ABS(${users.githubFollowerCount} - ${forUser.githubFollowerCount})`,
         )
         .limit(16).execute();
-    return foundUsers as MatchedUser[];
+    return foundUsers
 }
