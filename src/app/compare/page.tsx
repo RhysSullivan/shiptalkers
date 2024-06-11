@@ -11,29 +11,6 @@ import { fetchTwitterProfile } from "../../server/lib/twitter";
 import { db } from "../../server/db";
 import { users } from "../../server/db/schema";
 
-type Props = {
-  searchParams:
-    | {
-        github: string;
-        twitter: string;
-      }
-    | {
-        name: string;
-      };
-};
-
-function parse(props: Props) {
-  return "name" in props.searchParams
-    ? {
-        github: props.searchParams.name.toLowerCase(),
-        twitter: props.searchParams.name.toLowerCase(),
-      }
-    : {
-        github: props.searchParams.github.toLowerCase(),
-        twitter: props.searchParams.twitter.toLowerCase(),
-      };
-}
-
 async function getPageDataInternal(props: Props) {
   const { github, twitter } = parse(props);
   const user = await getCachedUserData({
@@ -82,6 +59,7 @@ async function getPageDataInternal(props: Props) {
 import Dataloader from "dataloader";
 import { revalidatePath } from "next/cache";
 import { getPageUrl } from "../../lib/utils";
+import { Props, parse } from "../utils";
 const dataloader = new Dataloader(
   // @ts-expect-error - this is a hack to make the types work
   async (props: Props[]) => {

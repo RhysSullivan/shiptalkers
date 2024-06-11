@@ -5,6 +5,7 @@ import { TRPCReactProvider } from "../trpc/react";
 import { PHProvider, PostHogPageView } from "../components/ui/posthog";
 import Link from "next/link";
 import { Suspense } from "react";
+import { DynamicHomeUrl } from "./components.client";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -75,9 +76,7 @@ export default function RootLayout({
             </Suspense>
             <nav className="z-50 bg-white px-4 py-2 shadow-lg dark:bg-gray-900">
               <div className="mx-auto flex max-w-screen-xl items-center justify-between">
-                <a href="/">
-                  <h1 className="text-2xl font-bold">Shiptalkers</h1>
-                </a>
+                <DynamicHomeUrl />
                 <div className="flex items-center space-x-4">
                   <Link
                     className="inline-flex h-9 items-center justify-center rounded-md bg-gray-50 px-4 py-2 text-sm font-medium text-gray-900 shadow transition-colors hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-700 disabled:pointer-events-none disabled:opacity-50"

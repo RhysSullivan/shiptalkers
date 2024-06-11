@@ -1,3 +1,5 @@
+"use client";
+import { useState } from "react";
 /* eslint-disable @next/next/no-img-element */
 import { cn } from "../../lib/utils";
 import { User } from "../../server/db/schema";
@@ -12,7 +14,7 @@ const vercelTwitterPeople = [
   "tomlienard",
   "delba_oliveira",
   "jaredpalmer",
-  "timneutkens"
+  "timneutkens",
 ];
 
 export function TwitterAvatar(props: {
@@ -20,19 +22,31 @@ export function TwitterAvatar(props: {
   user: Pick<User, "twitterName" | "twitterAvatarUrl">;
 }) {
   const { twitterName, twitterAvatarUrl } = props.user;
-  const src =
+  const [url, setURL] = useState(
     twitterAvatarUrl?.replace("_normal", "") ??
-    `https://unavatar.io/x/${twitterName}`;
+      `https://unavatar.io/x/${twitterName}`,
+  );
+  const src = url;
   if (vercelTwitterPeople.includes(twitterName)) {
     return (
-      <a target="_blank" href={`https://vercel.lol/?utm=${twitterName}`}>
+      <a
+        target="_blank"
+        href={`https://vercel.lol/?utm=${twitterName}`}
+        key={twitterName}
+      >
         <img
           src={src}
-          alt="avatar"
-          className={props.className
-            ?.split(" ")
-            .filter((c) => !c.includes("rounded"))
-            .join(" ")}
+          alt={`avatar for ${twitterName}`}
+          onError={() => {
+            if (url.includes("unavatar.io")) return;
+            setURL(`https://unavatar.io/x/${twitterName}`);
+          }}
+          className={
+            props.className
+              ?.split(" ")
+              .filter((c) => !c.includes("rounded"))
+              .join(" ") + " shrink-0"
+          }
           style={{
             clipPath:
               "polygon(50% 0%, 0% 100%, 100% 100%)" /* adjust percentages as needed */,
@@ -42,10 +56,20 @@ export function TwitterAvatar(props: {
     );
   }
   return (
-    <img
-      src={src}
-      alt="avatar"
-      className={cn("rounded-full", props.className)}
-    />
+    <object
+      type="image/png"
+      data={src}
+      key={twitterName}
+      aria-label={`avatar for ${twitterName}`}
+      className={cn("shrink-0 rounded-full", props.className)}
+    >
+      <img
+        src={`https://unavatar.io/x/${twitterName}`}
+        key={twitterName}
+        alt={`avatar for ${twitterName}`}
+        width="150"
+        height="150"
+      />
+    </object>
   );
 }
