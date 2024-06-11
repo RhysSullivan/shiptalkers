@@ -4,7 +4,12 @@
  * @see https://v0.dev/t/0FjhmAlN5Xv
  * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
  */
-import { getMatchPercentRelative, parse, type Props } from "../utils";
+import {
+  getMatchPercentRelative,
+  getMatchPercentTotal,
+  parse,
+  type Props,
+} from "../utils";
 import { getUser } from "../../server/db/users";
 import { BestMatch, MatchCard } from "./hero";
 import {
@@ -15,7 +20,7 @@ import { ViewAnotherMatchCardSuggestion } from "../components.client";
 import { Home } from "./home";
 import { FindAMatch } from "./input";
 import { TweetBox } from "../../components/ui/tweet-box";
-import { getMatchPageOgImageUrl } from "../../lib/utils";
+import { getMatchPageOgImageUrl, getMatchPageUrl } from "../../lib/utils";
 
 type AAAA = {
   searchParams:
@@ -93,7 +98,22 @@ export default async function Component(
         </>
       )}
       <MatchCard leftUser={userA} matchedUser={userB} relative={relative} />
-      <TweetBox src={og} text="" />
+      <TweetBox
+        src={og}
+        text={`@${userA.twitterName} and @${userB.twitterName} are a ${
+          relative
+            ? getMatchPercentRelative(userA, userB)
+            : getMatchPercentTotal(userA, userB)
+        }% match to be cofounders! \n\nhttps://shiptalkers.dev${getMatchPageUrl(
+          {
+            github: userA.githubName,
+            twitter: userA.twitterName,
+            relative,
+            toGithub: userB.githubName,
+            toTwitter: userB.twitterName,
+          },
+        )}`}
+      />
       <div className="pt-32 text-center">
         <h2 className="pb-8 text-2xl font-semibold text-gray-900 dark:text-gray-100">
           Compare against another user
