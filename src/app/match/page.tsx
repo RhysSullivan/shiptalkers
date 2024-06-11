@@ -31,7 +31,12 @@ type AAAA = {
       };
 };
 
-type SpecificCompareProps = Props & AAAA;
+type SpecificCompareProps = Props &
+  AAAA & {
+    searchParams: {
+      rel?: string;
+    };
+  };
 
 function parse2ElectricBoogaloo(props: SpecificCompareProps) {
   const hasToName = "toName" in props.searchParams;
@@ -50,15 +55,12 @@ function parse2ElectricBoogaloo(props: SpecificCompareProps) {
       };
 }
 
-export default async function Component(
-  props: SpecificCompareProps & {
-    searchParams: {
-      rel?: string;
-    };
-  },
-) {
+import DataLoader from "dataloader";
+import { Metadata } from "next";
+
+async function getData(props: SpecificCompareProps) {
   if (!props.searchParams || Object.keys(props.searchParams).length === 0) {
-    return <Home />;
+    return "home";
   }
   const { github, twitter } = parse(props);
   const compareTo = parse2ElectricBoogaloo(props);
@@ -76,15 +78,84 @@ export default async function Component(
       }),
   ]);
   if (!userA) {
-    return null;
+    return "no first user";
   }
   const suggestions = await getMatchSuggestionsBasedOnTotal(userA);
   const userB = specificUser ?? suggestions.shift();
   if (!userB) {
-    return null;
+    return "no second user";
   }
 
-  const og = getMatchPageOgImageUrl({ userA, userB, relative });
+  const og = `https://shiptalkers.dev${getMatchPageUrl({
+    github: userA.githubName,
+    twitter: userA.twitterName,
+    relative,
+    toGithub: userB.githubName,
+    toTwitter: userB.twitterName,
+  })}`;
+  return { userA, userB, relative, suggestions, og, compareTo };
+}
+
+const dataloader = new DataLoader(
+  // @ts-expect-error - this is a hack to make the types work
+  async (props: SpecificCompareProps[]) => {
+    return Promise.all(props.map(getData));
+  },
+  { cacheKeyFn: (props) => JSON.stringify(props) },
+);
+
+export async function generateMetadata(
+  props: SpecificCompareProps,
+): Promise<Metadata> {
+  const data = await dataloader.load(props);
+  if (typeof data === "string") {
+    if (data == "home") {
+      return {
+        openGraph: {
+          title: `Find a cofounder - Shiptalkers.dev`,
+          description: `Find a cofounder based on your GitHub and Twitter activity`,
+        },
+      };
+    }
+    return {};
+  }
+  const { userA, userB, relative, og } = data;
+  return {
+    openGraph: {
+      images: [{ url: og }],
+      title: `${userA.twitterDisplayName} and ${userB.twitterDisplayName} Cofounder Compatibility - Shiptalkers.dev`,
+      description: `${userA.twitterDisplayName} and ${
+        userB.twitterDisplayName
+      } are a ${
+        relative
+          ? getMatchPercentRelative(userA, userB)
+          : getMatchPercentTotal(userA, userB)
+      }% match to be cofounders!`,
+    },
+  };
+}
+
+export default async function Component(
+  props: SpecificCompareProps & {
+    searchParams: {
+      rel?: string;
+    };
+  },
+) {
+  const data = await dataloader.load(props);
+  if (typeof data === "string") {
+    if (data === "home") {
+      return <Home />;
+    }
+    if (data === "no first user") {
+      return <div>Invalid URL {JSON.stringify(props.searchParams)}</div>;
+    }
+    if (data === "no second user") {
+      return <div>Invalid URL {JSON.stringify(props.searchParams)}</div>;
+    }
+  }
+
+  const { userA, userB, relative, suggestions, og, compareTo } = data;
   return (
     <div className="mx-auto flex w-full max-w-screen-xl flex-grow flex-col items-center gap-4">
       {!compareTo && (
@@ -102,15 +173,7 @@ export default async function Component(
           relative
             ? getMatchPercentRelative(userA, userB)
             : getMatchPercentTotal(userA, userB)
-        }% match to be cofounders! \n\nhttps://shiptalkers.dev${getMatchPageUrl(
-          {
-            github: userA.githubName,
-            twitter: userA.twitterName,
-            relative,
-            toGithub: userB.githubName,
-            toTwitter: userB.twitterName,
-          },
-        )}`}
+        }% match to be cofounders! \n\n${og}`}
       />
       <div className="pt-32 text-center">
         <h2 className="pb-8 text-2xl font-semibold text-gray-900 dark:text-gray-100">
