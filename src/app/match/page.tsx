@@ -12,10 +12,7 @@ import {
 } from "../utils";
 import { getUser } from "../../server/db/users";
 import { BestMatch, MatchCard } from "./hero";
-import {
-  getMatchSuggestionBasedOnRelative,
-  getMatchSuggestionsBasedOnTotal,
-} from "./utils";
+import { getMatchSuggestionsBasedOnTotal } from "./utils";
 import { ViewAnotherMatchCardSuggestion } from "../components.client";
 import { Home } from "./home";
 import { FindAMatch } from "./input";
@@ -93,7 +90,7 @@ export default async function Component(
       {!compareTo && (
         <>
           <h1 className="max-w-2xl py-4 text-center text-2xl font-semibold text-gray-900 dark:text-gray-100">
-            The best cofounder for {userB.twitterDisplayName} is...
+            The best cofounder for {userA.twitterDisplayName} is...
           </h1>
           <BestMatch matchedUser={userB} />
         </>
