@@ -3,7 +3,7 @@
  * @see https://v0.dev/t/HTV1Riwb0VD
  * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
  */
-
+"use client";
 import { useState } from "react";
 import { Button } from "./button";
 import { LinkButton } from "./link-button";
@@ -13,6 +13,7 @@ import { ClipboardIcon, ClipboardCheckIcon, LoaderIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 function ReloadButton(props: { twitter: string; github: string }) {
+  const { twitter, github } = props;
   const [isReloading, setIsReloading] = useState<boolean>(false);
   const [status, setStatus] = useState<string | null>(null);
   const navigation = useRouter();
@@ -24,8 +25,8 @@ function ReloadButton(props: { twitter: string; github: string }) {
       onClick={async () => {
         setIsReloading(true);
         const urlSearchParams = new URLSearchParams({
-          github: props.github,
-          twitter: props.twitter,
+          github: github,
+          twitter: twitter,
           reset: "true",
         });
         const res = await fetch(
@@ -63,12 +64,13 @@ function ReloadButton(props: { twitter: string; github: string }) {
 export function TweetBox(props: {
   src: string;
   text: string;
-  twitter: string;
-  github: string;
+  twitter?: string;
+  github?: string;
 }) {
+  const { src, text, twitter, github } = props;
   const [copySuccess, setCopySuccess] = useState<boolean>(false);
   const queryParams = new URLSearchParams({
-    text: props.text,
+    text: text,
   });
 
   const copyToClipboard = async () => {
@@ -78,7 +80,7 @@ export function TweetBox(props: {
         const img = new Image();
         img.crossOrigin = "anonymous";
         img.onload = () => resolve(img);
-        img.src = props.src;
+        img.src = src;
       });
 
       // Render to unmounted canvas and rip image from that
@@ -112,22 +114,24 @@ export function TweetBox(props: {
     <div className="mx-auto max-w-[100vw] rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-950">
       <div className="overflow-hidden  border-b-2 border-gray-200 dark:border-gray-800">
         <img
-          src={props.src}
+          src={src}
           width={300}
           height={200}
-          key={props.src}
+          key={src}
           alt="Placeholder"
           className="aspect-[2/1] w-[100vw] object-cover sm:h-[270px] md:w-[516px]"
         />
         <Textarea
           placeholder="What's on your mind?"
-          defaultValue={props.text}
+          defaultValue={text}
           className="min-h-[10px] w-full resize-none rounded-none border-0 p-4 py-0 dark:bg-gray-950 dark:text-gray-50"
           rows={3}
         />
       </div>
       <div className="mt-4 flex w-full items-center justify-end space-x-2">
-        <ReloadButton twitter={props.twitter} github={props.github} />
+        {twitter && github && (
+          <ReloadButton twitter={twitter} github={github} />
+        )}
         <Button
           onClick={copyToClipboard}
           variant={"secondary"}

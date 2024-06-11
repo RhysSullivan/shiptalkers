@@ -1,5 +1,5 @@
 "use client";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import { Github, LoaderIcon, Twitter } from "lucide-react";
@@ -10,7 +10,8 @@ import { ChangeEvent, useEffect, useState } from "react";
 import { GithubMetadata } from "../server/lib/github";
 import { GitTweetBars } from "../components/ui/git-tweet-bars";
 import { TwitterAvatar } from "../components/ui/twitter-avatar";
-import { getPageUrl } from "../lib/utils";
+import { getMatchPageUrl, getPageUrl } from "../lib/utils";
+import { getMatchPercentRelative, getMatchPercentTotal } from "./utils";
 
 // Debounce function
 // eslint-disable-next-line @typescript-eslint/ban-types
@@ -130,7 +131,6 @@ export function Hero() {
           )}
         </div>
       </div>
-
       <Button
         className="mt-4 rounded-lg hover:bg-neutral-700 active:translate-y-0.5 active:bg-neutral-500"
         type="submit"
@@ -181,6 +181,75 @@ export function ComparisonCard(props: { user: HeatmaplessUser }) {
           </div>
         </div>
       </div>
+    </a>
+  );
+}
+
+export function ViewAnotherMatchCardSuggestion(props: {
+  rootUser: HeatmaplessUser;
+  suggestedUser: HeatmaplessUser;
+  relative: boolean;
+}) {
+  const { suggestedUser, rootUser } = props;
+  return (
+    <a
+      className="flex flex-row items-center justify-between rounded-md border-2  p-4 drop-shadow-sm transition-all hover:scale-105 hover:border-blue-500 hover:shadow-lg"
+      href={getMatchPageUrl({
+        toGithub: suggestedUser.githubName,
+        toTwitter: suggestedUser.twitterName,
+        github: rootUser.githubName,
+        twitter: rootUser.twitterName,
+        relative: props.relative,
+      })}
+    >
+      <div className="flex flex-row items-center justify-center gap-4">
+        <TwitterAvatar user={suggestedUser} className="size-24 min-w-24" />
+        <div className="flex h-full flex-col justify-start gap-2 text-start">
+          <h3 className="line-clamp-2 h-full max-w-56 text-wrap text-lg font-bold leading-5">
+            {suggestedUser.twitterDisplayName}
+          </h3>
+          <div className="flex flex-row items-end justify-between gap-4">
+            <div className="flex h-full flex-col items-start justify-start text-start">
+              <span className="text-sm text-gray-500">
+                @{suggestedUser.twitterName}
+              </span>
+              <span className="text-sm text-gray-500">
+                {suggestedUser.twitterFollowerCount.toLocaleString()} followers
+              </span>
+              <span className="text-sm text-gray-500">
+                {suggestedUser.tweetsSent.toLocaleString()} tweets
+              </span>
+              <span className="text-sm text-gray-500">
+                {suggestedUser.commitsMade.toLocaleString()} commits
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="flex h-full flex-col items-center justify-center text-lg font-semibold">
+        {props.relative
+          ? getMatchPercentRelative(
+              props.rootUser,
+              props.suggestedUser,
+            ).toString()
+          : getMatchPercentTotal(
+              props.rootUser,
+              props.suggestedUser,
+            ).toString()}
+        % match
+      </div>
+    </a>
+  );
+}
+
+// if we're on /match, return to /match
+// otherwise, return to /
+export function DynamicHomeUrl() {
+  const pathname = usePathname();
+
+  return (
+    <a href={pathname.includes("/match?") ? "/match" : "/"}>
+      <h1 className="text-2xl font-bold">Shiptalkers</h1>
     </a>
   );
 }

@@ -4,24 +4,37 @@ export function GitTweetBars(props: {
   user: Pick<User, "tweetsSent" | "commitsMade">;
   barHeight: number;
   barWidth?: number;
+  otherUser?: Pick<User, "tweetsSent" | "commitsMade">;
   iconSize?: number;
+  smallestBarLast?: boolean;
+  relative?: boolean;
 }) {
   const { user } = props;
-  const { barHeight, iconSize = 48, barWidth = 100 } = props;
+  const { iconSize = 48, barWidth = 100 } = props;
+  let barHeight = props.barHeight;
   const { tweetsSent: tweets, commitsMade: commits } = user;
-  const tweetBarHeight =
-    tweets + commits > 0 ? barHeight * (tweets / (tweets + commits)) : 0;
-  const commitBarHeight =
-    tweets + commits > 0 ? barHeight * (commits / (tweets + commits)) : 0;
+  const { tweetsSent: otherTweets = 0, commitsMade: otherCommits = 0 } =
+    props.otherUser ?? {};
+  const total = tweets + commits;
+  const otherTotal = otherTweets + otherCommits;
+  const maxTotal = Math.max(total, otherTotal);
+  if (!props.relative) {
+    barHeight = barHeight * (total / maxTotal);
+  }
+  const tweetBarHeight = total > 0 ? barHeight * (tweets / total) : 0;
+  const commitBarHeight = total > 0 ? barHeight * (commits / total) : 0;
   return (
     <div
       style={{
         display: "flex",
-        flexDirection: "row",
-        height: `${barHeight}px`,
+        height: `${props.barHeight}px`,
         gap: "20px",
         justifyContent: "flex-end",
         alignItems: "flex-end",
+        flexDirection:
+          props.smallestBarLast && commitBarHeight < tweetBarHeight
+            ? "row"
+            : "row-reverse",
       }}
     >
       <div
