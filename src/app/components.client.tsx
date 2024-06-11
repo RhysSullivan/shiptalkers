@@ -11,6 +11,7 @@ import { GithubMetadata } from "../server/lib/github";
 import { GitTweetBars } from "../components/ui/git-tweet-bars";
 import { TwitterAvatar } from "../components/ui/twitter-avatar";
 import { getMatchPageUrl, getPageUrl } from "../lib/utils";
+import { getMatchPercentRelative, getMatchPercentTotal } from "./utils";
 
 // Debounce function
 // eslint-disable-next-line @typescript-eslint/ban-types
@@ -186,9 +187,8 @@ export function ComparisonCard(props: { user: HeatmaplessUser }) {
 
 export function ViewAnotherMatchCardSuggestion(props: {
   rootUser: HeatmaplessUser;
-  suggestedUser: HeatmaplessUser & {
-    matchPercent: string;
-  };
+  suggestedUser: HeatmaplessUser;
+  relative: boolean;
 }) {
   const { suggestedUser, rootUser } = props;
   return (
@@ -199,6 +199,7 @@ export function ViewAnotherMatchCardSuggestion(props: {
         toTwitter: suggestedUser.twitterName,
         github: rootUser.githubName,
         twitter: rootUser.twitterName,
+        relative: props.relative,
       })}
     >
       <div className="flex flex-row items-center justify-center gap-4">
@@ -224,9 +225,18 @@ export function ViewAnotherMatchCardSuggestion(props: {
             </div>
           </div>
         </div>
-        <div className="flex h-full flex-col items-center justify-center text-lg font-semibold">
-          {parseFloat(Number(suggestedUser.matchPercent).toFixed(2))}% match
-        </div>
+      </div>
+      <div className="flex h-full flex-col items-center justify-center text-lg font-semibold">
+        {props.relative
+          ? getMatchPercentRelative(
+              props.rootUser,
+              props.suggestedUser,
+            ).toString()
+          : getMatchPercentTotal(
+              props.rootUser,
+              props.suggestedUser,
+            ).toString()}
+        % match
       </div>
     </a>
   );

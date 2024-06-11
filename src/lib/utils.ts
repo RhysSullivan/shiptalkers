@@ -1,6 +1,6 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { type User } from "../server/db/schema";
+import { HeatmaplessUser, type User } from "../server/db/schema";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -85,6 +85,32 @@ export function getMatchPageUrl(input: {
   }
   return `/match?${query.toString()}`
 }
+
+
+export function getMatchPageOgImageUrl(args: {
+  userA: HeatmaplessUser;
+  userB: HeatmaplessUser;
+  relative: boolean;
+}) {
+  const { userA, userB } = args;
+  const queryParams = new URLSearchParams({
+    githubA: userA.githubName,
+    tweetsA: userA.tweetsSent.toString(),
+    commitsA: userA.commitsMade.toString(),
+    twitterA: userA.twitterName,
+    avatarA: userA.twitterAvatarUrl ?? "",
+    displayNameA: userA.twitterDisplayName,
+    githubB: userB.githubName,
+    tweetsB: userB.tweetsSent.toString(),
+    commitsB: userB.commitsMade.toString(),
+    twitterB: userB.twitterName,
+    avatarB: userB.twitterAvatarUrl ?? "",
+    displayNameB: userB.twitterDisplayName,
+    rel: args.relative ? "true" : "false",
+  });
+  return `/api/og/match?${queryParams.toString()}`;
+}
+
 
 // Verified users are users who have their Twitter handle in their GitHub bio, or have the same Twitter and GitHub handle
 export function isVerifiedUser(user: Pick<User, "twitterInGithubBio" | "twitterName" | "githubName">): boolean {

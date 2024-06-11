@@ -153,14 +153,12 @@ export function FindAMatch(props?: {
         const secondGithubName = maybeSecondGithub.split("/").pop()!.trim();
         const secondTwitterName = maybeSecondTwitter.split("/").pop()!.trim();
         if (!firstGithubName || !firstTwitterName) return;
-        void router.push(
-          getMatchPageUrl({
-            github: firstGithubName,
-            twitter: firstTwitterName,
-            toGithub: secondGithubName,
-            toTwitter: secondTwitterName,
-          }),
-        );
+        window.location.href = getMatchPageUrl({
+          github: firstGithubName,
+          twitter: firstTwitterName,
+          toGithub: secondGithubName,
+          toTwitter: secondTwitterName,
+        });
       }}
     >
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">

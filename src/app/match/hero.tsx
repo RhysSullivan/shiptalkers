@@ -147,15 +147,15 @@ export function MatchCard(props: {
     : getMatchPercentTotal(leftUser, matchedUser).toString();
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col items-center justify-center gap-8 pt-16 xl:flex-row  ">
+      <div className="grid grid-cols-1 items-center justify-center  pt-16 xl:grid-cols-3">
         <Bio
           user={leftUser}
           direction="right"
           otherUser={matchedUser}
           relative={props.relative}
         />
-        <div className="flex w-[450px] flex-col items-center gap-4">
-          <span className="text-center  text-2xl font-semibold text-gray-900 dark:text-gray-100">
+        <div className="flex max-w-[300px] flex-col items-center gap-4 px-4">
+          <span className=" text-center text-2xl font-semibold text-gray-900 dark:text-gray-100">
             {leftUser.twitterDisplayName} and {matchedUser.twitterDisplayName}{" "}
             are {parseFloat(Number(matchPercent).toFixed())}% compatible as
             cofounders

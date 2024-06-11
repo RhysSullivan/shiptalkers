@@ -15,6 +15,7 @@ import { ViewAnotherMatchCardSuggestion } from "../components.client";
 import { Home } from "./home";
 import { FindAMatch } from "./input";
 import { TweetBox } from "../../components/ui/tweet-box";
+import { getMatchPageOgImageUrl } from "../../lib/utils";
 
 type AAAA = {
   searchParams:
@@ -80,9 +81,10 @@ export default async function Component(
     return null;
   }
 
+  const og = getMatchPageOgImageUrl({ userA, userB, relative });
   return (
     <div className="mx-auto flex w-full max-w-screen-xl flex-grow flex-col items-center gap-4">
-      {userB && !compareTo && (
+      {!compareTo && (
         <>
           <h1 className="max-w-2xl py-4 text-center text-2xl font-semibold text-gray-900 dark:text-gray-100">
             The best cofounder for {userB.twitterDisplayName} is...
@@ -91,18 +93,27 @@ export default async function Component(
         </>
       )}
       <MatchCard leftUser={userA} matchedUser={userB} relative={relative} />
-      <TweetBox github="" src="" text="" twitter="" />
-      <FindAMatch
-        defaultUserAGithub={userA.githubName}
-        defaultUserATwitter={userA.twitterName}
-        defaultUserBGithub={userB.githubName}
-        defaultUserBTwitter={userB.twitterName}
-      />
-      <div className="grid grid-cols-1 gap-4 pb-48 pt-32 md:grid-cols-3 ">
+      <TweetBox src={og} text="" />
+      <div className="pt-32 text-center">
+        <h2 className="pb-8 text-2xl font-semibold text-gray-900 dark:text-gray-100">
+          Compare against another user
+        </h2>
+        <FindAMatch
+          defaultUserAGithub={userA.githubName}
+          defaultUserATwitter={userA.twitterName}
+        />
+      </div>
+      <div className="w-full pt-16 text-start">
+        <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+          View more matches
+        </h2>
+      </div>
+      <div className="grid grid-cols-1 gap-4 pb-48  md:grid-cols-3 ">
         {suggestions.map((user) => (
           <ViewAnotherMatchCardSuggestion
             key={user.twitterId}
             suggestedUser={user}
+            relative={relative}
             rootUser={userA}
           />
         ))}

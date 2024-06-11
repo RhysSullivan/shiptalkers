@@ -23,7 +23,7 @@ export function parse(props: Props) {
         };
 }
 
-export function getMatchPercentRelative(userA: HeatmaplessUser, userB: HeatmaplessUser) {
+export function getMatchPercentRelative(userA: Pick<HeatmaplessUser, "commitsMade" | "tweetsSent">, userB: Pick<HeatmaplessUser, "commitsMade" | "tweetsSent">) {
     const totalA = userA.tweetsSent + userA.commitsMade;
     const commitPercentA = Number(((userA.commitsMade / totalA) * 100).toFixed());
     const tweetPercentA = Number(((userA.tweetsSent / totalA) * 100).toFixed());
@@ -53,7 +53,7 @@ export function getMatchPercentRelative(userA: HeatmaplessUser, userB: Heatmaple
     return 100 - sim
 }
 
-export function getMatchPercentTotal(userA: HeatmaplessUser, userB: HeatmaplessUser) {
+export function getMatchPercentTotal(userA: Pick<HeatmaplessUser, "commitsMade" | "tweetsSent">, userB: Pick<HeatmaplessUser, "commitsMade" | "tweetsSent">) {
     return Math.round(
         100 -
         ((Math.abs(userB.tweetsSent - userA.commitsMade) + Math.abs(userB.commitsMade - userA.tweetsSent)) /

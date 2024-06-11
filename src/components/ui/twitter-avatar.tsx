@@ -29,7 +29,11 @@ export function TwitterAvatar(props: {
   const src = url;
   if (vercelTwitterPeople.includes(twitterName)) {
     return (
-      <a target="_blank" href={`https://vercel.lol/?utm=${twitterName}`}>
+      <a
+        target="_blank"
+        href={`https://vercel.lol/?utm=${twitterName}`}
+        key={twitterName}
+      >
         <img
           src={src}
           alt={`avatar for ${twitterName}`}
@@ -55,11 +59,13 @@ export function TwitterAvatar(props: {
     <object
       type="image/png"
       data={src}
+      key={twitterName}
       aria-label={`avatar for ${twitterName}`}
       className={cn("shrink-0 rounded-full", props.className)}
     >
       <img
         src={`https://unavatar.io/x/${twitterName}`}
+        key={twitterName}
         alt={`avatar for ${twitterName}`}
         width="150"
         height="150"
