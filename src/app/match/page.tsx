@@ -86,14 +86,19 @@ async function getData(props: SpecificCompareProps) {
     return "no second user";
   }
 
-  const og = `https://shiptalkers.dev${getMatchPageUrl({
+  const url = `https://shiptalkers.dev${getMatchPageUrl({
     github: userA.githubName,
     twitter: userA.twitterName,
     relative,
     toGithub: userB.githubName,
     toTwitter: userB.twitterName,
   })}`;
-  return { userA, userB, relative, suggestions, og, compareTo };
+  const og = `https://shiptalkers.dev${getMatchPageOgImageUrl({
+    userA,
+    userB,
+    relative,
+  })}`;
+  return { userA, userB, relative, suggestions, og, url, compareTo };
 }
 
 const dataloader = new DataLoader(
@@ -155,7 +160,7 @@ export default async function Component(
     }
   }
 
-  const { userA, userB, relative, suggestions, og, compareTo } = data;
+  const { userA, userB, relative, suggestions, og, url, compareTo } = data;
   return (
     <div className="mx-auto flex w-full max-w-screen-xl flex-grow flex-col items-center gap-4">
       {!compareTo && (
@@ -173,7 +178,7 @@ export default async function Component(
           relative
             ? getMatchPercentRelative(userA, userB)
             : getMatchPercentTotal(userA, userB)
-        }% match to be cofounders! \n\n${og}`}
+        }% match to be cofounders! \n\n${url}`}
       />
       <div className="pt-32 text-center">
         <h2 className="pb-8 text-2xl font-semibold text-gray-900 dark:text-gray-100">
