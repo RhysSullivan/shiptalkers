@@ -247,7 +247,7 @@ export function ViewAnotherMatchCardSuggestion(props: {
 export function DynamicHomeUrl() {
   const pathname = usePathname();
   return (
-    <a href={pathname.includes("/match") ? "/match" : "/"}>
+    <a href={pathname.includes("/match?") ? "/match" : "/"}>
       <h1 className="text-2xl font-bold">Shiptalkers</h1>
     </a>
   );
