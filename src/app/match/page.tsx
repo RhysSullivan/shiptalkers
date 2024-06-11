@@ -79,7 +79,7 @@ export default async function Component(
     return null;
   }
   const suggestions = await getMatchSuggestionsBasedOnTotal(userA);
-  const userB = specificUser ?? suggestions[0];
+  const userB = specificUser ?? suggestions.shift();
   if (!userB) {
     return null;
   }
