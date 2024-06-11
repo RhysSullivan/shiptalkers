@@ -1,8 +1,20 @@
 import { Github, HeartIcon, Twitter } from "lucide-react";
 import { FindAMatch } from "./input";
 import { Tweet } from "react-tweet";
-
-export function Home() {
+import { db } from "../../server/db";
+import { users } from "../../server/db/schema";
+import { desc, gt } from "drizzle-orm";
+import { getMatchPageUrl, isVerifiedUser } from "../../lib/utils";
+import { TwitterAvatar } from "../../components/ui/twitter-avatar";
+export async function Home() {
+  const recentComparisons = await db
+    .select()
+    .from(users)
+    .where(gt(users.commitsMade, 500))
+    .orderBy(desc(users.twitterFollowerCount))
+    .limit(200)
+    .execute()
+    .then((x) => x.filter(isVerifiedUser));
   return (
     <main className="mx-auto flex w-full max-w-screen-2xl flex-grow flex-col items-center justify-center overflow-x-hidden py-6 xl:pt-[calc(30vh-3.25rem)]">
       {/* bg-[linear-gradient(90deg,#8884_1px,transparent_0),linear-gradient(180deg,#8884_1px,transparent_0)] */}
@@ -20,12 +32,57 @@ export function Home() {
       </span>
       <FindAMatch />
       <div className="flex flex-col justify-center gap-4 px-2 md:flex-row md:gap-16"></div>
-      <div className="flex  flex-col items-center ">
-        <span className="text-center text-lg font-semibold">
+      <div className="flex  flex-col items-center py-16">
+        <span className=" text-center text-lg font-semibold">
           Support the launch!
         </span>
         <Tweet id={"1800585506096558567"} />
       </div>
+      <section className="flex w-full max-w-6xl flex-col items-center justify-center gap-4 rounded-md px-4 py-6 text-center">
+        <h2 className="text-2xl font-bold">{"Explore popular cofounders"}</h2>
+        <div className="grid w-full grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+          {recentComparisons
+            .map((user) => {
+              return (
+                <a
+                  className="flex flex-row items-center justify-between rounded-md border-2 bg-white p-4 drop-shadow-sm transition-all hover:scale-105 hover:border-blue-500 hover:shadow-lg"
+                  href={getMatchPageUrl({
+                    github: user.githubName,
+                    twitter: user.twitterName,
+                  })}
+                >
+                  <div className="flex flex-row items-start justify-center gap-4">
+                    <TwitterAvatar user={user} className="size-24 min-w-24" />
+                    <div className="flex h-full flex-col justify-start gap-2 text-start">
+                      <h3 className="line-clamp-2 h-full max-w-56 text-wrap text-lg font-bold leading-5">
+                        {user.twitterDisplayName}
+                      </h3>
+                      <div className="flex flex-row items-end justify-between gap-4">
+                        <div className="flex h-full flex-col items-start justify-start text-start">
+                          <span className="text-sm text-gray-500">
+                            @{user.twitterName}
+                          </span>
+                          <span className="text-sm text-gray-500">
+                            {user.twitterFollowerCount.toLocaleString()}{" "}
+                            followers
+                          </span>
+                          <span className="text-sm text-gray-500">
+                            {user.tweetsSent.toLocaleString()} tweets
+                          </span>
+                          <span className="text-sm text-gray-500">
+                            {user.commitsMade.toLocaleString()} commits
+                          </span>
+                        </div>
+                        <div className="-mb-4 flex h-full flex-col items-center justify-end pl-4"></div>
+                      </div>
+                    </div>
+                  </div>
+                </a>
+              );
+            })
+            .filter(Boolean)}
+        </div>
+      </section>
     </main>
   );
 }
