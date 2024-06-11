@@ -1,5 +1,6 @@
 import { Github, HeartIcon, Twitter } from "lucide-react";
 import { FindAMatch } from "./input";
+import { Tweet } from "react-tweet";
 
 export function Home() {
   return (
