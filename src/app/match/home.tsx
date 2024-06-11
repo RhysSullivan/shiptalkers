@@ -4,7 +4,7 @@ import { Tweet } from "react-tweet";
 
 export function Home() {
   return (
-    <main className="mx-auto flex w-full max-w-screen-2xl flex-grow flex-col items-center justify-center overflow-x-hidden py-6">
+    <main className="mx-auto flex w-full max-w-screen-2xl flex-grow flex-col items-center justify-center overflow-x-hidden py-6 xl:pt-[calc(30vh-3.25rem)]">
       {/* bg-[linear-gradient(90deg,#8884_1px,transparent_0),linear-gradient(180deg,#8884_1px,transparent_0)] */}
       <div className="absolute left-1/2 top-1/2 -z-10 hidden h-32 w-96 -translate-x-[calc(50%+16rem)] -translate-y-full -rotate-45 rounded-full bg-pink-500/20 blur-[128px] md:block" />
       <div className="absolute left-1/2 top-1/2 -z-10 hidden h-32 w-96 -translate-x-1/2 -translate-y-full -rotate-45 rounded-full bg-purple-500/20 blur-[128px] md:block" />
