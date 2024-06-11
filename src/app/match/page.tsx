@@ -21,6 +21,7 @@ import { Home } from "./home";
 import { FindAMatch } from "./input";
 import { TweetBox } from "../../components/ui/tweet-box";
 import { getMatchPageOgImageUrl, getMatchPageUrl } from "../../lib/utils";
+import Image from "next/image";
 export const revalidate = 3600; // revalidate at most every hour
 
 type AAAA = {
@@ -61,6 +62,7 @@ function parse2ElectricBoogaloo(props: SpecificCompareProps) {
 
 import DataLoader from "dataloader";
 import { Metadata } from "next";
+import { ArrowRight } from "lucide-react";
 
 async function getData(props: SpecificCompareProps) {
   if (!props.searchParams || Object.keys(props.searchParams).length === 0) {
@@ -224,6 +226,29 @@ export default async function Component(
           }% match to be cofounders! \n\n${url}`}
         />
       </div>
+      <div className="flex flex-col items-center gap-4 pt-8">
+        <Image
+          src="/clerk_logo.png"
+          className="max-w-[220px]"
+          width={600}
+          height={175}
+          alt="Clerk Logo"
+        />
+        <span className="gap-4 text-center text-xl font-semibold">
+          Found your match?{" "}
+          <a
+            href="https://clerk.com?utm_source=ad&utm_medium=website&utm_campaign=shiptalkers&utm_content=cta"
+            className="flex flex-row items-center gap-1 text-blue-500 hover:underline"
+            target="_blank"
+          >
+            Start building today with Clerk!
+            <ArrowRight size={20} className="mt-1" />
+          </a>
+        </span>
+        <span className="rounded-md bg-gray-200 px-4 py-2 text-sm">
+          Sponsored
+        </span>
+      </div>
       <div className="pt-32 text-center">
         <h2 className="pb-8 text-2xl font-semibold text-gray-900 dark:text-gray-100">
           Compare against another user
@@ -233,6 +258,7 @@ export default async function Component(
           defaultUserATwitter={userA.twitterName}
         />
       </div>
+
       <div className="flex flex-col items-center gap-4 py-8">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
           Support my other projects!
