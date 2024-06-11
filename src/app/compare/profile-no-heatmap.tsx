@@ -7,7 +7,12 @@ import {
 } from "lucide-react";
 import { RatioPie } from "./pie";
 import type { PageData } from "../../server/api/routers/get-data";
-import { getPageUrl, getRatioText, isVerifiedUser } from "../../lib/utils";
+import {
+  getMatchPageUrl,
+  getPageUrl,
+  getRatioText,
+  isVerifiedUser,
+} from "../../lib/utils";
 import { SocialData } from "../../components/ui/socialdata";
 import { TwitterAvatar } from "../../components/ui/twitter-avatar";
 import { TweetBox } from "../../components/ui/tweet-box";
@@ -18,6 +23,8 @@ import {
   TooltipTrigger,
 } from "../../components/ui/tooltip";
 import Link from "next/link";
+import { LinkButton } from "../../components/ui/link-button";
+import ShimmerButton from "../../components/ui/shimmer-button";
 
 function StreamingCTAs() {
   return (
@@ -203,11 +210,16 @@ export function Profile(props: {
           src={ogImageUrl}
         />
       </div>
-
-      <span>
-        We've given up on showing heatmaps of contribution counts and instead
-        are just doing total all time tweets & commits
-      </span>
+      <div className="py-12">
+        <ShimmerButton
+          href={getMatchPageUrl({
+            github: githubName,
+            twitter: twitterName,
+          })}
+        >
+          Find their cofounder
+        </ShimmerButton>
+      </div>
       {props.recentlyCompared}
     </div>
   );

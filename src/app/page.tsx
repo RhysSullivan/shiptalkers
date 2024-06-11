@@ -1,8 +1,8 @@
 import { Github, Twitter } from "lucide-react";
 import { Hero } from "./components.client";
 import { db } from "../server/db";
-import { HeatmaplessUser, User, users } from "../server/db/schema";
-import { desc } from "drizzle-orm";
+import { HeatmaplessUser, users } from "../server/db/schema";
+import { desc, gt } from "drizzle-orm";
 import { BrowseSection } from "./components.server";
 import {
   Table,
@@ -17,6 +17,7 @@ import { ScrollArea } from "../components/ui/scroll-area";
 import Link from "next/link";
 import { getPageUrl, isVerifiedUser } from "../lib/utils";
 import { Tweet } from "react-tweet";
+import { Button } from "../components/ui/button";
 
 export const revalidate = 600; // 10 minutes
 
@@ -88,6 +89,7 @@ export default async function Component() {
   const topTweeters = await db
     .select()
     .from(users)
+    .where(gt(users.commitsMade, 1000))
     .orderBy(desc(users.tweetsSent))
     .limit(200)
     .execute();
@@ -110,6 +112,14 @@ export default async function Component() {
         <h2 className="-ml-1.5 text-4xl font-bold">/</h2>
         <Twitter size={64} />
       </div>
+
+      <div className="flex flex-col gap-4 py-4">
+        <span className="text-balance text-center">🌟 New! 🌟</span>
+        <Button asChild variant={"blue"} className="rounded-lg">
+          <Link href={"/match"}>Find a cofounder</Link>
+        </Button>
+      </div>
+
       <span className="max-w-[600px] text-balance pb-4 text-center opacity-70">
         Find out if the person you're losing an argument to on Twitter actually
         ships code or if it's all just shiptalk
