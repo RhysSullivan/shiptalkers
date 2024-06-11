@@ -95,9 +95,19 @@ export async function GET(req: Request) {
         gap: "20px",
       }}
     >
-      <span style={{ fontSize: "2em", fontWeight: "bold" }}>
+      <div
+        style={{
+          fontSize: "2em",
+          fontWeight: "bold",
+          maxWidth: "220px",
+          textAlign: "center",
+          textOverflow: "ellipsis",
+          overflow: "hidden",
+          whiteSpace: "nowrap",
+        }}
+      >
         {props.displayName}
-      </span>
+      </div>
       <object
         type="image/png"
         data={
@@ -220,6 +230,9 @@ export async function GET(req: Request) {
             color: "gray",
             display: "flex",
             fontSize: "25px",
+            maxWidth: "1200px",
+            textWrap: "wrap",
+            lineBreak: "anywhere",
           }}
         >
           shiptalkers.dev
