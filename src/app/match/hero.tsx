@@ -72,11 +72,11 @@ function Bio(props: {
   return (
     <div
       className={cn(
-        "flex w-full max-w-[400px] items-center justify-between gap-4",
+        "flex w-full  items-center justify-between gap-4",
         direction === "left" ? "flex-row-reverse" : "flex-row",
       )}
     >
-      <div className="flex max-w-[400px]  flex-col">
+      <div className="flex max-w-[300px]  flex-col">
         <div
           className={cn(
             "flex flex-row gap-8",
@@ -103,7 +103,7 @@ function Bio(props: {
           time tweeting and {percentCommits.toFixed()}% of their time coding
         </span>
       </div>
-      <div className="hidden md:block">
+      <div className="hidden  md:block">
         <GitTweetBars
           user={user}
           barHeight={300}
@@ -114,7 +114,7 @@ function Bio(props: {
           smallestBarLast={direction === "right"}
         />
       </div>
-      <div className="md:hidden">
+      <div className=" md:hidden">
         <GitTweetBars
           user={user}
           otherUser={otherUser}
@@ -154,12 +154,12 @@ export function MatchCard(props: {
           otherUser={matchedUser}
           relative={props.relative}
         />
-        <div className="flex max-w-[300px] flex-col items-center gap-4 px-4">
-          <span className=" text-center text-2xl font-semibold text-gray-900 dark:text-gray-100">
+        <div className="flex  flex-col items-center gap-4 px-4">
+          <div className="max-w-[300px] text-center text-2xl font-semibold text-gray-900 dark:text-gray-100">
             {leftUser.twitterDisplayName} and {matchedUser.twitterDisplayName}{" "}
             are {parseFloat(Number(matchPercent).toFixed())}% compatible as
             cofounders
-          </span>
+          </div>
           <CompatibilityText leftUser={leftUser} matchedUser={matchedUser} />
         </div>
         <Bio
