@@ -1,5 +1,5 @@
 import { Github, Twitter } from "lucide-react";
-import { Hero } from "./components.client";
+import { CompareInput } from "./components.client";
 import { db } from "../server/db";
 import { HeatmaplessUser, users } from "../server/db/schema";
 import { desc, gt } from "drizzle-orm";
@@ -45,13 +45,13 @@ function TopTable(props: {
             {props.users.filter(isVerifiedUser).map((user, index) => (
               <TableRow key={user.twitterId}>
                 <TableCell
-                  className={`text-center font-bold select-none ${
+                  className={`select-none text-center font-bold ${
                     index < 3 ? "text-3xl" : "text-md"
                   }`}
                 >
                   {index + 1 <= 3 ? (
                     <>
-                      {index + 1 === 1 ? '🥇' : index + 1 === 2 ? '🥈' : '🥉'}
+                      {index + 1 === 1 ? "🥇" : index + 1 === 2 ? "🥈" : "🥉"}
                     </>
                   ) : (
                     index + 1
@@ -124,7 +124,7 @@ export default async function Component() {
         Find out if the person you're losing an argument to on Twitter actually
         ships code or if it's all just shiptalk
       </span>
-      <Hero />
+      <CompareInput />
       <div className="flex flex-col justify-center gap-4 px-2 md:flex-row md:gap-16">
         <TopTable mode="tweets" users={topTweeters} />
         <TopTable mode="commits" users={topCommitters} />

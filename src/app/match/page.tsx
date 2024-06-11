@@ -13,7 +13,10 @@ import {
 import { getUser } from "../../server/db/users";
 import { BestMatch, MatchCard } from "./hero";
 import { getMatchSuggestionsBasedOnTotal } from "./utils";
-import { ViewAnotherMatchCardSuggestion } from "../components.client";
+import {
+  CompareInput,
+  ViewAnotherMatchCardSuggestion,
+} from "../components.client";
 import { Home } from "./home";
 import { FindAMatch } from "./input";
 import { TweetBox } from "../../components/ui/tweet-box";
@@ -44,6 +47,7 @@ function parse2ElectricBoogaloo(props: SpecificCompareProps) {
   if (!hasToName && !hasToGithub) {
     return;
   }
+
   return "toName" in props.searchParams
     ? {
         toGithub: props.searchParams.toName.toLowerCase(),
@@ -81,7 +85,7 @@ async function getData(props: SpecificCompareProps) {
     return "no first user";
   }
   const suggestions = await getMatchSuggestionsBasedOnTotal(userA);
-  const userB = specificUser ?? suggestions.shift();
+  const userB = compareTo ? specificUser : suggestions.shift();
   if (!userB) {
     return "no second user";
   }
@@ -98,7 +102,19 @@ async function getData(props: SpecificCompareProps) {
     userB,
     relative,
   })}`;
-  return { userA, userB, relative, suggestions, og, url, compareTo };
+  return {
+    userA,
+    userB,
+    relative,
+    suggestions,
+    og,
+    url,
+    compareTo,
+    github: github,
+    twitter: twitter,
+    toTwitter: compareTo?.toTwitter,
+    toGithub: compareTo?.toGithub,
+  };
 }
 
 const dataloader = new DataLoader(
@@ -152,17 +168,43 @@ export default async function Component(
     if (data === "home") {
       return <Home />;
     }
+    const match = parse(props);
     if (data === "no first user") {
-      return <div>Invalid URL {JSON.stringify(props.searchParams)}</div>;
+      // center in middle of page, 100% width
+      return (
+        <div className="mx-auto flex w-full max-w-screen-xl flex-grow flex-col items-center justify-center gap-4">
+          <h1 className="max-w-2xl py-4 text-center text-2xl font-semibold text-gray-900 dark:text-gray-100">
+            {match.github} not found, first try comparing their tweets to
+            commits
+          </h1>
+          <CompareInput
+            defaultGithub={match.github}
+            defaultTwitter={match.twitter}
+          />
+        </div>
+      );
     }
     if (data === "no second user") {
-      return <div>Invalid URL {JSON.stringify(props.searchParams)}</div>;
+      const to = parse2ElectricBoogaloo(props);
+      return (
+        <div className="mx-auto flex w-full max-w-screen-xl flex-grow flex-col items-center justify-center gap-4">
+          <h1 className="max-w-2xl py-4 text-center text-2xl font-semibold text-gray-900 dark:text-gray-100">
+            {to!.toGithub} not found, first try comparing their tweets to
+            commits
+          </h1>
+          <span>The first user, {match.github} was found however</span>
+          <CompareInput
+            defaultGithub={to!.toGithub}
+            defaultTwitter={to!.toTwitter}
+          />
+        </div>
+      );
     }
   }
 
   const { userA, userB, relative, suggestions, og, url, compareTo } = data;
   return (
-    <div className="mx-auto flex w-full max-w-screen-xl flex-grow flex-col items-center gap-4">
+    <div className="mx-auto flex w-full max-w-screen-xl flex-grow flex-col items-center gap-4 ">
       {!compareTo && (
         <>
           <h1 className="max-w-2xl py-4 text-center text-2xl font-semibold text-gray-900 dark:text-gray-100">
@@ -172,14 +214,16 @@ export default async function Component(
         </>
       )}
       <MatchCard leftUser={userA} matchedUser={userB} relative={relative} />
-      <TweetBox
-        src={og}
-        text={`@${userA.twitterName} and @${userB.twitterName} are a ${
-          relative
-            ? getMatchPercentRelative(userA, userB)
-            : getMatchPercentTotal(userA, userB)
-        }% match to be cofounders! \n\n${url}`}
-      />
+      <div className="pt-8 text-center">
+        <TweetBox
+          src={og}
+          text={`@${userA.twitterName} and @${userB.twitterName} are a ${
+            relative
+              ? getMatchPercentRelative(userA, userB)
+              : getMatchPercentTotal(userA, userB)
+          }% match to be cofounders! \n\n${url}`}
+        />
+      </div>
       <div className="pt-32 text-center">
         <h2 className="pb-8 text-2xl font-semibold text-gray-900 dark:text-gray-100">
           Compare against another user

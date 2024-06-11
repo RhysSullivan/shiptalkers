@@ -147,7 +147,7 @@ export function MatchCard(props: {
     : getMatchPercentTotal(leftUser, matchedUser).toString();
   return (
     <div className="flex flex-col gap-4">
-      <div className="grid grid-cols-1 items-center justify-center  pt-16 xl:grid-cols-3">
+      <div className="grid grid-cols-1 items-center justify-center  gap-8 pt-16 xl:grid-cols-3">
         <Bio
           user={leftUser}
           direction="right"
