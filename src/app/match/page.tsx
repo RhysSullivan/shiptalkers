@@ -21,6 +21,7 @@ import { Home } from "./home";
 import { FindAMatch } from "./input";
 import { TweetBox } from "../../components/ui/tweet-box";
 import { getMatchPageOgImageUrl, getMatchPageUrl } from "../../lib/utils";
+export const revalidate = 3600; // revalidate at most every hour
 
 type AAAA = {
   searchParams:

@@ -10,6 +10,7 @@ import { fetchGithubPage } from "../../server/lib/github";
 import { fetchTwitterProfile } from "../../server/lib/twitter";
 import { db } from "../../server/db";
 import { users } from "../../server/db/schema";
+export const revalidate = 3600; // revalidate at most every hour
 
 async function getPageDataInternal(props: Props) {
   const { github, twitter } = parse(props);
