@@ -23,7 +23,7 @@ export function Home() {
         <span className="text-center text-lg font-semibold">
           Support the launch!
         </span>
-        {/* <Tweet id={"1798512543574708731"} /> */}
+        <Tweet id={"1800585506096558567"} />
       </div>
     </main>
   );
