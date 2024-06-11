@@ -237,7 +237,7 @@ export default async function Component(
         <span className="gap-4 text-center text-xl font-semibold">
           Found your match?{" "}
           <a
-            href="https://clerk.com?utm_source=shiptalkers.dev"
+            href="https://clerk.com?utm_source=ad&utm_medium=website&utm_campaign=shiptalkers&utm_content=cta"
             className="flex flex-row items-center gap-1 text-blue-500 hover:underline"
             target="_blank"
           >
