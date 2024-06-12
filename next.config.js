@@ -22,6 +22,9 @@ const config = {
       },
     ];
   },
+  experimental: {
+    ppr: true,
+  },
 };
 
 module.exports = config;

@@ -41,9 +41,12 @@ const fetchGitHubProfile = async (
   return response.json() as Promise<GithubMetadata>;
 };
 
-export function Hero() {
+export function CompareInput(props: {
+  defaultTwitter?: string;
+  defaultGithub?: string;
+}) {
   const router = useRouter();
-  const [githubUrl, setGithubUrl] = useState<string>("");
+  const [githubUrl, setGithubUrl] = useState<string>(props.defaultGithub ?? "");
   const [twitterUrl, setTwitterUrl] = useState<string | null>(null);
   const [debouncedGithubUrl, setDebouncedGithubUrl] =
     useState<string>(githubUrl);
@@ -116,7 +119,9 @@ export function Hero() {
             className="w-full min-w-[300px] rounded-lg bg-white/70 backdrop-blur-sm backdrop-saturate-200"
             name="twitter-url"
             required
-            defaultValue={profileData?.twitter_username ?? ""}
+            defaultValue={
+              props.defaultTwitter ?? profileData?.twitter_username ?? ""
+            }
             placeholder="Twitter Profile Name"
           />
           {/* spinner if loading, slow speed */}
