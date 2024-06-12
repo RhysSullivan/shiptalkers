@@ -3,7 +3,7 @@ import { TwitterAvatar } from "../../components/ui/twitter-avatar";
 import type { HeatmaplessUser } from "../../server/db/schema";
 import type { MatchedUser } from "./utils";
 import Link from "next/link";
-import { cn, getPageUrl } from "../../lib/utils";
+import { cn, getCategory, getPageUrl } from "../../lib/utils";
 import { GitTweetBars } from "../../components/ui/git-tweet-bars";
 import { getMatchPercentRelative, getMatchPercentTotal } from "../utils";
 import { Switch } from "../../components/ui/switch";
@@ -12,6 +12,7 @@ import { ToggleRelative } from "./toggle-relative";
 
 function Stats(props: { user: HeatmaplessUser; className?: string }) {
   const { user } = props;
+  const tagline = getCategory({tweets: user.tweetsSent, commits: user.commitsMade, displayName: user.twitterDisplayName});
   return (
     <div className={cn("flex flex-col md:w-[300px]", props.className)}>
       <Link
@@ -23,6 +24,7 @@ function Stats(props: { user: HeatmaplessUser; className?: string }) {
       >
         {user.twitterDisplayName}
       </Link>
+      <span className={cn("font-serif text-sm text-blue-400")}>[{tagline}]</span>
       <div className="flex items-center gap-2">
         <TwitterIcon className="h-5 w-5 text-gray-600 dark:text-gray-400" />
         <Link
@@ -69,6 +71,11 @@ function Bio(props: {
   const total = user.tweetsSent + user.commitsMade;
   const percentTweets = (user.tweetsSent / total) * 100;
   const percentCommits = (user.commitsMade / total) * 100;
+  const tagline = getCategory({
+    tweets: user.tweetsSent,
+    commits: user.commitsMade,
+    displayName: user.twitterDisplayName,
+  });
   return (
     <div
       className={cn(
