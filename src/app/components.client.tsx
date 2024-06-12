@@ -12,7 +12,8 @@ import { GitTweetBars } from "../components/ui/git-tweet-bars";
 import { TwitterAvatar } from "../components/ui/twitter-avatar";
 import { getMatchPageUrl, getPageUrl } from "../lib/utils";
 import { getMatchPercentRelative, getMatchPercentTotal } from "./utils";
-import { getCategory } from "../lib/utils";
+import { getUserTagline } from "../lib/utils";
+import Tag from "../components/custom/Tag";
 
 // Debounce function
 // eslint-disable-next-line @typescript-eslint/ban-types
@@ -149,7 +150,7 @@ export function CompareInput(props: {
 
 export function ComparisonCard(props: { user: HeatmaplessUser }) {
   const { user } = props;
-  const tagLine = getCategory({
+  const tagLine = getUserTagline({
     tweets: user.tweetsSent,
     commits: user.commitsMade,
     displayName: user.twitterDisplayName,
@@ -169,7 +170,7 @@ export function ComparisonCard(props: { user: HeatmaplessUser }) {
           <h3 className="line-clamp-2 flex h-full max-w-56 items-center gap-2  text-lg font-bold leading-5">
             {user.twitterDisplayName}
           </h3>
-          <span className="font-serif text-sm text-blue-400">[{tagLine}]</span>
+          <Tag tagline={tagLine} />
           <div className="flex flex-row items-end justify-between gap-4">
             <div className="flex h-full flex-col items-start justify-start text-start">
               <span className="text-sm text-gray-500">@{user.twitterName}</span>
@@ -204,6 +205,12 @@ export function ViewAnotherMatchCardSuggestion(props: {
   relative: boolean;
 }) {
   const { suggestedUser, rootUser } = props;
+  const tagline = getUserTagline({
+    tweets: suggestedUser.tweetsSent,
+    commits: suggestedUser.commitsMade,
+    displayName: suggestedUser.twitterDisplayName,
+    twitterFollowerCount: suggestedUser.twitterFollowerCount,
+  });
   return (
     <a
       className="flex flex-row items-center justify-between rounded-md border-2  p-4 drop-shadow-sm transition-all hover:scale-105 hover:border-blue-500 hover:shadow-lg"
@@ -218,8 +225,9 @@ export function ViewAnotherMatchCardSuggestion(props: {
       <div className="flex flex-row items-center justify-center gap-4">
         <TwitterAvatar user={suggestedUser} className="size-24 min-w-24" />
         <div className="flex h-full flex-col justify-start gap-2 text-start">
-          <h3 className="line-clamp-2 h-full max-w-56 text-wrap text-lg font-bold leading-5">
+          <h3 className="line-clamp-2 flex h-full max-w-56 flex-col gap-1 text-wrap text-lg font-bold leading-5">
             {suggestedUser.twitterDisplayName}
+            <Tag tagline={tagline} />
           </h3>
           <div className="flex flex-row items-end justify-between gap-4">
             <div className="flex h-full flex-col items-start justify-start text-start">

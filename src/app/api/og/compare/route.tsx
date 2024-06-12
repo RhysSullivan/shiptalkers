@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import { ImageResponse } from "next/og";
 import { GitTweetBars } from "../../../../components/ui/git-tweet-bars";
-import { getCategory, getPageUrl, getRatioText } from "../../../../lib/utils";
+import { getUserTagline, getPageUrl, getRatioText } from "../../../../lib/utils";
 export const runtime = "edge";
 
 export async function GET(req: Request) {
@@ -22,13 +22,12 @@ export async function GET(req: Request) {
     !displayName ||
     !followers
   ) {
-    console.log("Missing parameters");
     return new Response("Missing parameters", { status: 400 });
   }
   const commits = Number(commitsS);
   const tweets = Number(tweetsS);
   const txt = getRatioText({ tweets, commits, displayName });
-  const tagLine = getCategory({
+  const tagLine = getUserTagline({
     tweets,
     commits,
     displayName,
@@ -42,7 +41,7 @@ export async function GET(req: Request) {
         fontSize: "25px",
       }}
     >
-      <h1
+      <div
         style={{
           display: "flex",
           flexDirection: "row",
@@ -51,17 +50,9 @@ export async function GET(req: Request) {
           gap: "10px",
         }}
       >
-        {displayName}
-        <span
-          style={{
-            fontSize: "35px",
-            fontWeight: "bolder",
-            color: "#60a5fa",
-          }}
-        >
-          [{tagLine}]
-        </span>
-      </h1>
+        <h1>{displayName}</h1>
+        <UserTag />
+      </div>
       <div
         style={{
           display: "flex",
@@ -72,7 +63,8 @@ export async function GET(req: Request) {
           fontSize: "24px",
           paddingBottom: "15px",
           fontWeight: "bold",
-        }}>
+        }}
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="48"
@@ -165,6 +157,22 @@ export async function GET(req: Request) {
       <UserMetadata />
     </div>
   );
+  const UserTag = () => {
+    return (
+      <div
+        style={{
+          backgroundColor: "#a855f7",
+          padding: "0.3rem 0.75rem",
+          fontSize: "2rem",
+          fontWeight: "semibold",
+          color: "white",
+          borderRadius: "9999px",
+        }}
+      >
+        {tagLine}
+      </div>
+    );
+  };
 
   const url = `shiptalkers.dev${getPageUrl({
     github,

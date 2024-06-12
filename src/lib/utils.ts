@@ -115,7 +115,7 @@ export function getMatchPageOgImageUrl(args: {
 export function isVerifiedUser(user: Pick<User, "twitterInGithubBio" | "twitterName" | "githubName">): boolean {
   return user.twitterInGithubBio || user.twitterName === user.githubName;
 }
-export function getCategory(input: {
+export function getUserTagline(input: {
   tweets: number,
   commits: number,
   displayName: string,
@@ -123,19 +123,19 @@ export function getCategory(input: {
 }): string {
   const { tweets, commits, twitterFollowerCount } = input;
   const ratio = (commits / tweets);
+  if (twitterFollowerCount && twitterFollowerCount > 100000) return "Popular";
   switch (true) {
     case (ratio >= 5):
-      return "Code Master";
+      return "No life";
     case (ratio >= 3 && ratio < 5):
-      return "Grinder";
+      return "Nerd";
     case (ratio >= 2 && ratio < 3):
-      return "Diligent Coder";
+      return "Builder";
     case (ratio >= 1 && ratio < 2):
-      return "Perfectly Balanced";
+      return "Load Balancer";
     case (ratio >= 0.5 && ratio < 1):
       return "Shiposter";
     case (ratio >= 0.333 && ratio < 0.5):
-      if (twitterFollowerCount && twitterFollowerCount > 100000) return "Founder";
       return "Indie Hacker";
     case (ratio >= 0.25 && ratio < 0.333):
       return "Reply Guy";
