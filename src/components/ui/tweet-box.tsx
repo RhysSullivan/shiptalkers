@@ -99,17 +99,7 @@ export function TweetBox(props: {
       });
 
       // Copy to clipboard if available
-      if (navigator.clipboard?.write) {
-        await navigator.clipboard.write([
-          new ClipboardItem({
-            [imageData.type]: imageData,
-          }),
-        ]);
-        setCopySuccess(true);
-        setTimeout(() => {
-          setCopySuccess(false);
-        }, 2000);
-      } else if (navigator.share) {
+      if (navigator.share) {
         const file = new File([imageData], "image.png", {
           type: imageData.type,
         });
@@ -118,6 +108,16 @@ export function TweetBox(props: {
           text: "Check out my Shiptalkers image!",
           files: [file],
         });
+        setCopySuccess(true);
+        setTimeout(() => {
+          setCopySuccess(false);
+        }, 2000);
+      } else if (navigator.clipboard?.write) {
+        await navigator.clipboard.write([
+          new ClipboardItem({
+            [imageData.type]: imageData,
+          }),
+        ]);
         setCopySuccess(true);
         setTimeout(() => {
           setCopySuccess(false);
