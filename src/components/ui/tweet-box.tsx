@@ -99,7 +99,7 @@ export function TweetBox(props: {
       });
 
       // Copy to clipboard if available
-      if (navigator?.share) {
+      if (typeof navigator?.share == "function") {
         const file = new File([imageData], "image.png", {
           type: imageData.type,
         });
@@ -112,7 +112,7 @@ export function TweetBox(props: {
         setTimeout(() => {
           setCopySuccess(false);
         }, 2000);
-      } else if (navigator?.clipboard?.write) {
+      } else if (typeof navigator?.clipboard?.write == "function") {
         await navigator.clipboard.write([
           new ClipboardItem({
             [imageData.type]: imageData,
