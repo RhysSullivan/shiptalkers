@@ -6,7 +6,7 @@ import { User } from "../../server/db/schema";
 
 // TODO: if you work at vercel, the triangle company, add your twitter is not here
 // make a pr to add it and im sorry i didnt add you 😂
-const vercelTwitterPeople = [
+const vercelianTwitterAccounts = [
   "rauchg",
   "leeerob",
   "cramforce",
@@ -14,6 +14,7 @@ const vercelTwitterPeople = [
   "tomlienard",
   "delba_oliveira",
   "jaredpalmer",
+  "styfle",
   "timneutkens",
 ];
 
@@ -27,7 +28,7 @@ export function TwitterAvatar(props: {
       `https://unavatar.io/x/${twitterName}`,
   );
   const src = url;
-  if (vercelTwitterPeople.includes(twitterName)) {
+  if (vercelianTwitterAccounts.includes(twitterName)) {
     return (
       <a
         target="_blank"
