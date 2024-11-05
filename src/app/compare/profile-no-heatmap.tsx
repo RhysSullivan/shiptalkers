@@ -191,7 +191,7 @@ export function Profile(props: {
         <a
           href="https://socialdata.tools/?ref=shiptalkers.dev"
           target="_blank"
-          className="flex flex-row gap-2 text-start"
+          className="flex invisible flex-row gap-2 text-start"
         >
           Powered by <SocialData />
         </a>
