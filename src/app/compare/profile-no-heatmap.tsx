@@ -8,6 +8,7 @@ import {
 import { RatioPie } from "./pie";
 import type { PageData } from "../../server/api/routers/get-data";
 import {
+  getUserTagline,
   getMatchPageUrl,
   getPageUrl,
   getRatioText,
@@ -25,6 +26,7 @@ import {
 import Link from "next/link";
 import { LinkButton } from "../../components/ui/link-button";
 import ShimmerButton from "../../components/ui/shimmer-button";
+import Tag from "../../components/custom/Tag";
 
 function StreamingCTAs() {
   return (
@@ -92,13 +94,13 @@ export function Profile(props: {
 
   const totalCommits = commitsMade;
   const totalTweets = tweetsSent;
-
   const ogUrl = new URLSearchParams({
     github: githubName,
     displayName: twitterDisplayName,
     twitter: twitterName,
     commits: totalCommits.toString(),
     tweets: totalTweets.toString(),
+    followers:Math.max(twitterFollowerCount, githubFollowerCount).toString()
   });
   if (pageData.user.twitterAvatarUrl) {
     ogUrl.set("avatar", pageData.user.twitterAvatarUrl);
@@ -111,6 +113,12 @@ export function Profile(props: {
     github: githubName,
     twitter: twitterName,
   })}`;
+  const tagline = getUserTagline({
+    tweets: totalTweets,
+    commits: totalCommits,
+    displayName: twitterDisplayName,
+    twitterFollowerCount: twitterFollowerCount,
+  });
   return (
     <div className="mx-auto flex w-full max-w-screen-xl flex-grow flex-col items-center  py-8">
       <div className="flex w-full flex-row items-center justify-between gap-4 md:mx-auto">
@@ -119,6 +127,16 @@ export function Profile(props: {
           <div className="flex flex-col justify-between gap-4 py-4">
             <div className="flex flex-col">
               <div className="flex flex-col">
+              <TooltipProvider>
+                <Tooltip delayDuration={100}>
+                  <TooltipTrigger className="flex flex-row items-center gap-1">
+                    <Tag tagline={tagline} className="text-base py-0"/>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-[260px]">
+                    {tagline} 😃
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
                 <div className="flex flex-row items-center gap-1">
                   <TwitterIcon size={20} />
                   <a
