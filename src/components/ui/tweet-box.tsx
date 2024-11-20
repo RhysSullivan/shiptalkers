@@ -92,24 +92,44 @@ export function TweetBox(props: {
       ctx.drawImage(img, 0, 0);
 
       const imageData: Blob = await new Promise((resolve) => {
-        canvas.toBlob((a) => a && resolve(a));
+        canvas.toBlob((blob) => {
+          if (blob) resolve(blob);
+          else throw new Error("Canvas toBlob failed.");
+        });
       });
 
-      await navigator.clipboard.write([
-        new ClipboardItem({
-          [imageData.type]: imageData,
-        }),
-      ]);
-
-      setCopySuccess(true);
-      setTimeout(() => {
-        setCopySuccess(false);
-      }, 2000);
+      // Copy to clipboard if available
+      if (typeof navigator?.share == "function") {
+        const file = new File([imageData], "image.png", {
+          type: imageData.type,
+        });
+        await navigator.share({
+          title: "Share Image",
+          text: "Check out my Shiptalkers image!",
+          files: [file],
+        });
+        setCopySuccess(true);
+        setTimeout(() => {
+          setCopySuccess(false);
+        }, 2000);
+      } else if (typeof navigator?.clipboard?.write == "function") {
+        await navigator.clipboard.write([
+          new ClipboardItem({
+            [imageData.type]: imageData,
+          }),
+        ]);
+        setCopySuccess(true);
+        setTimeout(() => {
+          setCopySuccess(false);
+        }, 2000);
+      } else {
+        console.error("Both Clipboard and Share APIs are not available.");
+      }
     } catch (error) {
       console.error("Error copying image: ", error);
     }
   };
-
+  
   return (
     <div className="mx-auto max-w-[100vw] rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-800 dark:bg-gray-950">
       <div className="overflow-hidden  border-b-2 border-gray-200 dark:border-gray-800">
