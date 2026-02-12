@@ -60,7 +60,6 @@ function parse2ElectricBoogaloo(props: SpecificCompareProps) {
       };
 }
 
-import DataLoader from "dataloader";
 import { Metadata } from "next";
 import { ArrowRight } from "lucide-react";
 
@@ -119,18 +118,10 @@ async function getData(props: SpecificCompareProps) {
   };
 }
 
-const dataloader = new DataLoader(
-  // @ts-expect-error - this is a hack to make the types work
-  async (props: SpecificCompareProps[]) => {
-    return Promise.all(props.map(getData));
-  },
-  { cacheKeyFn: (props) => JSON.stringify(props) },
-);
-
 export async function generateMetadata(
   props: SpecificCompareProps,
 ): Promise<Metadata> {
-  const data = await dataloader.load(props);
+  const data = await getData(props);
   if (typeof data === "string") {
     if (data == "home") {
       return {
@@ -165,7 +156,7 @@ export default async function Component(
     };
   },
 ) {
-  const data = await dataloader.load(props);
+  const data = await getData(props);
   if (typeof data === "string") {
     if (data === "home") {
       return <Home />;
