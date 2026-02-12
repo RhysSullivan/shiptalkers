@@ -56,18 +56,9 @@ async function getPageDataInternal(props: Props) {
   } as const;
 }
 
-// unstable cache and react cache don't seem to deduplicate properly
-import Dataloader from "dataloader";
 import { revalidatePath } from "next/cache";
 import { getPageUrl } from "../../lib/utils";
 import { Props, parse } from "../utils";
-const dataloader = new Dataloader(
-  // @ts-expect-error - this is a hack to make the types work
-  async (props: Props[]) => {
-    return Promise.all(props.map(getPageDataInternal));
-  },
-  { cacheKeyFn: (props) => JSON.stringify(props) },
-);
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
   let github: string;
@@ -122,7 +113,7 @@ export default async function Page(props: Props) {
   }
 
   try {
-    const { user, status } = await dataloader.load(props);
+    const { user, status } = await getPageDataInternal(props);
     if (status !== "fetched" && status !== "cached") {
       return <div>{status}</div>;
     }

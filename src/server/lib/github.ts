@@ -11,6 +11,7 @@ async function fetchTotalContributions(name: string) {
     const url = `https://github.com/${name}?action=show&controller=profiles&tab=contributions&user_id=${name}`;
     const data = await fetch(url,
         {
+            cache: "no-store",
             headers: {
                 connection: "keep-alive",
                 "X-Requested-With": "XMLHttpRequest",
@@ -37,7 +38,9 @@ async function fetchTotalContributions(name: string) {
             from: `${year}-01-01`,
             to: `${year}-12-31`,
         });
-        const result = await fetch(`https://github.com/users/${name}/contributions?${queryParams.toString()}`);
+        const result = await fetch(`https://github.com/users/${name}/contributions?${queryParams.toString()}`, {
+            cache: "no-store",
+        });
         if (!result.ok) {
             console.error(`Failed to fetch Github contributions for ${name} ${result.status} ${url} ${result.statusText}`);
             return;
@@ -100,7 +103,9 @@ async function fetchGithubMetadata(name: string): Promise<GithubMetadata | undef
     if (cached && !('json' in cached) && 'login' in cached) {
         return cached;
     }
-    const data = await fetch(`https://api.github.com/users/${name}`);
+    const data = await fetch(`https://api.github.com/users/${name}`, {
+        cache: "no-store",
+    });
     if (!data.ok) {
         console.error(`Failed to fetch Github metadata for ${name} ${data.status}`);
         return;

@@ -30,6 +30,7 @@ export async function fetchTwitterProfile(name: string) {
     const userInfo =
         await fetch(`https://api.socialdata.tools/twitter/user/${name}`, {
             method: "GET",
+            cache: "no-store",
             headers: {
                 Authorization: `Bearer ${process.env.SOCIAL_DATA_API_KEY}`,
                 Accept: "application/json",
@@ -94,6 +95,7 @@ async function fetchFromSocialData(input: {
     const res = await throttle(async () => {
         return await fetch(apiUrl, {
             method: "GET",
+            cache: "no-store",
             headers: {
                 Authorization: `Bearer ${process.env.SOCIAL_DATA_API_KEY}`,
                 Accept: "application/json",
