@@ -81,6 +81,43 @@ Unused in production (left as they are, not migrated):
 CPU per request, measured with `wrangler tail`: `/compare` 41–334 ms,
 `/match` 103–426 ms, `/` 150–456 ms (it renders about 600 cards and tables).
 
+## Alternative: vinext instead of OpenNext
+
+This branch builds the same app with [vinext](https://github.com/cloudflare/vinext)
+1.3 (Cloudflare's Vite reimplementation of the Next.js API). The D1/KV port,
+data invariants, migration scripts, and cutover plan are unchanged.
+
+Changes compared with the OpenNext branch:
+
+- `vite.config.ts` and `cloudflare.config.ts` (deployed with `cf`) replace
+  `wrangler.jsonc` and `open-next.config.ts`. `vinext init` set
+  `"type": "module"`, so `next.config.js` and `prettier.config` are ESM/CJS
+  accordingly.
+- Bindings are read with `import { env } from "cloudflare:workers"`.
+- `/` keeps `revalidate = 600`. vinext's Workers Cache adapter serves it as
+  ISR at the edge without build-time database access.
+- React 19.3.1 and TypeScript 5.9 (needed by the Vite plugin types).
+
+Measured on the preview against the same synthetic D1:
+
+| | OpenNext | vinext |
+| --- | --- | --- |
+| Build | ~60 s | ~5 s |
+| Worker upload (gzip) | 2.1 MiB | 1.6 MiB |
+| Startup | 23 ms | 2 ms |
+| `/` CPU | 150–456 ms on every request | ~30 ms on a cache hit; 25–71 ms observed |
+| `/compare`, `/match` | Dynamic | Dynamic (`BYPASS`); each comparison renders separately |
+| Rendered text on `/`, `/compare`, `/match` | Baseline | Identical |
+| Invocations per uncached request | 1 | 2 (routing Worker plus response stage) |
+
+Risks:
+
+- The Cloudflare toolchain it uses is pre-release: `@cloudflare/vite-plugin`
+  2.0.0-beta and `cf` 1.0.0-beta.
+- vinext does not aim for parity with undocumented Next.js behaviour.
+- Not yet observed on the preview: ISR stale-while-revalidate after the
+  600 s window, and `revalidatePath` purges.
+
 ## Data invariants
 
 D1 (`tweetstocommits_user`):

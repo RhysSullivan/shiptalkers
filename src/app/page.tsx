@@ -19,8 +19,7 @@ import { getPageUrl, isVerifiedUser } from "../lib/utils";
 import { Tweet } from "react-tweet";
 import { Button } from "../components/ui/button";
 
-// Rendered per request: the leaderboard reads D1, which is not available at build time.
-export const dynamic = "force-dynamic";
+export const revalidate = 600; // 10 minutes
 
 function TopTable(props: {
   mode: "commits" | "tweets";
