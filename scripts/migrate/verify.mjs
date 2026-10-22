@@ -20,7 +20,7 @@ function wrangler(args) {
   return JSON.parse(out);
 }
 
-const PAGE = 200;
+const PAGE = 1000;
 const d1Rows = [];
 for (let offset = 0; ; offset += PAGE) {
   const [result] = wrangler(["d1", "execute", database, "--remote", "--json", "--command", `${D1_SELECT} ORDER BY rowid LIMIT ${PAGE} OFFSET ${offset}`]);
