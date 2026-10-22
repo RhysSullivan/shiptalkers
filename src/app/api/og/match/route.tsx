@@ -7,7 +7,6 @@ import {
   getRatioText,
 } from "../../../../lib/utils";
 import { getMatchPercentRelative, getMatchPercentTotal } from "../../../utils";
-export const runtime = "edge";
 type ParsedUser = {
   github: string;
   twitter: string;

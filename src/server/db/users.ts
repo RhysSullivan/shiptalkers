@@ -1,4 +1,4 @@
-import { db } from "./index";
+import { getDb } from "./index";
 import { users } from "./schema";
 import { eq, and } from "drizzle-orm";
 export async function getUser(props: {
@@ -6,7 +6,7 @@ export async function getUser(props: {
     twitter: string;
 }) {
     const { github, twitter } = props;
-    return db
+    return getDb()
         .select()
         .from(users)
         .where(and(eq(users.githubName, github), eq(users.twitterName, twitter)))

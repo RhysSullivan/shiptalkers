@@ -61,3 +61,10 @@ export function getMatchPercentTotal(userA: Pick<HeatmaplessUser, "commitsMade" 
         100
     );
 }
+export type AsyncSearchParams<T extends { searchParams: unknown }> = Omit<T, "searchParams"> & {
+    searchParams: Promise<T["searchParams"]>;
+};
+
+export async function resolveSearchParams<T extends { searchParams: unknown }>(props: AsyncSearchParams<T>): Promise<T> {
+    return { ...props, searchParams: await props.searchParams } as T;
+}

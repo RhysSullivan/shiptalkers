@@ -1,6 +1,6 @@
 import { Github, Twitter } from "lucide-react";
 import { CompareInput } from "./components.client";
-import { db } from "../server/db";
+import { getDb } from "../server/db";
 import { HeatmaplessUser, users } from "../server/db/schema";
 import { desc, gt } from "drizzle-orm";
 import { BrowseSection } from "./components.server";
@@ -86,19 +86,21 @@ function TopTable(props: {
 }
 
 export default async function Component() {
-  const topTweeters = await db
-    .select()
-    .from(users)
-    .where(gt(users.commitsMade, 1000))
-    .orderBy(desc(users.tweetsSent))
-    .limit(200)
-    .execute();
-  const topCommitters = await db
-    .select()
-    .from(users)
-    .orderBy(desc(users.commitsMade))
-    .limit(200)
-    .execute();
+  const [topTweeters, topCommitters] = await Promise.all([
+    getDb()
+      .select()
+      .from(users)
+      .where(gt(users.commitsMade, 1000))
+      .orderBy(desc(users.tweetsSent))
+      .limit(200)
+      .execute(),
+    getDb()
+      .select()
+      .from(users)
+      .orderBy(desc(users.commitsMade))
+      .limit(200)
+      .execute(),
+  ]);
 
   return (
     <main className="mx-auto flex w-full max-w-screen-2xl flex-grow flex-col items-center justify-center overflow-x-hidden py-6 xl:pt-[calc(30vh-3.25rem)]">

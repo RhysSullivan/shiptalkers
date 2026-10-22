@@ -1,5 +1,5 @@
 import { and, asc, desc, eq, not, or, sql } from "drizzle-orm";
-import { db } from "../../server/db";
+import { getDb } from "../../server/db";
 import { HeatmaplessUser, users } from "../../server/db/schema";
 
 export type MatchedUser = HeatmaplessUser & {
@@ -9,7 +9,7 @@ export type MatchedUser = HeatmaplessUser & {
 export async function getMatchSuggestionsBasedOnTotal(
     forUser: HeatmaplessUser
 ) {
-    const foundUsers = await db
+    const foundUsers = await getDb()
         // @ts-expect-error idk drizzle
         .select({
             matchPercent: sql`100 - ((ABS(${users.tweetsSent} - ${forUser.commitsMade}) + ABS(${users.commitsMade} - ${forUser.tweetsSent})) / (${forUser.tweetsSent} + ${forUser.commitsMade})) * 100`,
@@ -41,7 +41,7 @@ export async function getMatchSuggestionBasedOnRelative(forUser: HeatmaplessUser
     const totalA = forUser.tweetsSent + forUser.commitsMade;
     const commitPercentA = forUser.commitsMade / totalA;
     const tweetPercentA = forUser.tweetsSent / totalA;
-    const foundUsers = await db
+    const foundUsers = await getDb()
         .select(
     )
         .from(users)

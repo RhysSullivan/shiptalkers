@@ -8,7 +8,7 @@ import { Suspense } from "react";
 import { BrowseSection } from "../components.server";
 import { fetchGithubPage } from "../../server/lib/github";
 import { fetchTwitterProfile } from "../../server/lib/twitter";
-import { db } from "../../server/db";
+import { getDb } from "../../server/db";
 import { users } from "../../server/db/schema";
 export const revalidate = 3600; // revalidate at most every hour
 
@@ -58,9 +58,17 @@ async function getPageDataInternal(props: Props) {
 
 import { revalidatePath } from "next/cache";
 import { getPageUrl } from "../../lib/utils";
-import { Props, parse } from "../utils";
+import {
+  type AsyncSearchParams,
+  type Props,
+  parse,
+  resolveSearchParams,
+} from "../utils";
 
-export async function generateMetadata(props: Props): Promise<Metadata> {
+export async function generateMetadata(
+  pageProps: AsyncSearchParams<Props>,
+): Promise<Metadata> {
+  const props = await resolveSearchParams(pageProps);
   let github: string;
   let twitter: string;
   try {
@@ -101,7 +109,8 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   };
 }
 export const maxDuration = 60;
-export default async function Page(props: Props) {
+export default async function Page(pageProps: AsyncSearchParams<Props>) {
+  const props = await resolveSearchParams(pageProps);
   let github: string;
   let twitter: string;
   try {
@@ -123,7 +132,8 @@ export default async function Page(props: Props) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { heatmapData, ...restForLogging } = rest;
       console.log("Writing to db", restForLogging);
-      await db.insert(users).values(rest).onDuplicateKeyUpdate({
+      await getDb().insert(users).values(rest).onConflictDoUpdate({
+        target: [users.githubName, users.twitterName],
         set: restForLogging,
       });
       revalidatePath(

@@ -105,12 +105,14 @@ async function fetchGithubMetadata(name: string): Promise<GithubMetadata | undef
     }
     const data = await fetch(`https://api.github.com/users/${name}`, {
         cache: "no-store",
+        // Workers fetch sends no default User-Agent, which GitHub rejects with 403.
+        headers: { "User-Agent": "shiptalkers.dev" },
     });
     if (!data.ok) {
         console.error(`Failed to fetch Github metadata for ${name} ${data.status}`);
         return;
     } else {
-        const json = await data.json() as Promise<GithubMetadata>;
+        const json: GithubMetadata = await data.json();
         await writeToCache(`${name}-metadata-github`, json);
         return json;
     }

@@ -37,7 +37,8 @@ const fetchGitHubProfile = async (
   if (!response.ok) {
     throw new Error("Profile not found");
   }
-  return response.json() as Promise<GithubMetadata>;
+  const metadata: GithubMetadata = await response.json();
+  return metadata;
 };
 
 export function CompareInput(props: {

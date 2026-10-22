@@ -8,6 +8,8 @@ import {
   getMatchPercentRelative,
   getMatchPercentTotal,
   parse,
+  resolveSearchParams,
+  type AsyncSearchParams,
   type Props,
 } from "../utils";
 import { getUser } from "../../server/db/users";
@@ -119,8 +121,9 @@ async function getData(props: SpecificCompareProps) {
 }
 
 export async function generateMetadata(
-  props: SpecificCompareProps,
+  pageProps: AsyncSearchParams<SpecificCompareProps>,
 ): Promise<Metadata> {
+  const props = await resolveSearchParams(pageProps);
   const data = await getData(props);
   if (typeof data === "string") {
     if (data == "home") {
@@ -150,12 +153,9 @@ export async function generateMetadata(
 }
 
 export default async function Component(
-  props: SpecificCompareProps & {
-    searchParams: {
-      rel?: string;
-    };
-  },
+  pageProps: AsyncSearchParams<SpecificCompareProps>,
 ) {
+  const props = await resolveSearchParams(pageProps);
   const data = await getData(props);
   if (typeof data === "string") {
     if (data === "home") {
