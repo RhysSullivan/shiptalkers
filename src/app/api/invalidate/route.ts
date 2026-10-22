@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     const token = parsed.get("token");
     const reset = parsed.get("reset");
     if (token !== process.env.INVALIDATE_TOKEN) {
-        console.log("Unauthorized", token, process.env.INVALIDATE_TOKEN)
+        console.log("Unauthorized invalidate request")
         return new Response("Unauthorized", { status: 401 });
     }
     if (!github || !twitter) {

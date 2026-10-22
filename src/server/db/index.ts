@@ -1,7 +1,7 @@
 import * as schema from "./schema";
 import { drizzle } from "drizzle-orm/d1";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { env } from "cloudflare:workers";
 
 export function getDb() {
-  return drizzle(getCloudflareContext().env.DB, { schema });
+  return drizzle(env.DB, { schema });
 }

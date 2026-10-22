@@ -1,11 +1,15 @@
 // Read-only export from Railway into D1/KV import files. Writes nothing to
 // either source. Usage:
 //   DATABASE_URL=... REDIS_URL=... node scripts/migrate/export.mjs <outDir>
+//   DUMP_FILE=dump.json node scripts/migrate/export.mjs <outDir>
+// A dump holds { rows, redis: { entries: [{ key, value, pttl }] } } produced
+// by the same queries inside the old deployment.
 // Produces d1-import.sql, kv-bulk.json, mysql-manifest.json, kv-manifest.json.
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { createHash } from "node:crypto";
 import mysql from "mysql2/promise";
+import { readFileSync } from "node:fs";
 import { createClient } from "redis";
 import { COLUMNS, KV_PREFIX_RULES, MYSQL_SELECT, TABLE, manifest, normalize, sqlLiteral } from "./rows.mjs";
 
@@ -53,14 +57,17 @@ function largeRowStatements(prefix, row) {
   ];
 }
 
-async function exportMysql() {
+async function readMysqlRows() {
   const conn = await mysql.createConnection({ uri: process.env.DATABASE_URL, supportBigNumbers: true });
   await conn.query("SET SESSION TRANSACTION READ ONLY");
   await conn.query("START TRANSACTION WITH CONSISTENT SNAPSHOT");
   const [rows] = await conn.query(MYSQL_SELECT);
   await conn.query("COMMIT");
   await conn.end();
+  return rows;
+}
 
+function writeMysql(rows) {
   const prefix = `INSERT INTO ${TABLE} (${COLUMNS.map((c) => `\`${c}\``).join(", ")}) VALUES\n`;
   const statements = [];
   const oversized = [];
@@ -100,11 +107,11 @@ async function exportMysql() {
   return { rows: m.count, statements: statements.length, chunkedRows, digest: m.digest };
 }
 
-async function exportRedis() {
+async function readRedisEntries() {
   const client = createClient({ url: process.env.REDIS_URL });
   await client.connect();
-  const entries = [];
-  const skipped = { notAllowlisted: 0, shortTtl: 0, notString: 0 };
+  const raw = [];
+  const skipped = { notAllowlisted: 0, notString: 0 };
   for await (const key of client.scanIterator({ COUNT: 1000 })) {
     if (!KV_PREFIX_RULES.some((rule) => rule(key))) {
       skipped.notAllowlisted++;
@@ -115,7 +122,17 @@ async function exportRedis() {
       continue;
     }
     const [value, pttl] = await Promise.all([client.get(key), client.pTTL(key)]);
-    if (value === null) continue;
+    if (value !== null) raw.push({ key, value, pttl });
+  }
+  await client.quit();
+  return { raw, skipped };
+}
+
+function writeRedis({ raw, skipped: sourceSkipped }) {
+  const entries = [];
+  const skipped = { ...sourceSkipped, shortTtl: 0 };
+  for (const { key, value, pttl } of raw) {
+    if (!KV_PREFIX_RULES.some((rule) => rule(key))) continue;
     const entry = { key, value };
     if (pttl > 0) {
       const ttl = Math.floor(pttl / 1000);
@@ -126,9 +143,7 @@ async function exportRedis() {
       entry.expiration_ttl = ttl;
     }
     entries.push(entry);
-  }
-  await client.quit();
-  entries.sort((a, b) => (a.key < b.key ? -1 : 1));
+  }  entries.sort((a, b) => (a.key < b.key ? -1 : 1));
   writeFileSync(join(outDir, "kv-bulk.json"), JSON.stringify(entries));
   const digest = createHash("sha256").update(JSON.stringify(entries.map((e) => [e.key, e.value]))).digest("hex");
   writeFileSync(join(outDir, "kv-manifest.json"), JSON.stringify({ count: entries.length, digest, skipped }));
@@ -136,6 +151,12 @@ async function exportRedis() {
 }
 
 const summary = {};
-if (process.env.DATABASE_URL) summary.mysql = await exportMysql();
-if (process.env.REDIS_URL) summary.redis = await exportRedis();
+if (process.env.DUMP_FILE) {
+  const dump = JSON.parse(readFileSync(process.env.DUMP_FILE, "utf8"));
+  summary.mysql = writeMysql(dump.rows);
+  summary.redis = writeRedis({ raw: dump.redis.entries, skipped: dump.redis.skipped });
+} else {
+  if (process.env.DATABASE_URL) summary.mysql = writeMysql(await readMysqlRows());
+  if (process.env.REDIS_URL) summary.redis = writeRedis(await readRedisEntries());
+}
 console.log(JSON.stringify(summary, null, 2));

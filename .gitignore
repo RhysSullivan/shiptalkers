@@ -45,3 +45,5 @@ redis/
 .open-next
 .wrangler
 .dev.vars
+.vinext/
+.cloudflare/

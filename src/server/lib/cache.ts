@@ -1,8 +1,8 @@
-import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { env } from "cloudflare:workers";
 import superjson from "superjson";
 
 function kv() {
-    return getCloudflareContext().env.CACHE;
+    return env.CACHE;
 }
 
 // KV rejects TTLs under 60 seconds.
