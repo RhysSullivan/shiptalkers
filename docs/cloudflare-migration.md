@@ -1,9 +1,10 @@
 # Moving Shiptalkers to Cloudflare
 
-Status: **plan for review**. A preview Worker runs on a `workers.dev` URL
-against a synthetic D1 database. Production traffic, data, and DNS are
-unchanged. The cutover, data import, DNS change, and retirement of the old
-databases each need separate approval.
+Status: **migrated on 2026-10-22.** `shiptalkers.dev` is served by the
+`shiptalkers` Worker (vinext) from D1 and KV. Both the import and the final
+snapshot were verified against MySQL (identical row digests), and no rows
+changed between them. Railway MySQL/Redis and the Vercel project are kept as a
+rollback; retiring them is a separate decision.
 
 ## Target
 
