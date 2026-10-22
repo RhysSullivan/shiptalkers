@@ -41,3 +41,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 redis/
+# opennext
+.open-next
+.wrangler
+.dev.vars

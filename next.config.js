@@ -10,6 +10,8 @@ const config = {
   },
   /** We run eslint as a separate task in CI */
   eslint: { ignoreDuringBuilds: !!process.env.CI },
+  // Only one static logo uses next/image; skip Cloudflare Images transformations.
+  images: { unoptimized: true },
   async rewrites() {
     return [
       {
@@ -21,10 +23,7 @@ const config = {
         destination: "https://us.i.posthog.com/:path*",
       },
     ];
-  },
-  experimental: {
-    ppr: true,
-  },
+  }
 };
 
 module.exports = config;

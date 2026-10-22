@@ -1,13 +1,13 @@
 import { Github, HeartIcon, Twitter } from "lucide-react";
 import { FindAMatch } from "./input";
 import { Tweet } from "react-tweet";
-import { db } from "../../server/db";
+import { getDb } from "../../server/db";
 import { users } from "../../server/db/schema";
 import { desc, gt } from "drizzle-orm";
 import { getMatchPageUrl, isVerifiedUser } from "../../lib/utils";
 import { TwitterAvatar } from "../../components/ui/twitter-avatar";
 export async function Home() {
-  const recentComparisons = await db
+  const recentComparisons = await getDb()
     .select()
     .from(users)
     .where(gt(users.commitsMade, 500))

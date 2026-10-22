@@ -1,6 +1,6 @@
 
 import type { HeatmapData } from "../../../lib/utils";
-import { db } from "../../db";
+import { getDb } from "../../db";
 import { HeatmaplessUser, TweetCommitData, User, users } from "../../db/schema";
 import { fetchGithubPage } from "../../lib/github";
 import { PartialTweet, fetchTweetsFromUser, fetchTwitterProfile } from "../../lib/twitter";
@@ -64,7 +64,8 @@ export const getUserDataStreamed = async (input: {
   const { createdAt, updatedAt, ...rest } = asUser;
   const { heatmapData, ...restForLogging } = rest;
   console.log("Writing to db", restForLogging)
-  await db.insert(users).values(rest).onDuplicateKeyUpdate({
+  await getDb().insert(users).values(rest).onConflictDoUpdate({
+    target: [users.githubName, users.twitterName],
     set: restForLogging,
   });
   const queryParams = new URLSearchParams({
@@ -148,7 +149,7 @@ import { and, eq } from "drizzle-orm";
 
 export async function getCachedUserData(input: { githubName: string, twitterName: string }) {
   const { githubName, twitterName } = input;
-  const user = await db.select().from(users).where(
+  const user = await getDb().select().from(users).where(
     and(
       eq(users.githubName, githubName),
       eq(users.twitterName, twitterName)

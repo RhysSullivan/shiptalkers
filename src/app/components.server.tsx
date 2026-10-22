@@ -1,4 +1,4 @@
-import { db } from "../server/db";
+import { getDb } from "../server/db";
 import { users } from "../server/db/schema";
 import { desc, gt } from "drizzle-orm";
 import { ComparisonCard } from "./components.client";
@@ -10,7 +10,7 @@ export async function BrowseSection(props: {
   try {
     const recentComparisons =
       props.sort === "popular"
-        ? await db
+        ? await getDb()
             .select()
             .from(users)
             .where(gt(users.commitsMade, 500))
@@ -18,7 +18,7 @@ export async function BrowseSection(props: {
             .limit(200)
             .execute()
             .then((x) => x.filter(isVerifiedUser))
-        : await db
+        : await getDb()
             .select()
             .from(users)
             .orderBy(desc(users.createdAt))

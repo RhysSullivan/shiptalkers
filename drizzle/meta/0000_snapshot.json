@@ -1,0 +1,162 @@
+{
+  "version": "6",
+  "dialect": "sqlite",
+  "id": "9b89e722-ed44-4fe2-8b8c-030e78de5719",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "tables": {
+    "tweetstocommits_user": {
+      "name": "tweetstocommits_user",
+      "columns": {
+        "twitterFollowerCount": {
+          "name": "twitterFollowerCount",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "githubFollowerCount": {
+          "name": "githubFollowerCount",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "tweetsSent": {
+          "name": "tweetsSent",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "commitsMade": {
+          "name": "commitsMade",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "twitterId": {
+          "name": "twitterId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "twitterDisplayName": {
+          "name": "twitterDisplayName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "githubName": {
+          "name": "githubName",
+          "type": "text COLLATE NOCASE",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "twitterName": {
+          "name": "twitterName",
+          "type": "text COLLATE NOCASE",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "twitterAvatarUrl": {
+          "name": "twitterAvatarUrl",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "twitterInGithubBio": {
+          "name": "twitterInGithubBio",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(unixepoch())"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "(unixepoch())"
+        },
+        "heatmapData": {
+          "name": "heatmapData",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "tweetstocommits_user_createdAt_idx": {
+          "name": "tweetstocommits_user_createdAt_idx",
+          "columns": [
+            "createdAt"
+          ],
+          "isUnique": false
+        },
+        "tweetstocommits_user_followers_idx": {
+          "name": "tweetstocommits_user_followers_idx",
+          "columns": [
+            "twitterFollowerCount"
+          ],
+          "isUnique": false
+        },
+        "tweetstocommits_user_commits_idx": {
+          "name": "tweetstocommits_user_commits_idx",
+          "columns": [
+            "commitsMade"
+          ],
+          "isUnique": false
+        },
+        "tweetstocommits_user_tweets_idx": {
+          "name": "tweetstocommits_user_tweets_idx",
+          "columns": [
+            "tweetsSent"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "tweetstocommits_user_githubName_twitterName_pk": {
+          "columns": [
+            "githubName",
+            "twitterName"
+          ],
+          "name": "tweetstocommits_user_githubName_twitterName_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    }
+  },
+  "views": {},
+  "enums": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  },
+  "internal": {
+    "indexes": {}
+  }
+}

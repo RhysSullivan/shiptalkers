@@ -2,7 +2,6 @@
 import { ImageResponse } from "next/og";
 import { GitTweetBars } from "../../../../components/ui/git-tweet-bars";
 import { getPageUrl, getRatioText } from "../../../../lib/utils";
-export const runtime = "edge";
 
 export async function GET(req: Request) {
   // get github, twitter, commits, tweets

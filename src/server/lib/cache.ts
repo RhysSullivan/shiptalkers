@@ -1,25 +1,20 @@
-import { createClient } from "redis";
-import { env } from "../../env";
-
-const client = createClient({
-    url: env.REDIS_URL,
-    socket: {
-        connectTimeout: 30000, // Increase the connection timeout to 10 seconds
-    },
-});
-void client.connect();
-
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 import superjson from "superjson";
 
+function kv() {
+    return getCloudflareContext().env.CACHE;
+}
+
+// KV rejects TTLs under 60 seconds.
 export async function writeToCache<T>(key: string, value: T, EX?: number) {
     if (EX) {
-        return client.set(key, superjson.stringify(value), { EX });
+        return kv().put(key, superjson.stringify(value), { expirationTtl: Math.max(EX, 60) });
     }
-    return client.set(key, superjson.stringify(value));
+    return kv().put(key, superjson.stringify(value));
 }
 
 export async function readFromCache<T>(key: string): Promise<T | null> {
-    const value = await client.get(key);
+    const value = await kv().get(key);
     if (!value) {
         return null;
     }
@@ -27,5 +22,5 @@ export async function readFromCache<T>(key: string): Promise<T | null> {
 }
 
 export async function deleteFromCache(key: string) {
-    return client.del(key);
+    return kv().delete(key);
 }

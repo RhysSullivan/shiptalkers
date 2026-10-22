@@ -45,7 +45,7 @@ export async function fetchTwitterProfile(name: string) {
             return null;
         }
     }
-    const data = await userInfo.json() as Promise<TwitterUser>;
+    const data: TwitterUser = await userInfo.json();
     await writeToCache(`twitter-profile-${name}`, data);
     return data;
 }
@@ -103,7 +103,7 @@ async function fetchFromSocialData(input: {
         })
     });
     console.log(`Fetching tweets from ${apiUrl} with status ${res.status}`)
-    const json = (await res.json()) as SuccessResponse | ErrorResponse;
+    const json: SuccessResponse | ErrorResponse = await res.json();
     if ("status" in json) {
         throw new Error(json.message);
     }

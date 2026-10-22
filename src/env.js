@@ -1,29 +1,15 @@
 import { createEnv } from "@t3-oss/env-nextjs";
 import { z } from "zod";
 
-/**
- * @param {string} def
- */
-function defaultInDevEnv(def) {
-  if (process.env.NODE_ENV === "production") {
-    return z.string();
-  }
-  return z.string().default(def);
-}
-
 export const env = createEnv({
   /**
    * Specify your server-side environment variables schema here. This way you can ensure the app
    * isn't built with invalid env vars.
    */
   server: {
-    DATABASE_URL: defaultInDevEnv(
-      "mysql://youruser:yourpassword@localhost:3306/yourdatabase",
-    ),
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
-    REDIS_URL: defaultInDevEnv("redis://:yourpassword@localhost:6379"),
   },
 
   /**
@@ -40,9 +26,7 @@ export const env = createEnv({
    * middlewares) or client-side so we need to destruct manually.
    */
   runtimeEnv: {
-    DATABASE_URL: process.env.DATABASE_URL,
     NODE_ENV: process.env.NODE_ENV,
-    REDIS_URL: process.env.REDIS_URL,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
