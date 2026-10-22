@@ -103,13 +103,21 @@ async function fetchGithubMetadata(name: string): Promise<GithubMetadata | undef
     if (cached && !('json' in cached) && 'login' in cached) {
         return cached;
     }
+    const headers: Record<string, string> = {
+        // Workers fetch sends no default User-Agent, which GitHub rejects with 403.
+        "User-Agent": "shiptalkers.dev",
+    };
+    // Unauthenticated requests share a 60/hour limit per egress IP, which
+    // Workers exhaust quickly; a token raises it to 5,000/hour.
+    if (process.env.GITHUB_TOKEN) {
+        headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
+    }
     const data = await fetch(`https://api.github.com/users/${name}`, {
         cache: "no-store",
-        // Workers fetch sends no default User-Agent, which GitHub rejects with 403.
-        headers: { "User-Agent": "shiptalkers.dev" },
+        headers,
     });
     if (!data.ok) {
-        console.error(`Failed to fetch Github metadata for ${name} ${data.status}`);
+        console.error(`Failed to fetch Github metadata for ${name} ${data.status} ratelimit-remaining=${data.headers.get("x-ratelimit-remaining")} authenticated=${Boolean(process.env.GITHUB_TOKEN)}`);
         return;
     } else {
         const json: GithubMetadata = await data.json();
